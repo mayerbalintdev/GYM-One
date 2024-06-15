@@ -125,8 +125,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="form-group">
             <label for="gender">Neme</label>
             <select class="form-control" id="gender" name="gender" required>
-                <option value="Fiu">Férfi</option>
-                <option value="Lany">Nő</option>
+                <option value="Male">Férfi</option>
+                <option value="Famale">Nő</option>
             </select>
         </div>
         <div class="form-group">

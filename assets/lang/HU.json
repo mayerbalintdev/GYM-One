@@ -92,6 +92,7 @@
     "lastname": "Keresztnév",
     "register": "Regisztrálás",
     "login": "Bejelentkezés",
+    "logout": "Kijelentkezés",
     "incorrect-pass": "Helytelen jelszó! Kérlek próbáld újra!",
     "user-notexist": "Nincsen ilyen felhasználó!",
     "exit-modal": "Biztos, hogy ki szeretnél lépni?",
@@ -99,7 +100,20 @@
     "confirm": "Jóváhagyás",
 
     "dashboard": "Irányítópult",
+    "docs": "Dokumentáció",
+    "support": "Támogatás",
     "businessedit": "Üzlet beállítások",
+
+    "dont-access": "Nincs jogosultságod a kért oldal megtekintéséhez!",
+    "cant-delete-main" : "Nem törölheted a fő felhasználót!",
+    "success-delete": "Sikeresen törölted a felhasználót!",
+    "success-add": "Sikeresen hozzáadtad a felhasználót!",
+    "action": "Intézkedések",
+    "delete": "Törlés",
+    "boss": "Főnök",
+    "worker": "Dolgozó",
+    "position": "Pozíció",
+    "isboss-or-not": "Főnök fiók - (Minden veled egyszintű jogot megkap!)",
 
     "users": "Tagok",
     "new-users": "Legutóbbi felhasználók",

@@ -73,7 +73,7 @@ $dataRegistrations = array();
 
 if ($resultRegistrations->num_rows > 0) {
     // Adatok kinyerése
-    while($row = $resultRegistrations->fetch_assoc()) {
+    while ($row = $resultRegistrations->fetch_assoc()) {
         $dataRegistrations[] = $row;
     }
 
@@ -166,24 +166,25 @@ $conn->close();
                     <li><a href="#section2">Age</a></li>
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
-                    <li><a href="business"><?php echo $translations["businessedit"];?></a></li>
+                    <li><a href="../global"><?php echo $translations["businessedit"]; ?></a></li>
                 </ul><br>
             </div>
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://azuriom.com/discord" class="btn btn-primary mx-1" target="_blank"
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
                         rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
-                        Támogatás
+                        <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://azuriom.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
-                        Dokumentáció
+                        <?php echo $translations["docs"]; ?>
                     </a>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#logoutModal">
-                        Kilépés
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
+                        <?php echo $translations["logout"]; ?>
                     </button>
                 </div>
                 <div class="row">
@@ -201,21 +202,17 @@ $conn->close();
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["new-users"];?>
+                                    <?php echo $translations["new-users"]; ?>
                                 </h5>
                                 <div id="chart"></div>
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
     </div>
-
-
-
-
 
     <!-- EXIT MODAL -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
@@ -235,11 +232,9 @@ $conn->close();
         </div>
     </div>
 
-
     <!-- SCRIPTS! -->
-
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // PHP által generált JSON adatokat használunk
             let data = <?php echo json_encode($dataRegistrations); ?>;
             let categories = <?php echo json_encode($categories); ?>;
@@ -253,20 +248,20 @@ $conn->close();
                         show: false
                     },
                     zoom: {
-                        enabled: false 
+                        enabled: false
                     }
                 },
                 colors: ['#59F8E4'],
                 series: [{
-                    name: '<?php echo $translations["reg-number"];?>',
+                    name: '<?php echo $translations["reg-number"]; ?>',
                     data: seriesData
                 }],
                 xaxis: {
                     categories: categories,
                 },
                 yaxis: {
-                    tickAmount: Math.max(...seriesData), 
-                    min: 0, 
+                    tickAmount: Math.max(...seriesData),
+                    min: 0,
                     labels: {
                         formatter: function (value) {
                             return Math.floor(value);
@@ -279,6 +274,7 @@ $conn->close();
             chart.render();
         });
     </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

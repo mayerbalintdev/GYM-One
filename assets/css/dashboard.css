@@ -24,6 +24,10 @@ a {
     color: #f5f7fb;
 }
 
+.shadow{
+    box-shadow: 0 0.1rem 0.2rem rgba(0,0,0,.05);;
+}
+
 .card {
     box-shadow: 0 0 .875rem 0 rgba(33, 37, 41, .05);
     margin-bottom: 24px;
