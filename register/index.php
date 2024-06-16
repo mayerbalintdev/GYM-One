@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Adatbázis kapcsolat beállítása
 function get_db_connection() {
     $env_data = read_env_file('../.env');
     
@@ -19,7 +18,6 @@ function get_db_connection() {
     return $conn;
 }
 
-// .env fájl olvasása
 function read_env_file($file_path) {
     $env_file = file_get_contents($file_path);
     $env_lines = explode("\n", $env_file);
@@ -37,7 +35,6 @@ function read_env_file($file_path) {
     return $env_data;
 }
 
-// Űrlap feldolgozása
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstname = $_POST['firstname'];
     $lastname = $_POST['lastname'];
@@ -51,33 +48,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $house_number = $_POST['house_number'];
     $allergy = $_POST['allergy'];
     
-    // Jelszó megerősítés ellenőrzése
     if ($password !== $confirm_password) {
         $alerts_html = '<div class="alert alert-danger">A két jelszó nem egyezik meg.</div>';
     } else {
-        // Hash jelszó generálása
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
-        // Random userid generálása (10 számjegyű)
         $userid = rand(pow(10, 9), pow(10, 10) - 1);
         
-        // Visszaigazolás default 'No'
         $confirmed = 'No';
         
-        // Dátum formázása
         $registration_date = date('Y-m-d H:i:s');
         
-        // Adatbázis kapcsolat
         $conn = get_db_connection();
         
-        // SQL beszúrás előkészítése
         $stmt = $conn->prepare("INSERT INTO users (userid, firstname, lastname, email, password, gender, birthdate, city, street, house_number, allergy, registration_date, confirmed)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         $stmt->bind_param("issssssssssss", $userid, $firstname, $lastname, $email, $hashed_password, $gender, $birthdate, $city, $street, $house_number, $allergy, $registration_date, $confirmed);
         
         if ($stmt->execute()) {
-            // Sikeres beszúrás esetén átirányítás vagy egyéb teendők
             $alerts_html = '<div class="alert alert-success">Sikeres regisztráció!</div>';
         } else {
             $alerts_html = '<div class="alert alert-danger">Hiba történt a regisztráció során.</div>';

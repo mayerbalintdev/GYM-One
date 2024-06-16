@@ -14,6 +14,17 @@
     "Oct": "Október",
     "Nov": "November",
     "Dec": "December",
+
+    "Mon": "Hétfő",
+    "Tue": "Kedd",
+    "Wed": "Szerda",
+    "Thu": "Csütörtök",
+    "Fri": "Péntek",
+    "Sat": "Szombat",
+    "Sun": "Vasárnap",
+
+    "day": "Nap",
+
     "mainpage": "Kezdőlap",
     "downloadpage": "Letöltés",
     "docspage": "Dokumentumok",
@@ -91,6 +102,11 @@
     "firstname": "Vezetéknév",
     "lastname": "Keresztnév",
     "register": "Regisztrálás",
+    "email": "E-mail",
+    "host": "Hoszt",
+    "port": "Port",
+    "encry": "Titkosítás",
+    "mailtest": "Teszt e-mail küldése",
     "login": "Bejelentkezés",
     "logout": "Kijelentkezés",
     "incorrect-pass": "Helytelen jelszó! Kérlek próbáld újra!",
@@ -98,11 +114,15 @@
     "exit-modal": "Biztos, hogy ki szeretnél lépni?",
     "not-yet": "Mégsem",
     "confirm": "Jóváhagyás",
+    "currency": "Pénznem:",
 
     "dashboard": "Irányítópult",
     "docs": "Dokumentáció",
     "support": "Támogatás",
-    "businessedit": "Üzlet beállítások",
+    "openhourspage": "Nyitvatartás",
+    "logpage": "Tevékenységek",
+    "mailpage": "Levelezés",
+    "other-header": "Egyéb",
 
     "dont-access": "Nincs jogosultságod a kért oldal megtekintéséhez!",
     "cant-delete-main" : "Nem törölheted a fő felhasználót!",
@@ -112,10 +132,24 @@
     "delete": "Törlés",
     "boss": "Főnök",
     "worker": "Dolgozó",
+    "workers" : "Dolgozók",
     "position": "Pozíció",
     "isboss-or-not": "Főnök fiók - (Minden veled egyszintű jogot megkap!)",
+    "settings": "Beállítások",
+    "businesspage": "Alapvető beállítások",
 
     "users": "Tagok",
+    "opentime": "Nyitás",
+    "closetime": "Zárás",
+    "closed": "Zárva",
+    "save": "Mentés",
     "new-users": "Legutóbbi felhasználók",
-    "reg-number": "Regisztrációk száma"
+    "reg-number": "Regisztrációk száma",
+
+    "success-update": "Sikeres frissítés!",
+    "error-env": "Nem sikerült frissíteni a .env filet!",
+
+
+    "add_user_log": "Dolgozó hozzáadva:",
+    "time-update-success": "Sikeresen firssítetted a nyitvatartási időket!"
 }

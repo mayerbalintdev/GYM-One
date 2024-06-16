@@ -9,6 +9,7 @@ body {
     background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
+    height: 100vh;
 }
 
 p.lead.mb-4.fs-4{
@@ -19,6 +20,23 @@ p.lead.mb-4.fs-4{
     background-color: #242424;
     margin-bottom: 24px;
 }
+
+.sidebar-header {
+    background: transparent;
+    color: #ced4da;
+    font-size: 1.25rem;
+    padding: 1.5rem 1.5rem .375rem;
+}
+
+
+.sidenav ul.nav.nav-pills.nav-stacked li {
+    text-align: center;
+}
+
+.sidenav ul.nav.nav-pills.nav-stacked li.sidebar-header {
+    text-align: left;
+}
+
 
 a {
     color: #f5f7fb;
@@ -34,4 +52,8 @@ a {
     border-radius: 5px;
     color: #242424;
     padding: 10px;
+}
+
+.footer{
+    background-color: #242424;
 }

@@ -39,7 +39,6 @@ if (!file_exists($langFile)) {
     die("A nyelvi fájl nem található: $langFile");
 }
 
-// Nyelvi fájl betöltése és dekódolása
 $translations = json_decode(file_get_contents($langFile), true);
 
 $alerts_html = '';

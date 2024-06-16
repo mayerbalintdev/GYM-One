@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Adatbázis kapcsolat beállítása
 function get_db_connection() {
     $env_data = read_env_file('../.env');
     
@@ -19,7 +18,6 @@ function get_db_connection() {
     return $conn;
 }
 
-// .env fájl olvasása
 function read_env_file($file_path) {
     $env_file = file_get_contents($file_path);
     $env_lines = explode("\n", $env_file);
@@ -37,15 +35,12 @@ function read_env_file($file_path) {
     return $env_data;
 }
 
-// Bejelentkezés feldolgozása
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
     
-    // Adatbázis kapcsolat
     $conn = get_db_connection();
     
-    // SQL lekérdezés előkészítése
     $stmt = $conn->prepare("SELECT userid, password, confirmed FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -55,23 +50,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_result($userid, $hashed_password, $confirmed);
         $stmt->fetch();
         
-        // Jelszó ellenőrzése
         if (password_verify($password, $hashed_password)) {
             if ($confirmed == 'Yes') {
-                // Sikeres bejelentkezés
                 $_SESSION['userid'] = $userid;
-                header("Location: ../dashboard"); // Átirányítás a sikeres bejelentkezés után
+                header("Location: ../dashboard"); 
                 exit();
             } else {
-                // Visszaigazolás nélküli hiba
                 $login_error = "Kérem fogadja el a visszaigazolót az emailben!";
             }
         } else {
-            // Helytelen jelszó
             $login_error = "Hibás email cím vagy jelszó!";
         }
     } else {
-        // Helytelen email cím
         $login_error = "Hibás email cím vagy jelszó!";
     }
     

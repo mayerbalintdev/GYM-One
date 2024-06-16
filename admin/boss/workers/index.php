@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_user"])) {
     $lastname = $_POST["lastname"];
     $username = $_POST["username"];
     $password = $_POST["password"];
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT); // Jelszó hash-elése
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
     $is_boss = isset($_POST["is_boss"]) ? 1 : 0;
 
     $userid = mt_rand(1000000000, 9999999999);
@@ -153,28 +153,74 @@ $conn->close();
                 <h2><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#section2">Age</a></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../dashboard">
+                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
+                        </a>
+                    </li>
+                    <?php
+                    if ($stmt->num_rows > 0) {
+                        $stmt->bind_result($is_boss);
+                        $stmt->fetch();
+
+                        if ($is_boss == 1) {
+                            ?>
+                            <li class="sidebar-header">
+                                <?php echo $translations["settings"]; ?>
+                            </li>
+                            <li class="sidebar-item active">
+                                <a class="sidebar-link" href="#">
+                                    <i class="bi bi-people"></i>
+                                    <span><?php echo $translations["workers"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../hours">
+                                    <i class="bi bi-clock"></i>
+                                    <span><?php echo $translations["openhourspage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../smtp">
+                                    <i class="bi bi-envelope-at"></i>
+                                    <span><?php echo $translations["mailpage"]; ?></span>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                    }
+                    ?>
+                    <li class="sidebar-header">
+                        Bolt
+                    </li>
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
-                    <li><a href="../global"><?php echo $translations["businessedit"]; ?></a></li>
+                    <li class="sidebar-header"><?php echo $translations["other-header"];?></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-ling" href="../../log">
+                            <i class="bi bi-clock-history"></i>
+                            <span><?php echo $translations["logpage"]; ?></span>
+                        </a>
+                    </li>
                 </ul><br>
             </div>
+
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
                     <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
                         rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
-                        <?php echo $translations["support"];?>
+                        <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
+                        rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
-                        <?php echo $translations["docs"];?>
+                        <?php echo $translations["docs"]; ?>
                     </a>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-                    <?php echo $translations["logout"];?>
+                        <?php echo $translations["logout"]; ?>
                     </button>
                 </div>
                 <div class="row">
@@ -196,7 +242,7 @@ $conn->close();
                                                     <th scope="col"><?php echo $translations["firstname"]; ?></th>
                                                     <th scope="col"><?php echo $translations["lastname"]; ?></th>
                                                     <th scope="col"><?php echo $translations["username"]; ?></th>
-                                                    <th scope="col"><?php echo $translations["position"];?></th>
+                                                    <th scope="col"><?php echo $translations["position"]; ?></th>
                                                     <th scope="col"><?php echo $translations["action"]; ?></th>
                                                 </tr>
                                             </thead>
@@ -258,7 +304,8 @@ $conn->close();
                                                     <div class="form-row">
                                                         <div class="form-group col-md-3">
                                                             <input type="text" class="form-control" name="firstname"
-                                                                placeholder="<?php echo $translations["firstname"]; ?>" required>
+                                                                placeholder="<?php echo $translations["firstname"]; ?>"
+                                                                required>
                                                         </div>
                                                         <div class="form-group col-md-3">
                                                             <input type="text" class="form-control" name="lastname"
@@ -276,9 +323,11 @@ $conn->close();
                                                     <div class="form-group form-check">
                                                         <input type="checkbox" class="form-check-input" id="is_boss"
                                                             name="is_boss" value="1">
-                                                        <label class="form-check-label" for="is_boss"><?php echo $translations["isboss-or-not"];?></label>
+                                                        <label class="form-check-label"
+                                                            for="is_boss"><?php echo $translations["isboss-or-not"]; ?></label>
                                                     </div>
-                                                    <button type="submit" class="btn btn-primary" name="add_user"><?php echo $translations["register"]; ?></button>
+                                                    <button type="submit" class="btn btn-primary"
+                                                        name="add_user"><?php echo $translations["register"]; ?></button>
                                                 </form>
                                                 <?php
                                             } else {
@@ -295,11 +344,13 @@ $conn->close();
                     </div>
                 </div>
                 <footer class="footer">
-                <div class="container-fluid">
-                    <p class="mb-0 py-2 text-center text-body-secondary">
-                        Powered by <a href="https://azuriom.com" target="_blank" rel="noopener noreferrer">Azuriom</a> © 2019-2024. Panel designed by <a href="https://adminkit.io/" target="_blank" rel="noopener noreferrer">AdminKit</a>.                    </p>
-                </div>
-            </footer>
+                    <div class="container-fluid">
+                        <p class="mb-0 py-2 text-center text-body-secondary">
+                            Powered by <a href="https://azuriom.com" target="_blank"
+                                rel="noopener noreferrer">Azuriom</a> © 2019-2024. Panel designed by <a
+                                href="https://adminkit.io/" target="_blank" rel="noopener noreferrer">AdminKit</a>. </p>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>
@@ -315,7 +366,7 @@ $conn->close();
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
+                    <a href="../../logout.php" type="button"
                         class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>

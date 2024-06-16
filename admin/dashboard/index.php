@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Ellenőrzés, hogy a felhasználó be van-e jelentkezve
 if (!isset($_SESSION['userid'])) {
     header("Location: ../");
     exit();
@@ -9,7 +8,6 @@ if (!isset($_SESSION['userid'])) {
 
 $userid = $_SESSION['userid'];
 
-// Adatbázis kapcsolódás beállítása
 function read_env_file($file_path)
 {
     $env_file = file_get_contents($file_path);
@@ -49,18 +47,14 @@ if (!file_exists($langFile)) {
     die("A nyelvi fájl nem található: $langFile");
 }
 
-// Nyelvi fájl betöltése és dekódolása
 $translations = json_decode(file_get_contents($langFile), true);
 
-// Kapcsolat létrehozása
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
-// Kapcsolat ellenőrzése
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-// SQL lekérdezés összeállítása és végrehajtása az új regisztrációk számára
 $sqlRegistrations = "SELECT DATE_FORMAT(registration_date, '%Y-%m') as reg_month, 
                             COUNT(*) as count 
                      FROM users 
@@ -72,12 +66,10 @@ $resultRegistrations = $conn->query($sqlRegistrations);
 $dataRegistrations = array();
 
 if ($resultRegistrations->num_rows > 0) {
-    // Adatok kinyerése
     while ($row = $resultRegistrations->fetch_assoc()) {
         $dataRegistrations[] = $row;
     }
 
-    // Hónapok magyar nevei
     $months = [
         "01" => $translations["Jan"],
         "02" => $translations["Feb"],
@@ -93,7 +85,6 @@ if ($resultRegistrations->num_rows > 0) {
         "12" => $translations["Dec"]
     ];
 
-    // Adatok előkészítése
     $categories = array();
     foreach ($dataRegistrations as $row) {
         $year_month = explode("-", $row['reg_month']);
@@ -103,19 +94,16 @@ if ($resultRegistrations->num_rows > 0) {
     }
 }
 
-// SQL lekérdezés összeállítása és végrehajtása az összes felhasználó számára
 $sqlUserCount = "SELECT COUNT(*) as count FROM users";
 $resultUserCount = $conn->query($sqlUserCount);
 
 $userCount = 0;
 
 if ($resultUserCount->num_rows > 0) {
-    // Eredmény feldolgozása
     $row = $resultUserCount->fetch_assoc();
     $userCount = $row["count"];
 }
 
-// Kapcsolat bezárása
 $conn->close();
 ?>
 
@@ -196,6 +184,30 @@ $conn->close();
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
+                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
+                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
+                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
@@ -235,7 +247,6 @@ $conn->close();
     <!-- SCRIPTS! -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // PHP által generált JSON adatokat használunk
             let data = <?php echo json_encode($dataRegistrations); ?>;
             let categories = <?php echo json_encode($categories); ?>;
             let seriesData = data.map(item => parseInt(item.count));
