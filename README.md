@@ -17,6 +17,8 @@ Here're some of the project's best features:
 *   Notifications and Reminders: Send automated notifications and reminders for class schedules payments and other important events.
 *   Customization: Customize the software to fit your specific needs with various themes and settings.
 
+<h2>⏰ Expected arrival:</h2>
+The very first version of GYM One is expected to be released in **mid-October 2024**.
   
   
 <h2>💻 Built with</h2>
