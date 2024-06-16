@@ -18,7 +18,7 @@ Here're some of the project's best features:
 *   Customization: Customize the software to fit your specific needs with various themes and settings.
 
 <h2>⏰ Expected arrival:</h2>
-The very first version of GYM One is expected to be released in **mid-October 2024**.
+The very first version of GYM One is expected to be released in <strong>mid-October 2024</strong>.
   
   
 <h2>💻 Built with</h2>
