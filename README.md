@@ -19,8 +19,7 @@ Here're some of the project's best features:
 
 <h2>⏰ Expected arrival:</h2>
 The very first version of GYM One is expected to be released in <strong>mid-October 2024</strong>.
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="mayerbalint" data-color="#5F7FFF" data-emoji="" data-font="Poppins" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
-  
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/mayerbalint){:target="_blank"}
   
 <h2>💻 Built with</h2>
 
