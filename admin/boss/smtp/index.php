@@ -10,7 +10,6 @@ $userid = $_SESSION['userid'];
 
 $alerts_html = "";
 
-
 function read_env_file($file_path)
 {
     $env_file = file_get_contents($file_path);
@@ -49,44 +48,73 @@ $langFile = $langDir . "$lang.json";
 if (!file_exists($langFile)) {
     die("A nyelvi fájl nem található: $langFile");
 }
-
-$translations = json_decode(file_get_contents($langFile), true);
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $smtp_mail = $_POST['smtp_mail'] ?? '';
-    $smtp_host = $_POST['smtp_host'] ?? '';
-    $smtp_port = $_POST['smtp_port'] ?? '';
-    $smtp_username = $_POST['smtp_username'] ?? '';
-    $smtp_password = $_POST['smtp_password'] ?? '';
-    $smtp_encryption = $_POST['smtp_encryption'] ?? '';
-
-    $env_data['MAIL_MAIL'] = $smtp_mail;
-    $env_data['MAIL_HOST'] = $smtp_host;
-    $env_data['MAIL_PORT'] = $smtp_port;
-    $env_data['MAIL_USERNAME'] = $smtp_username;
-    $env_data['MAIL_PASSWORD'] = $smtp_password;
-    $env_data['MAIL_ENCRYPTION'] = $smtp_encryption;
-
-    $env_content = '';
-    foreach ($env_data as $key => $value) {
-        $env_content .= "$key=$value\n";
-    }
-
-    if (file_put_contents('../../../.env', $env_content) !== false) {
-        $alerts_html .= "<div class='alert alert-success'>{$translations["success-update"]}</div>";
-        header("Refresh:2");
-    } else {
-        $alerts_html .= "<div class='alert alert-success'>{$translations["error-env"]}</div>";
-        header("Refresh:2");
-    }
-}
-
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$translations = json_decode(file_get_contents($langFile), true);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['smtp_host'])) {
+        $smtp_host = $_POST['smtp_host'] ?? '';
+        $smtp_port = $_POST['smtp_port'] ?? '';
+        $smtp_username = $_POST['smtp_username'] ?? '';
+        $smtp_password = $_POST['smtp_password'] ?? '';
+        $smtp_encryption = $_POST['smtp_encryption'] ?? '';
+
+        $env_data['MAIL_HOST'] = $smtp_host;
+        $env_data['MAIL_PORT'] = $smtp_port;
+        $env_data['MAIL_USERNAME'] = $smtp_username;
+        $env_data['MAIL_PASSWORD'] = $smtp_password;
+        $env_data['MAIL_ENCRYPTION'] = $smtp_encryption;
+
+        $env_content = '';
+        foreach ($env_data as $key => $value) {
+            $env_content .= "$key=$value\n";
+        }
+
+        if (file_put_contents('../../../.env', $env_content) !== false) {
+            $alerts_html .= "<div class='alert alert-success'>{$translations["success-update"]}</div>";
+            $action = $translations['success-update-env-smtp'];
+            $actioncolor = 'success';
+            $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iss", $userid, $action, $actioncolor);
+            $stmt->execute();
+
+            header("Refresh:2");
+        } else {
+            $alerts_html .= "<div class='alert alert-danger'>{$translations["error-env"]}</div>";
+            header("Refresh:2");
+        }
+    } elseif (isset($_POST['test_email_address'])) {
+        require_once '../../../vendor/autoload.php';
+
+        $transport = (new Swift_SmtpTransport($env_data['MAIL_HOST'], $env_data['MAIL_PORT']))
+            ->setUsername($env_data['MAIL_USERNAME'])
+            ->setPassword($env_data['MAIL_PASSWORD'])
+            ->setEncryption($env_data['MAIL_ENCRYPTION']);
+
+        $mailer = new Swift_Mailer($transport);
+
+        $message = (new Swift_Message($translations['test-mail-header']))
+            ->setFrom([$env_data['MAIL_USERNAME'] => $business_name])
+            ->setTo([$_POST['test_email_address']])
+            ->setBody($translations["test-mail-body"]);
+
+        try {
+            $result = $mailer->send($message);
+            $alerts_html .= "<div class='alert alert-success'>{$translations["testemail-sented"]}</div>";
+            header("Refresh:2");
+        } catch (Exception $e) {
+            $alerts_html .= "<div class='alert alert-danger'>Failed to send test email: " . $e->getMessage() . "</div>";
+            header("Refresh:2");
+        }
+    }
+}
 
 
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
@@ -97,8 +125,6 @@ $stmt->store_result();
 
 $conn->close();
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="<?php echo $lang_code; ?>">
@@ -227,13 +253,6 @@ $conn->close();
                                         ?>
                                         <form method="POST">
                                             <div class="form-row">
-                                                <div class="form-group col-md-12">
-                                                    <label for="smtp_mail">SMTP <?php echo $translations["email"]; ?>:</label>
-                                                    <input type="email" class="form-control" id="smtp_mail" name="smtp_mail"
-                                                        value="<?= htmlspecialchars($env_data['MAIL_MAIL'] ?? '') ?>">
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
                                                 <div class="form-group col-md-6">
                                                     <label for="smtp_host">SMTP <?php echo $translations["host"]; ?>:</label>
                                                     <input type="text" class="form-control" id="smtp_host" name="smtp_host"
@@ -320,6 +339,36 @@ $conn->close();
             </div>
         </div>
     </div>
+
+    <!-- EMAIL MODAL -->
+    <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="emailModalLabel"><?php echo $translations["mailtest"]; ?></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="test_email_address"><?php echo $translations["test-email"]; ?></label>
+                            <input type="email" class="form-control" id="test_email_address" name="test_email_address"
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-dismiss="modal"><?php echo $translations["close"]; ?></button>
+                        <button type="submit" class="btn btn-primary"><?php echo $translations["send"]; ?></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPTS! -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>

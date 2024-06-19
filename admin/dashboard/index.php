@@ -103,6 +103,11 @@ if ($resultUserCount->num_rows > 0) {
     $row = $resultUserCount->fetch_assoc();
     $userCount = $row["count"];
 }
+$sql = "SELECT is_boss FROM workers WHERE userid = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $userid);
+$stmt->execute();
+$stmt->store_result();
 
 $conn->close();
 ?>
@@ -150,11 +155,55 @@ $conn->close();
                 <h2><img src="../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#section2">Age</a></li>
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="#">
+                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
+                        </a>
+                    </li>
+                    <?php
+                    if ($stmt->num_rows > 0) {
+                        $stmt->bind_result($is_boss);
+                        $stmt->fetch();
+
+                        if ($is_boss == 1) {
+                            ?>
+                            <li class="sidebar-header">
+                                <?php echo $translations["settings"]; ?>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/workers">
+                                    <i class="bi bi-people"></i>
+                                    <span><?php echo $translations["workers"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/hours">
+                                    <i class="bi bi-clock"></i>
+                                    <span><?php echo $translations["openhourspage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/smtp">
+                                    <i class="bi bi-envelope-at"></i>
+                                    <span><?php echo $translations["mailpage"]; ?></span>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                    }
+                    ?>
+                    <li class="sidebar-header">
+                        Bolt
+                    </li>
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
-                    <li><a href="../global"><?php echo $translations["businessedit"]; ?></a></li>
+                    <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-ling" href="../log">
+                            <i class="bi bi-clock-history"></i>
+                            <span><?php echo $translations["logpage"]; ?></span>
+                        </a>
+                    </li>
                 </ul><br>
             </div>
             <br>

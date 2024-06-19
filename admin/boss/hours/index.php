@@ -83,6 +83,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $update_stmt->execute();
     }
     $alerts_html .= "<div class='alert alert-success'>{$translations["time-update-success"]}</div>";
+    $action = $translations['success-update-hours'];
+    $actioncolor = 'success';
+    $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iss", $userid, $action, $actioncolor);
+    $stmt->execute();
     header("Refresh:2");
 }
 $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
@@ -121,7 +128,7 @@ $conn->close();
                     <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
                     <li><a href="#">Age</a></li>
                     <li><a href="#">Gender</a></li>
-                    <li><a href="#"><?php echo $_SESSION["userid"];?></a></li>
+                    <li><a href="#"><?php echo $_SESSION["userid"]; ?></a></li>
                 </ul>
             </div>
         </div>
@@ -220,9 +227,9 @@ $conn->close();
                                             <table class="table">
                                                 <thead>
                                                     <tr>
-                                                        <th><?php echo $translations["day"];?></th>
-                                                        <th><?php echo $translations["opentime"];?></th>
-                                                        <th><?php echo $translations["closetime"];?></th>
+                                                        <th><?php echo $translations["day"]; ?></th>
+                                                        <th><?php echo $translations["opentime"]; ?></th>
+                                                        <th><?php echo $translations["closetime"]; ?></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -232,7 +239,7 @@ $conn->close();
                                                             <td>
                                                                 <select name="open_time[<?php echo $key; ?>]" class="form-control">
                                                                     <option value="closed" <?php if (!isset($opening_hours[$key]['open_time']))
-                                                                        echo 'selected'; ?>><?php echo $translations["closed"];?></option>
+                                                                        echo 'selected'; ?>><?php echo $translations["closed"]; ?></option>
                                                                     <?php for ($hour = 0; $hour < 24; $hour++): ?>
                                                                         <option value="<?php echo sprintf("%02d:00", $hour); ?>" <?php if (isset($opening_hours[$key]['open_time']) && $opening_hours[$key]['open_time'] == sprintf("%02d:00", $hour))
                                                                                 echo 'selected'; ?>>
@@ -244,7 +251,8 @@ $conn->close();
                                                             <td>
                                                                 <select name="close_time[<?php echo $key; ?>]" class="form-control">
                                                                     <option value="closed" <?php if (!isset($opening_hours[$key]['close_time']))
-                                                                        echo 'selected'; ?>><?php echo $translations["closed"];?></option>
+                                                                        echo 'selected'; ?>><?php echo $translations["closed"]; ?>
+                                                                    </option>
                                                                     <?php for ($hour = 0; $hour < 24; $hour++): ?>
                                                                         <option value="<?php echo sprintf("%02d:00", $hour); ?>" <?php if (isset($opening_hours[$key]['close_time']) && $opening_hours[$key]['close_time'] == sprintf("%02d:00", $hour))
                                                                                 echo 'selected'; ?>>
@@ -257,7 +265,8 @@ $conn->close();
                                                     <?php endforeach; ?>
                                                 </tbody>
                                             </table>
-                                            <button type="submit" class="btn btn-primary"><?php echo $translations["save"];?></button>
+                                            <button type="submit"
+                                                class="btn btn-primary"><?php echo $translations["save"]; ?></button>
                                         </form>
                                         <?php
                                     } else {

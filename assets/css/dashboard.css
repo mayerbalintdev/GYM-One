@@ -17,7 +17,6 @@ p.lead.mb-4.fs-4{
 }
 
 .topnav{
-    background-color: #242424;
     margin-bottom: 24px;
 }
 
@@ -56,4 +55,21 @@ a {
 
 .footer{
     background-color: #242424;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.tree {
+    padding-left: 20px;
+}
+.tree ul {
+    padding-left: 20px;
+}
+.tree li {
+    list-style-type: none;
+}
+.tree .fas {
+    margin-right: 5px;
 }

@@ -1,7 +1,7 @@
 {
     "HU": "Magyar",
     "GB": "Angol",
-
+    "DE": "Német",
     "Jan": "Január",
     "Feb": "Február",
     "Mar": "Március",
@@ -14,7 +14,6 @@
     "Oct": "Október",
     "Nov": "November",
     "Dec": "December",
-
     "Mon": "Hétfő",
     "Tue": "Kedd",
     "Wed": "Szerda",
@@ -22,9 +21,7 @@
     "Fri": "Péntek",
     "Sat": "Szombat",
     "Sun": "Vasárnap",
-
     "day": "Nap",
-
     "mainpage": "Kezdőlap",
     "downloadpage": "Letöltés",
     "docspage": "Dokumentumok",
@@ -115,7 +112,6 @@
     "not-yet": "Mégsem",
     "confirm": "Jóváhagyás",
     "currency": "Pénznem:",
-
     "dashboard": "Irányítópult",
     "docs": "Dokumentáció",
     "support": "Támogatás",
@@ -123,33 +119,46 @@
     "logpage": "Tevékenységek",
     "mailpage": "Levelezés",
     "other-header": "Egyéb",
-
     "dont-access": "Nincs jogosultságod a kért oldal megtekintéséhez!",
-    "cant-delete-main" : "Nem törölheted a fő felhasználót!",
+    "cant-delete-main": "Nem törölheted a fő felhasználót!",
     "success-delete": "Sikeresen törölted a felhasználót!",
     "success-add": "Sikeresen hozzáadtad a felhasználót!",
     "action": "Intézkedések",
     "delete": "Törlés",
     "boss": "Főnök",
     "worker": "Dolgozó",
-    "workers" : "Dolgozók",
+    "workers": "Dolgozók",
     "position": "Pozíció",
     "isboss-or-not": "Főnök fiók - (Minden veled egyszintű jogot megkap!)",
     "settings": "Beállítások",
     "businesspage": "Alapvető beállítások",
-
     "users": "Tagok",
     "opentime": "Nyitás",
     "closetime": "Zárás",
     "closed": "Zárva",
+    "close": "Bezárás",
+    "send": "Küldés",
+    "test-email": "Kérlek adj meg egy email címet havá érkezni fog a teszt levél:",
+    "testemail-sented": "Teszt email elküldve! Kérlek tekitsd meg a levelezésed!",
+    "test-mail-header": "Teszt Email",
+    "test-mail-body": "Ez egy teszt email!",
     "save": "Mentés",
     "new-users": "Legutóbbi felhasználók",
     "reg-number": "Regisztrációk száma",
-
     "success-update": "Sikeres frissítés!",
     "error-env": "Nem sikerült frissíteni a .env filet!",
-
-
     "add_user_log": "Dolgozó hozzáadva:",
-    "time-update-success": "Sikeresen firssítetted a nyitvatartási időket!"
+    "time-update-success": "Sikeresen firssítetted a nyitvatartási időket!",
+
+    "date-log": "Dátum",
+    "notexist-log": "Nincsenek logok!",
+    "success-log-delete": "Sikeresen törölted a 15 napnál régebbi tevékenységeket!",
+    "success-update-env-smtp": "SMTP Adatok frissítve!",
+    "success-update-hours": "Nyitvatartási Adatok firssítve!",
+    "success-user-create": "Dolgozó hozzáadva:",
+    "action-log": "Intézkedés",
+    "deletelog": "Régebbi adatok törlése (+15 nap)",
+
+    "piece": "Darab"
+    
 }
