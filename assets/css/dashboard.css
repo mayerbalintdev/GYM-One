@@ -41,8 +41,20 @@ a {
     color: #f5f7fb;
 }
 
+.blacka{
+    color: #242424 !important;
+}
+
 .shadow{
     box-shadow: 0 0.1rem 0.2rem rgba(0,0,0,.05);;
+}
+
+span.sidebar-badge.badge{
+    background-color: #DC3545 !important;
+}
+
+i.bi.bi-exclamation-circle {
+    color: whitesmoke !important;
 }
 
 .card {

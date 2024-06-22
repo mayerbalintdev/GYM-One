@@ -227,6 +227,33 @@ while ($category = $category_result->fetch_assoc()) {
     }
 }
 
+$username = 'mayerbalintdev';
+$repo = 'GYM-One';
+$current_version = $version;
+
+$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+$options = [
+    'http' => [
+        'header' => [
+            'User-Agent: PHP'
+        ]
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
+$release = json_decode($response);
+
+$is_new_version_available = false;
+
+if ($release && isset($release->tag_name)) {
+    $latest_version = $release->tag_name;
+
+    if (version_compare($latest_version, $current_version) > 0) {
+        $is_new_version_available = true;
+    }
+}
+
+
 $category_sql = "SELECT id, name FROM categories";
 $category_result = $conn->query($category_sql);
 ?>
@@ -298,7 +325,7 @@ $category_result = $conn->query($category_sql);
                             </li>
                             <li class="sidebar-item">
                                 <a class="sidebar-link active" href="#">
-                                <i class="bi bi-box-seam"></i>
+                                    <i class="bi bi-box-seam"></i>
                                     <span><?php echo $translations["packagepage"]; ?></span>
                                 </a>
                             </li>
@@ -354,20 +381,23 @@ $category_result = $conn->query($category_sql);
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["categorymanage"];?></h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["categorymanage"]; ?>
+                                </h5>
                                 <form method="post" class="mb-4" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="<?php echo $translations["newcategoryname"];?>"
+                                        <input type="text" class="form-control"
+                                            placeholder="<?php echo $translations["newcategoryname"]; ?>"
                                             name="category_name">
                                         <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-primary" name="add_category"><?php echo $translations["addcategory"];?></button>
+                                            <button type="submit" class="btn btn-primary"
+                                                name="add_category"><?php echo $translations["addcategory"]; ?></button>
                                         </span>
                                     </div>
                                 </form>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="input-group">
                                         <select class="form-control" name="category_id">
-                                        <?php
+                                            <?php
                                             if ($category_result->num_rows > 0) {
                                                 while ($row = $category_result->fetch_assoc()) {
                                                     echo "<option value='" . $row["id"] . "'>" . $row["name"] . "</option>";
@@ -378,7 +408,7 @@ $category_result = $conn->query($category_sql);
                                         </select>
                                         <span class="input-group-btn">
                                             <button type="submit" class="btn btn-danger"
-                                                name="delete_category"><?php echo $translations["deletecategory"];?></button>
+                                                name="delete_category"><?php echo $translations["deletecategory"]; ?></button>
                                         </span>
                                     </div>
                                 </form>
@@ -388,15 +418,17 @@ $category_result = $conn->query($category_sql);
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackageprice"];?></h5>
-                                <h2><strong><?php echo $allprice; ?></strong> <?php echo $currency;?></h2>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackageprice"]; ?>
+                                </h5>
+                                <h2><strong><?php echo $allprice; ?></strong> <?php echo $currency; ?></h2>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackagepiece"];?></h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackagepiece"]; ?>
+                                </h5>
                                 <h2><strong><?php echo $total_products; ?></strong>
                                     <?php echo $translations["piece"]; ?>
                                 </h2>
@@ -406,8 +438,8 @@ $category_result = $conn->query($category_sql);
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["latelyautoff"];?></h5>
-                                <h2><strong><?php echo $outoff; ?></strong> <?php echo $translations["product"];?></h2>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["latelyautoff"]; ?></h5>
+                                <h2><strong><?php echo $outoff; ?></strong> <?php echo $translations["product"]; ?></h2>
                             </div>
                         </div>
                     </div>
@@ -417,11 +449,11 @@ $category_result = $conn->query($category_sql);
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["addproducttocategory"];?>
+                                    <?php echo $translations["addproducttocategory"]; ?>
                                 </h5>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="category_id"><?php echo $translations["categoryselect"];?></label>
+                                        <label for="category_id"><?php echo $translations["categoryselect"]; ?></label>
                                         <select class="form-control" id="category_id" name="category_id">
                                             <?php
                                             if ($category_result->num_rows > 0) {
@@ -434,18 +466,19 @@ $category_result = $conn->query($category_sql);
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="product_name"><?php echo $translations["product-name"];?></label>
+                                        <label for="product_name"><?php echo $translations["product-name"]; ?></label>
                                         <input type="text" class="form-control" id="product_name" name="product_name">
                                     </div>
                                     <div class="form-group">
-                                        <label for="price"><?php echo $translations["price"];?>:</label>
+                                        <label for="price"><?php echo $translations["price"]; ?>:</label>
                                         <input type="text" class="form-control" id="price" name="price">
                                     </div>
                                     <div class="form-group">
-                                        <label for="quantity"><?php echo $translations["amount"];?>:</label>
+                                        <label for="quantity"><?php echo $translations["amount"]; ?>:</label>
                                         <input type="text" class="form-control" id="quantity" name="quantity">
                                     </div>
-                                    <button type="submit" class="btn btn-primary" name="add_product"><?php echo $translations["addpackage"];?></button>
+                                    <button type="submit" class="btn btn-primary"
+                                        name="add_product"><?php echo $translations["addpackage"]; ?></button>
                                 </form>
 
                             </div>
@@ -455,11 +488,11 @@ $category_result = $conn->query($category_sql);
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["packagedelete"];?>
+                                    <?php echo $translations["packagedelete"]; ?>
                                 </h5>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="product_id"><?php echo $translations["packageselect"];?>:</label>
+                                        <label for="product_id"><?php echo $translations["packageselect"]; ?>:</label>
                                         <select class="form-control" id="product_id" name="product_id">
                                             <?php
                                             $product_query = "SELECT * FROM products";
@@ -473,7 +506,8 @@ $category_result = $conn->query($category_sql);
                                             ?>
                                         </select>
                                     </div>
-                                    <button type="submit" class="btn btn-danger" name="delete_product"><?php echo $translations["packagedelete"];?></button>
+                                    <button type="submit" class="btn btn-danger"
+                                        name="delete_product"><?php echo $translations["packagedelete"]; ?></button>
                                 </form>
                             </div>
                         </div>
@@ -482,11 +516,12 @@ $category_result = $conn->query($category_sql);
                         <div class="card">
                             <div class="card-body">
                                 <div class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["updatepackage"];?>
+                                    <?php echo $translations["updatepackage"]; ?>
                                 </div>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="product_id_update"><?php echo $translations["packageselect"];?>:</label>
+                                        <label
+                                            for="product_id_update"><?php echo $translations["packageselect"]; ?>:</label>
                                         <select class="form-control" id="product_id_update" name="product_id">
                                             <?php
                                             $product_result->data_seek(0);
@@ -500,16 +535,18 @@ $category_result = $conn->query($category_sql);
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="price_change"><?php echo $translations["newprice"];?>:</label>
+                                        <label for="price_change"><?php echo $translations["newprice"]; ?>:</label>
                                         <input type="text" class="form-control" id="price_change" name="price_change">
                                     </div>
                                     <div class="form-group">
-                                        <label for="quantity_change"><?php echo $translations["newpiece"];?></label>
+                                        <label for="quantity_change"><?php echo $translations["newpiece"]; ?></label>
                                         <input type="text" class="form-control" id="quantity_change"
                                             name="quantity_change">
                                     </div>
-                                    <button type="submit" class="btn btn-primary" name="update_price"><?php echo $translations["pricechange"];?></button>
-                                    <button type="submit" class="btn btn-primary" name="update_quantity"><?php echo $translations["piecechange"];?></button>
+                                    <button type="submit" class="btn btn-primary"
+                                        name="update_price"><?php echo $translations["pricechange"]; ?></button>
+                                    <button type="submit" class="btn btn-primary"
+                                        name="update_quantity"><?php echo $translations["piecechange"]; ?></button>
                                 </form>
                             </div>
                         </div>
@@ -545,7 +582,7 @@ $category_result = $conn->query($category_sql);
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <div class="card-title mb-0 fw-semibold"><?php echo $translations["overview"];?></div>
+                                <div class="card-title mb-0 fw-semibold"><?php echo $translations["overview"]; ?></div>
                                 <div class="tree">
                                     <ul>
                                         <?php

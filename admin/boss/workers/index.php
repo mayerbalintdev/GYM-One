@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_user"])) {
     $lastname = $_POST["lastname"];
     $username = $_POST["username"];
     $password = $_POST["password"];
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $is_boss = isset($_POST["is_boss"]) ? 1 : 0;
 
     $userid = mt_rand(1000000000, 9999999999);
@@ -104,6 +104,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_user"])) {
         $alerts_html .= "<div class='alert alert-warning'> {$translations["cant-delete-main"]}</div>";
         header("Refresh:2");
 
+    }
+}
+
+$username = 'mayerbalintdev';
+$repo = 'GYM-One';
+$current_version = $version;
+
+$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+$options = [
+    'http' => [
+        'header' => [
+            'User-Agent: PHP'
+        ]
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
+$release = json_decode($response);
+
+$is_new_version_available = false;
+
+if ($release && isset($release->tag_name)) {
+    $latest_version = $release->tag_name;
+
+    if (version_compare($latest_version, $current_version) > 0) {
+        $is_new_version_available = true;
     }
 }
 
@@ -196,7 +222,7 @@ $conn->close();
                     </li>
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
-                    <li class="sidebar-header"><?php echo $translations["other-header"];?></li>
+                    <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../../log">
                             <i class="bi bi-clock-history"></i>

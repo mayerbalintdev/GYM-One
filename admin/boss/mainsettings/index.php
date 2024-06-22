@@ -132,6 +132,32 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$username = 'mayerbalintdev';
+$repo = 'GYM-One';
+$current_version = $version;
+
+$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+$options = [
+    'http' => [
+        'header' => [
+            'User-Agent: PHP'
+        ]
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
+$release = json_decode($response);
+
+$is_new_version_available = false;
+
+if ($release && isset($release->tag_name)) {
+    $latest_version = $release->tag_name;
+
+    if (version_compare($latest_version, $current_version) > 0) {
+        $is_new_version_available = true;
+    }
+}
+
 $conn->close();
 ?>
 
@@ -359,7 +385,8 @@ $conn->close();
                                         <div class="card-body">
                                             <form action="" method="post" enctype="multipart/form-data">
                                                 <div class="form-group">
-                                                    <label for="logoFile"><?php echo $translations["select-upload-logo"];?></label>
+                                                    <label
+                                                        for="logoFile"><?php echo $translations["select-upload-logo"]; ?></label>
                                                     <input type="file" class="form-control-file" id="logoFile" name="logoFile"
                                                         accept="image/png, image/jpeg">
                                                 </div>
@@ -383,7 +410,8 @@ $conn->close();
                                         <div class="card-body">
                                             <form action="" method="post" enctype="multipart/form-data">
                                                 <div class="form-group">
-                                                    <label for="backgroundFile"><?php echo $translations["select-upload-background"];?></label>
+                                                    <label
+                                                        for="backgroundFile"><?php echo $translations["select-upload-background"]; ?></label>
                                                     <input type="file" class="form-control-file" id="backgroundFile"
                                                         name="backgroundFile" accept="image/png, image/jpeg">
                                                 </div>
@@ -407,7 +435,8 @@ $conn->close();
                                         <div class="card-body">
                                             <form action="" method="post" enctype="multipart/form-data">
                                                 <div class="form-group">
-                                                    <label for="faviconFile"><?php echo $translations["select-upload-favicon"];?></label>
+                                                    <label
+                                                        for="faviconFile"><?php echo $translations["select-upload-favicon"]; ?></label>
                                                     <input type="file" class="form-control-file" id="faviconFile"
                                                         name="faviconFile" accept="image/png, image/jpeg">
                                                 </div>

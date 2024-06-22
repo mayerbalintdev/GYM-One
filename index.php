@@ -61,11 +61,11 @@ $translations = json_decode(file_get_contents($langFile), true);
     <link rel="stylesheet" href="assets/css/default.css">
     <link rel="shortcut icon" href="assets/img/brand/favicon.png" type="image/x-icon">
     <meta name="title" content="<?php echo $business_name; ?> - <?php echo $translations["mainpage"]; ?>">
-    <meta name="description" content="<?php echo $description;?>">
-    <meta name="keywords" content="<?php echo $metakey;?>">
+    <meta name="description" content="<?php echo $description; ?>">
+    <meta name="keywords" content="<?php echo $metakey; ?>">
     <meta name="robots" content="index, follow">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="author" content="<?php echo $business_name;?>">
+    <meta name="author" content="<?php echo $business_name; ?>">
 
 </head>
 
@@ -119,8 +119,8 @@ $translations = json_decode(file_get_contents($langFile), true);
 
             <div class="border-top border-secondary pt-3 mt-3">
                 <p class="small text-center mb-0">
-                    Copyright © 2024 <?php echo $business_name; ?> - <?php echo $translations["copyright"]; ?> &nbsp;<svg
-                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    Copyright © 2024 <?php echo $business_name; ?> - <?php echo $translations["copyright"]; ?>
+                    &nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                         class="bi bi-heart-fill" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314">

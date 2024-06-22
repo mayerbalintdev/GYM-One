@@ -94,6 +94,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 
+$username = 'mayerbalintdev';
+$repo = 'GYM-One';
+$current_version = $version;
+
+$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+$options = [
+    'http' => [
+        'header' => [
+            'User-Agent: PHP'
+        ]
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
+$release = json_decode($response);
+
+$is_new_version_available = false;
+
+if ($release && isset($release->tag_name)) {
+    $latest_version = $release->tag_name;
+
+    if (version_compare($latest_version, $current_version) > 0) {
+        $is_new_version_available = true;
+    }
+}
+
 $conn->close();
 ?>
 

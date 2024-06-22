@@ -8,8 +8,6 @@ if (!isset($_SESSION['userid'])) {
 
 $userid = $_SESSION['userid'];
 
-$alerts_html = "";
-
 function read_env_file($file_path)
 {
     $env_file = file_get_contents($file_path);
@@ -56,52 +54,11 @@ $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
-
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
-
-$limit = 13; // Number of entries per page
-$page = isset($_GET['page']) ? $_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-// Retrieve logs from the database with pagination
-$sql = "SELECT logs.id, workers.username as username, logs.action, logs.actioncolor, logs.time 
-        FROM logs 
-        JOIN workers ON logs.userid = workers.userid 
-        ORDER BY logs.time DESC
-        LIMIT $limit OFFSET $offset";
-$result = $conn->query($sql);
-
-if (isset($_POST['delete_old_logs'])) {
-    $date_limit = date('Y-m-d', strtotime('-15 days'));
-
-    $sql = "DELETE FROM logs WHERE time < '$date_limit'";
-
-    if ($conn->query($sql) === TRUE) {
-        $delete_message = $translations["success-log-delete"];
-        $action = $translations['success-log-delete'];
-        $actioncolor = 'warning';
-        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
-            VALUES (?, ?, ?, NOW())";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $userid, $action, $actioncolor);
-        $stmt->execute();
-        header("Refresh:2");
-    } else {
-        $delete_message = "An error occurred during the deletion: " . $conn->error;
-        header("Refresh:2");
-    }
-}
-
-// Get total number of logs for pagination
-$total_sql = "SELECT COUNT(*) as total FROM logs";
-$total_result = $conn->query($total_sql);
-$total_row = $total_result->fetch_assoc();
-$total_logs = $total_row['total'];
-$total_pages = ceil($total_logs / $limit);
 
 $username = 'mayerbalintdev';
 $repo = 'GYM-One';
@@ -131,6 +88,7 @@ if ($release && isset($release->tag_name)) {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="<?php echo $lang_code; ?>">
@@ -163,7 +121,7 @@ $conn->close();
                     <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
                     <li><a href="#">Age</a></li>
                     <li><a href="#">Gender</a></li>
-                    <li><a href="#"><?php echo $_SESSION["userid"]; ?></a></li>
+                    <li><a href="#">Geo</a></li>
                 </ul>
             </div>
         </div>
@@ -176,7 +134,7 @@ $conn->close();
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../dashboard">
+                        <a class="sidebar-link" href="#">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
@@ -191,9 +149,21 @@ $conn->close();
                                 <?php echo $translations["settings"]; ?>
                             </li>
                             <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/mainsettings">
+                                    <i class="bi bi-gear"></i>
+                                    <span><?php echo $translations["businesspage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
                                 <a class="sidebar-link" href="../boss/workers">
                                     <i class="bi bi-people"></i>
                                     <span><?php echo $translations["workers"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/packages">
+                                    <i class="bi bi-box-seam"></i>
+                                    <span><?php echo $translations["packagepage"]; ?></span>
                                 </a>
                             </li>
                             <li class="sidebar-item">
@@ -218,15 +188,36 @@ $conn->close();
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
-                    <li class="sidebar-item active">
-                        <a class="sidebar-ling" href="#">
+                    <?php
+                    if ($stmt->num_rows > 0) {
+                        $stmt->bind_result($is_boss);
+                        $stmt->fetch();
+
+                        if ($is_boss == 1) {
+                            ?>
+                            <li class="sidebar-item active">
+                                <a class="sidebar-ling" href="../updater">
+                                    <i class="bi bi-cloud-download"></i>
+                                    <span><?php echo $translations["updatepage"]; ?></span>
+                                    <?php if ($is_new_version_available): ?>
+                                        <span class="sidebar-badge badge">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                        </span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                    }
+                    ?>
+                    <li class="sidebar-item">
+                        <a class="sidebar-ling" href="../log">
                             <i class="bi bi-clock-history"></i>
                             <span><?php echo $translations["logpage"]; ?></span>
                         </a>
                     </li>
                 </ul><br>
             </div>
-
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
@@ -247,67 +238,70 @@ $conn->close();
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <?php echo $alerts_html; ?>
-                        <div class="card shadow">
-                            <div class="card-body">
-                                <?php if (isset($delete_message)): ?>
-                                    <div class="alert alert-info"><?php echo $delete_message; ?></div>
-                                <?php endif; ?>
-                                <div class="table-responsive table-striped">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th><?php echo $translations["username"]; ?></th>
-                                                <th><?php echo $translations["action-log"]; ?></th>
-                                                <th><?php echo $translations["date-log"]; ?></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            if ($result->num_rows > 0) {
-                                                while ($row = $result->fetch_assoc()) {
-                                                    echo "<tr>";
-                                                    echo "<td><b>" . htmlspecialchars($row['id']) . "</b></td>";
-                                                    echo "<td>" . htmlspecialchars($row['username']) . "</td>";
-                                                    echo "<td class='text-" . htmlspecialchars($row['actioncolor']) . "'><p>" . htmlspecialchars($row['action']) . "</td>";
-                                                    echo "<td>" . htmlspecialchars($row['time']) . "</td>";
-                                                    echo "</tr>";
-                                                }
-                                            } else {
-                                                echo "<tr><td class='text-center' colspan='5'>" . $translations["notexist-log"] . "</td></tr>";
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
+                        <?php
+                        $username = 'mayerbalintdev';
+                        $repo = 'GYM-One';
+
+                        $api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+                        $options = [
+                            'http' => [
+                                'header' => 'User-Agent: PHP'
+                            ]
+                        ];
+                        $context = stream_context_create($options);
+                        $response = file_get_contents($api_url, false, $context);
+                        $release = json_decode($response);
+
+                        if ($release && isset($release->tag_name)) {
+                            $latest_version = $release->tag_name;
+                            $current_version = $version;
+
+                            if (version_compare($latest_version, $current_version) > 0) {
+                                $download_url = $release->zipball_url;
+                                ?>
+                                <div class="card shadow mb-4">
+                                    <div class="card-body">
+                                        <h2><?php echo $translations["updateavilable"]; ?></h2>
+                                        <div class="alert alert-warning mt-3" role="alert">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            <?php echo $translations["makebackup"]; ?>
+                                        </div>
+                                        <p><?php echo $translations["nowusedversion"]; ?>
+                                            <code><?php echo $current_version; ?></code>
+                                            <?php echo $translations["newversion"]; ?>
+                                            <code><?php echo $latest_version; ?></code>
+                                        </p>
+                                        <p><?php echo $translations["readytoupdate"]; ?></p>
+                                        <!-- <a href="" class="btn btn-primary" download>Letöltés</a> -->
+                                    </div>
                                 </div>
-                                <nav>
-                                    <ul class="pagination justify-content-center">
-                                        <?php
-                                        for ($i = 1; $i <= $total_pages; $i++) {
-                                            $active = $i == $page ? 'active' : '';
-                                            echo "<li class='page-item $active'><a class='page-link' href='?page=$i'>$i</a></li>";
-                                        }
-                                        ?>
-                                    </ul>
-                                    <form method="POST">
-                                        <button type="submit" name="delete_old_logs" class="btn btn-danger mb-3"><i
-                                                class="bi bi-trash"></i><?php echo $translations["deletelog"]; ?></button>
-                                    </form>
-                                </nav>
+                                <?php
+                            } else {
+                                ?>
+                                <div class="card shadow mb-4">
+                                    <div class="card-body">
+                                        <h2><?php echo $translations["thisislatest"]; ?></h2>
+                                        <p><?php echo $translations["latest-text"]; ?> - <a class="blacka"
+                                                href="https://github.com/mayerbalintdev/GYM-One/releases/"><?php echo $translations["changelog"]; ?></a>
+                                            <code><?php echo $latest_version; ?></code>
+                                        </p>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo $translations["updatenodata"]; ?></h5>
+                                    <p class="card-text"><?php echo $translations["updatelater"]; ?></p>
+                                </div>
                             </div>
-                        </div>
+                            <?php
+                        }
+                        ?>
                     </div>
                 </div>
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <p class="mb-0 py-2 text-center text-body-secondary">
-                            Powered by <a href="https://azuriom.com" target="_blank"
-                                rel="noopener noreferrer">Azuriom</a> ©
-                            2019-2024. Panel designed by <a href="https://adminkit.io/" target="_blank"
-                                rel="noopener noreferrer">AdminKit</a>. </p>
-                    </div>
-                </footer>
             </div>
         </div>
     </div>
@@ -323,7 +317,7 @@ $conn->close();
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../../logout.php" type="button"
+                    <a href="../logout.php" type="button"
                         class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>

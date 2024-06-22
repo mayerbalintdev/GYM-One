@@ -109,6 +109,33 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$username = 'mayerbalintdev';
+$repo = 'GYM-One';
+$current_version = $version;
+
+$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
+$options = [
+    'http' => [
+        'header' => [
+            'User-Agent: PHP'
+        ]
+    ]
+];
+$context = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
+$release = json_decode($response);
+
+$is_new_version_available = false;
+
+if ($release && isset($release->tag_name)) {
+    $latest_version = $release->tag_name;
+
+    if (version_compare($latest_version, $current_version) > 0) {
+        $is_new_version_available = true;
+    }
+}
+
+
 $conn->close();
 ?>
 
@@ -211,6 +238,28 @@ $conn->close();
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
+                    <?php
+                    if ($stmt->num_rows > 0) {
+                        $stmt->bind_result($is_boss);
+                        $stmt->fetch();
+
+                        if ($is_boss == 1) {
+                            ?>
+                            <li class="sidebar-item">
+                                <a class="sidebar-ling" href="../updater">
+                                    <i class="bi bi-cloud-download"></i>
+                                    <span><?php echo $translations["updatepage"]; ?></span>
+                                    <?php if ($is_new_version_available): ?>
+                                        <span class="sidebar-badge badge">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                        </span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                            <?php
+                        }
+                    }
+                    ?>
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../log">
                             <i class="bi bi-clock-history"></i>
@@ -237,6 +286,24 @@ $conn->close();
                         <?php echo $translations["logout"]; ?>
                     </button>
                 </div>
+                <?php
+                if ($stmt->num_rows > 0) {
+                    $stmt->bind_result($is_boss);
+                    $stmt->fetch();
+
+                    if ($is_boss == 1 && $is_new_version_available) {
+                        ?>
+                        <div class="row justify-content-center">
+                            <div class="col-sm-5">
+                                <div class="alert alert-danger">
+                                    <?php echo $translations["newupdate-text"]; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                }
+                ?>
                 <div class="row">
                     <div class="col-sm-3">
                         <div class="card">

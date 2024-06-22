@@ -195,7 +195,19 @@
     "select-upload-background": "Válassza ki a héttérkép fájlt (PNG vagy JPG):",
     "select-upload-favicon": "Válassza ki a favicon fájlt (PNG vagy JPG):",
     
-
     "success-package-price": "Sikeresen frissítetted a csomag árát!",
-    "success-update-package-price": "A csomag ára frissítve lett:"
-}
+    "success-update-package-price": "A csomag ára frissítve lett:",
+    
+    "updatepage": "Frissítés",
+    "readytoupdate": "A GYM One legújabb verziója készen áll a telepítésre!",
+    "changelog": "Változásnapló",
+    "thisislatest": "Nincs elérhető frissítés!",
+    "updateavilable": "Frissítés elérhető!",
+    "makebackup": "A GYM One frissítése előtt készíts biztonsági mentést az oldaláról!",
+    "nowusedversion": "Te jelenleg ezt a verziót használod:",
+    "newversion": "Új elérhető verzió:",
+    "newupdate-text": "Új frissítés elérhető! Kattints a frissítés gombra!",
+    "latest-text": "A GYM One legújabb verziója fut a weboldalon. A változásnapló elérhető itt:",
+    "updatenodata": "Frissítés ellenőrzése sikertelen",
+    "updatelater": "Kérlek próbáld újra kásőbb!"
+}   
