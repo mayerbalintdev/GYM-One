@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             if (password_verify($password, $row['password_hash'])) {
-                $_SESSION['userid'] = $row['userid']; 
+                $_SESSION['userid'] = $row['userid'];
                 header("Location: dashboard/");
                 exit();
             } else {
@@ -107,6 +107,7 @@ $conn->close();
     <link rel="stylesheet" href="../assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 
 <body>

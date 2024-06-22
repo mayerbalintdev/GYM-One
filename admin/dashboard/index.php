@@ -123,6 +123,7 @@ $conn->close();
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -171,9 +172,21 @@ $conn->close();
                                 <?php echo $translations["settings"]; ?>
                             </li>
                             <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/mainsettings">
+                                    <i class="bi bi-gear"></i>
+                                    <span><?php echo $translations["businesspage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
                                 <a class="sidebar-link" href="../boss/workers">
                                     <i class="bi bi-people"></i>
                                     <span><?php echo $translations["workers"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/packages">
+                                    <i class="bi bi-box-seam"></i>
+                                    <span><?php echo $translations["packagepage"]; ?></span>
                                 </a>
                             </li>
                             <li class="sidebar-item">

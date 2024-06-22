@@ -32,6 +32,7 @@ $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
+$currency = $env_data['CURRENCY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -72,12 +73,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_category"])) {
 
     if ($check_result->num_rows > 0) {
         $message = "A kategória már létezik!";
+        header("Refresh:1");
     } else {
         $insert_query = "INSERT INTO categories (name) VALUES ('$category_name')";
         if ($conn->query($insert_query) === TRUE) {
             $message = "Kategória hozzáadva!";
+            header("Refresh:1");
         } else {
             $message = "Hiba történt: " . $conn->error;
+            header("Refresh:2");
         }
     }
 }
@@ -90,12 +94,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_category"])) {
 
     if ($check_product_result->num_rows > 0) {
         $message = "Nem lehet törölni, mert a kategóriához van termék hozzárendelve!";
+        header("Refresh:2");
     } else {
         $delete_query = "DELETE FROM categories WHERE id = $category_id";
         if ($conn->query($delete_query) === TRUE) {
             $message = "Kategória törölve!";
+            header("Refresh:1");
         } else {
             $message = "Hiba történt: " . $conn->error;
+            header("Refresh:2");
         }
     }
 }
@@ -110,8 +117,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_product"])) {
 
     if ($conn->query($insert_product_query) === TRUE) {
         $message = "Termék hozzáadva a kategóriához!";
+        header("Refresh:1");
     } else {
         $message = "Hiba történt: " . $conn->error;
+        header("Refresh:2");
     }
 }
 
@@ -122,8 +131,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_product"])) {
 
     if ($conn->query($delete_product_query) === TRUE) {
         $message = "Termék törölve!";
+        header("Refresh:1");
     } else {
         $message = "Hiba történt: " . $conn->error;
+        header("Refresh:2");
     }
 }
 
@@ -135,8 +146,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_quantity"])) {
 
     if ($conn->query($update_quantity_query) === TRUE) {
         $message = "Mennyiség módosítva!";
+        header("Refresh:1");
     } else {
         $message = "Hiba történt: " . $conn->error;
+        header("Refresh:2");
     }
 }
 
@@ -148,9 +161,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update_price"])) {
     $update_price_query = "UPDATE products SET price = $price_change WHERE id = $product_id";
 
     if ($conn->query($update_price_query) === TRUE) {
-        $message = "Ár módosítva!";
+        $message = $translations["success-package-price"];
+        $action = $translations['success-update-package-price'] . " {$product_id} -> {$price_change} $currency;";
+        $actioncolor = 'success';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+        VALUES (?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
+        header("Refresh:1");
     } else {
         $message = "Hiba történt: " . $conn->error;
+        header("Refresh:2");
     }
 }
 
@@ -178,9 +200,6 @@ if ($product_result->num_rows > 0) {
     }
 }
 
-$category_query = "SELECT * FROM categories";
-$category_result = $conn->query($category_query);
-
 $tree = array();
 while ($category = $category_result->fetch_assoc()) {
     $category_id = $category['id'];
@@ -207,6 +226,9 @@ while ($category = $category_result->fetch_assoc()) {
         );
     }
 }
+
+$category_sql = "SELECT id, name FROM categories";
+$category_result = $conn->query($category_sql);
 ?>
 
 
@@ -220,6 +242,7 @@ while ($category = $category_result->fetch_assoc()) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../../assets/css/dashboard.css">
+    <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -252,8 +275,8 @@ while ($category = $category_result->fetch_assoc()) {
                 <h2><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
@@ -268,19 +291,25 @@ while ($category = $category_result->fetch_assoc()) {
                                 <?php echo $translations["settings"]; ?>
                             </li>
                             <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/workers">
+                                <a class="sidebar-link" href="../workers">
                                     <i class="bi bi-people"></i>
                                     <span><?php echo $translations["workers"]; ?></span>
                                 </a>
                             </li>
                             <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/hours">
+                                <a class="sidebar-link active" href="#">
+                                <i class="bi bi-box-seam"></i>
+                                    <span><?php echo $translations["packagepage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../hours">
                                     <i class="bi bi-clock"></i>
                                     <span><?php echo $translations["openhourspage"]; ?></span>
                                 </a>
                             </li>
                             <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/smtp">
+                                <a class="sidebar-link" href="../smtp">
                                     <i class="bi bi-envelope-at"></i>
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
@@ -296,7 +325,7 @@ while ($category = $category_result->fetch_assoc()) {
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../log">
+                        <a class="sidebar-ling" href="../../log">
                             <i class="bi bi-clock-history"></i>
                             <span><?php echo $translations["logpage"]; ?></span>
                         </a>
@@ -325,21 +354,20 @@ while ($category = $category_result->fetch_assoc()) {
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">Kategóriák kezelése</h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["categorymanage"];?></h5>
                                 <form method="post" class="mb-4" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Új kategória neve"
+                                        <input type="text" class="form-control" placeholder="<?php echo $translations["newcategoryname"];?>"
                                             name="category_name">
                                         <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-primary" name="add_category">Kategória
-                                                hozzáadása</button>
+                                            <button type="submit" class="btn btn-primary" name="add_category"><?php echo $translations["addcategory"];?></button>
                                         </span>
                                     </div>
                                 </form>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="input-group">
                                         <select class="form-control" name="category_id">
-                                            <?php
+                                        <?php
                                             if ($category_result->num_rows > 0) {
                                                 while ($row = $category_result->fetch_assoc()) {
                                                     echo "<option value='" . $row["id"] . "'>" . $row["name"] . "</option>";
@@ -350,7 +378,7 @@ while ($category = $category_result->fetch_assoc()) {
                                         </select>
                                         <span class="input-group-btn">
                                             <button type="submit" class="btn btn-danger"
-                                                name="delete_category">Kategória törlése</button>
+                                                name="delete_category"><?php echo $translations["deletecategory"];?></button>
                                         </span>
                                     </div>
                                 </form>
@@ -360,15 +388,15 @@ while ($category = $category_result->fetch_assoc()) {
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">Összes termék ára:</h5>
-                                <h2><strong><?php echo $allprice; ?></strong> ÁR!</h2>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackageprice"];?></h5>
+                                <h2><strong><?php echo $allprice; ?></strong> <?php echo $currency;?></h2>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">Összes termék száma:</h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allpackagepiece"];?></h5>
                                 <h2><strong><?php echo $total_products; ?></strong>
                                     <?php echo $translations["piece"]; ?>
                                 </h2>
@@ -378,8 +406,8 @@ while ($category = $category_result->fetch_assoc()) {
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">Fogyóban lévő termékek száma:</h5>
-                                <h2><strong><?php echo $outoff; ?></strong> termék</h2>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["latelyautoff"];?></h5>
+                                <h2><strong><?php echo $outoff; ?></strong> <?php echo $translations["product"];?></h2>
                             </div>
                         </div>
                     </div>
@@ -389,11 +417,11 @@ while ($category = $category_result->fetch_assoc()) {
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold">
-                                    Termék kategórához adása
+                                    <?php echo $translations["addproducttocategory"];?>
                                 </h5>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="category_id">Kategória választása:</label>
+                                        <label for="category_id"><?php echo $translations["categoryselect"];?></label>
                                         <select class="form-control" id="category_id" name="category_id">
                                             <?php
                                             if ($category_result->num_rows > 0) {
@@ -406,19 +434,18 @@ while ($category = $category_result->fetch_assoc()) {
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="product_name">Termék neve:</label>
+                                        <label for="product_name"><?php echo $translations["product-name"];?></label>
                                         <input type="text" class="form-control" id="product_name" name="product_name">
                                     </div>
                                     <div class="form-group">
-                                        <label for="price">Ár:</label>
+                                        <label for="price"><?php echo $translations["price"];?>:</label>
                                         <input type="text" class="form-control" id="price" name="price">
                                     </div>
                                     <div class="form-group">
-                                        <label for="quantity">Mennyiség:</label>
+                                        <label for="quantity"><?php echo $translations["amount"];?>:</label>
                                         <input type="text" class="form-control" id="quantity" name="quantity">
                                     </div>
-                                    <button type="submit" class="btn btn-primary" name="add_product">Termék
-                                        hozzáadása</button>
+                                    <button type="submit" class="btn btn-primary" name="add_product"><?php echo $translations["addpackage"];?></button>
                                 </form>
 
                             </div>
@@ -428,11 +455,11 @@ while ($category = $category_result->fetch_assoc()) {
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold">
-                                    Termék törlése
+                                    <?php echo $translations["packagedelete"];?>
                                 </h5>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="product_id">Termék választása:</label>
+                                        <label for="product_id"><?php echo $translations["packageselect"];?>:</label>
                                         <select class="form-control" id="product_id" name="product_id">
                                             <?php
                                             $product_query = "SELECT * FROM products";
@@ -446,8 +473,7 @@ while ($category = $category_result->fetch_assoc()) {
                                             ?>
                                         </select>
                                     </div>
-                                    <button type="submit" class="btn btn-danger" name="delete_product">Termék
-                                        törlése</button>
+                                    <button type="submit" class="btn btn-danger" name="delete_product"><?php echo $translations["packagedelete"];?></button>
                                 </form>
                             </div>
                         </div>
@@ -456,11 +482,11 @@ while ($category = $category_result->fetch_assoc()) {
                         <div class="card">
                             <div class="card-body">
                                 <div class="card-title mb-0 fw-semibold">
-                                    Termékek módosítása
+                                    <?php echo $translations["updatepackage"];?>
                                 </div>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
-                                        <label for="product_id_update">Termék választása:</label>
+                                        <label for="product_id_update"><?php echo $translations["packageselect"];?>:</label>
                                         <select class="form-control" id="product_id_update" name="product_id">
                                             <?php
                                             $product_result->data_seek(0);
@@ -474,18 +500,16 @@ while ($category = $category_result->fetch_assoc()) {
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="price_change">Új ár:</label>
+                                        <label for="price_change"><?php echo $translations["newprice"];?>:</label>
                                         <input type="text" class="form-control" id="price_change" name="price_change">
                                     </div>
                                     <div class="form-group">
-                                        <label for="quantity_change">Mennyiség módosítása:</label>
+                                        <label for="quantity_change"><?php echo $translations["newpiece"];?></label>
                                         <input type="text" class="form-control" id="quantity_change"
                                             name="quantity_change">
                                     </div>
-                                    <button type="submit" class="btn btn-primary" name="update_price">Ár
-                                        módosítása</button>
-                                    <button type="submit" class="btn btn-primary" name="update_quantity">Mennyiség
-                                        módosítása</button>
+                                    <button type="submit" class="btn btn-primary" name="update_price"><?php echo $translations["pricechange"];?></button>
+                                    <button type="submit" class="btn btn-primary" name="update_quantity"><?php echo $translations["piecechange"];?></button>
                                 </form>
                             </div>
                         </div>
@@ -521,7 +545,7 @@ while ($category = $category_result->fetch_assoc()) {
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <div class="card-title mb-0 fw-semibold">Áttekintés</div>
+                                <div class="card-title mb-0 fw-semibold"><?php echo $translations["overview"];?></div>
                                 <div class="tree">
                                     <ul>
                                         <?php
@@ -534,7 +558,7 @@ while ($category = $category_result->fetch_assoc()) {
                                                     echo "<li><i class='bi bi-box-fill'></i> " . $product['name'] . " - Ár: " . $product['price'] . " Ft, Mennyiség: " . $product['quantity'] . "</li>";
                                                     $count++;
                                                     if ($count % 7 == 0) {
-                                                        echo "</ul></div></div></div></div><div class='col-sm-4'><div class='card'><div class='card-body'><div class='card-title mb-0 fw-semibold'>Áttekintés</div><div class='tree'><ul>";
+                                                        echo "</ul></div></div></div></div><div class='col-sm-4'><div class='card'><div class='card-body'><div class='card-title mb-0 fw-semibold'>$overview</div><div class='tree'><ul>";
                                                     }
                                                 }
                                                 echo "</ul>";
