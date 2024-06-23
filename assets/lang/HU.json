@@ -142,6 +142,8 @@
     "test-email": "Kérlek adj meg egy email címet havá érkezni fog a teszt levél:",
     "testemail-sented": "Teszt email elküldve! Kérlek tekitsd meg a levelezésed!",
     "test-mail-header": "Teszt Email",
+    "acceptemailplease": "Kérlek erősítsd meg a regisztrációdat, a megadott emailcímre küldtünk egy e-mail!",
+    "notcorrectlogin": "Hibás email cím vagy jelszó!",
     "test-mail-body": "Ez egy teszt email!",
     "save": "Mentés",
     "new-users": "Legutóbbi felhasználók",
@@ -209,5 +211,9 @@
     "newupdate-text": "Új frissítés elérhető! Kattints a frissítés gombra!",
     "latest-text": "A GYM One legújabb verziója fut a weboldalon. A változásnapló elérhető itt:",
     "updatenodata": "Frissítés ellenőrzése sikertelen",
-    "updatelater": "Kérlek próbáld újra kásőbb!"
+    "updatelater": "Kérlek próbáld újra kásőbb!",
+
+    "welcome": "Üdv újra!",
+    "lastworkout": "Legutóbbi edzésed dátuma:",
+    "currentticket": "Jelenlegi bérleted:"
 }   

@@ -107,27 +107,17 @@ $username = 'mayerbalintdev';
 $repo = 'GYM-One';
 $current_version = $version;
 
-$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
-$options = [
-    'http' => [
-        'header' => [
-            'User-Agent: PHP'
-        ]
-    ]
-];
-$context = stream_context_create($options);
-$response = file_get_contents($api_url, false, $context);
-$release = json_decode($response);
+$file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
-$is_new_version_available = false;
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $file_path);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$latest_version = curl_exec($ch);
+curl_close($ch);
 
-if ($release && isset($release->tag_name)) {
-    $latest_version = $release->tag_name;
+$current_version = $version;
 
-    if (version_compare($latest_version, $current_version) > 0) {
-        $is_new_version_available = true;
-    }
-}
+$is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
 $conn->close();
 ?>

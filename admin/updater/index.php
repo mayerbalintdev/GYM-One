@@ -59,32 +59,18 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
+// API!
+$file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
-$username = 'mayerbalintdev';
-$repo = 'GYM-One';
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $file_path);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$latest_version = curl_exec($ch);
+curl_close($ch);
+
 $current_version = $version;
 
-$api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
-$options = [
-    'http' => [
-        'header' => [
-            'User-Agent: PHP'
-        ]
-    ]
-];
-$context = stream_context_create($options);
-$response = file_get_contents($api_url, false, $context);
-$release = json_decode($response);
-
-$is_new_version_available = false;
-
-if ($release && isset($release->tag_name)) {
-    $latest_version = $release->tag_name;
-
-    if (version_compare($latest_version, $current_version) > 0) {
-        $is_new_version_available = true;
-    }
-}
+$is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
 $conn->close();
 ?>
@@ -238,69 +224,40 @@ $conn->close();
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <?php
-                        $username = 'mayerbalintdev';
-                        $repo = 'GYM-One';
-
-                        $api_url = "https://api.github.com/repos/{$username}/{$repo}/releases/latest";
-                        $options = [
-                            'http' => [
-                                'header' => 'User-Agent: PHP'
-                            ]
-                        ];
-                        $context = stream_context_create($options);
-                        $response = file_get_contents($api_url, false, $context);
-                        $release = json_decode($response);
-
-                        if ($release && isset($release->tag_name)) {
-                            $latest_version = $release->tag_name;
-                            $current_version = $version;
-
-                            if (version_compare($latest_version, $current_version) > 0) {
-                                $download_url = $release->zipball_url;
-                                ?>
-                                <div class="card shadow mb-4">
-                                    <div class="card-body">
-                                        <h2><?php echo $translations["updateavilable"]; ?></h2>
-                                        <div class="alert alert-warning mt-3" role="alert">
-                                            <i class="bi bi-exclamation-triangle"></i>
-                                            <?php echo $translations["makebackup"]; ?>
-                                        </div>
-                                        <p><?php echo $translations["nowusedversion"]; ?>
-                                            <code><?php echo $current_version; ?></code>
-                                            <?php echo $translations["newversion"]; ?>
-                                            <code><?php echo $latest_version; ?></code>
-                                        </p>
-                                        <p><?php echo $translations["readytoupdate"]; ?></p>
-                                        <!-- <a href="" class="btn btn-primary" download>Letöltés</a> -->
-                                    </div>
-                                </div>
-                                <?php
-                            } else {
-                                ?>
-                                <div class="card shadow mb-4">
-                                    <div class="card-body">
-                                        <h2><?php echo $translations["thisislatest"]; ?></h2>
-                                        <p><?php echo $translations["latest-text"]; ?> - <a class="blacka"
-                                                href="https://github.com/mayerbalintdev/GYM-One/releases/"><?php echo $translations["changelog"]; ?></a>
-                                            <code><?php echo $latest_version; ?></code>
-                                        </p>
-                                    </div>
-                                </div>
-                                <?php
-                            }
-                        } else {
-                            ?>
-                            <div class="card">
+                        <?php if ($is_new_version_available) { ?>
+                            <div class="card shadow mb-4">
                                 <div class="card-body">
-                                    <h5 class="card-title"><?php echo $translations["updatenodata"]; ?></h5>
-                                    <p class="card-text"><?php echo $translations["updatelater"]; ?></p>
+                                    <h2><?php echo $translations["updateavilable"]; ?></h2>
+                                    <div class="alert alert-warning mt-3" role="alert">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        <?php echo $translations["makebackup"]; ?>
+                                    </div>
+                                    <p>
+                                        <?php echo $translations["nowusedversion"]; ?>
+                                        <code><?php echo $current_version; ?></code>
+                                        <?php echo $translations["newversion"]; ?>
+                                        <code><?php echo $latest_version; ?></code>
+                                    </p>
+                                    <p><?php echo $translations["readytoupdate"]; ?></p>
+                                    <!-- <a href="" class="btn btn-primary" download>Letöltés</a> -->
                                 </div>
                             </div>
-                            <?php
-                        }
-                        ?>
+                        <?php } else { ?>
+                            <div class="card shadow mb-4">
+                                <div class="card-body">
+                                    <h2><?php echo $translations["thisislatest"]; ?></h2>
+                                    <p>
+                                        <?php echo $translations["latest-text"]; ?> -
+                                        <a class="blacka" href="https://github.com/mayerbalintdev/GYM-One/releases/">
+                                            <?php echo $translations["changelog"]; ?>
+                                        </a>
+                                        <code><?php echo $latest_version; ?></code>
+                                    </p>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </div>
+
                 </div>
             </div>
         </div>
