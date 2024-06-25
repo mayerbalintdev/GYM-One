@@ -59,7 +59,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($firstname, $lastname);
+$stmt->bind_result($lastname,$firstname );
 $stmt->fetch();
 
 $stmt->close();

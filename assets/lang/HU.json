@@ -148,11 +148,11 @@
     "save": "Mentés",
     "new-users": "Legutóbbi felhasználók",
     "reg-number": "Regisztrációk száma",
+    "reg-date": "Regisztráció dátuma",
     "success-update": "Sikeres frissítés!",
     "error-env": "Nem sikerült frissíteni a .env filet!",
     "add_user_log": "Dolgozó hozzáadva:",
     "time-update-success": "Sikeresen firssítetted a nyitvatartási időket!",
-
     "date-log": "Dátum",
     "notexist-log": "Nincsenek logok!",
     "success-log-delete": "Sikeresen törölted a 15 napnál régebbi tevékenységeket!",
@@ -162,7 +162,6 @@
     "success-user-create": "Dolgozó hozzáadva:",
     "action-log": "Intézkedés",
     "deletelog": "Régebbi adatok törlése (+15 nap)",
-
     "packagepage": "Termékek",
     "piece": "Darab",
     "categorymanage": "Kategóriák kezelése",
@@ -184,6 +183,7 @@
     "amount": "Mennyiség",
     "addpackage": "Termék hozzáadása",
     "packagedelete": "Termék törlése",
+    "deletefail": "Sikertelen a felhasználó törlése! Váratlan hiba történt",
     "piecechange": "Mennyiség módosítása",
     "pricechange": "Ár módosítása",
     "overview": "Áttekintés",
@@ -196,10 +196,8 @@
     "select-upload-logo": "Válassza ki a logó fájlt (PNG vagy JPG):",
     "select-upload-background": "Válassza ki a héttérkép fájlt (PNG vagy JPG):",
     "select-upload-favicon": "Válassza ki a favicon fájlt (PNG vagy JPG):",
-    
     "success-package-price": "Sikeresen frissítetted a csomag árát!",
     "success-update-package-price": "A csomag ára frissítve lett:",
-    
     "updatepage": "Frissítés",
     "readytoupdate": "A GYM One legújabb verziója készen áll a telepítésre!",
     "changelog": "Változásnapló",
@@ -212,8 +210,24 @@
     "latest-text": "A GYM One legújabb verziója fut a weboldalon. A változásnapló elérhető itt:",
     "updatenodata": "Frissítés ellenőrzése sikertelen",
     "updatelater": "Kérlek próbáld újra kásőbb!",
-
+    "waitingconfirm": "Megerősítésre vár",
+    "profilesee": "Profil megtekintése",
+    "search": "Keresés",
+    "resetbtn": "Alaphelyzetbe állítás",
+    "email-search": "Email cím keresése",
+    "name-search": "Név keresése",
+    "editprofile": "Profil szerkesztése",
+    "userinfo": "Felhasználó információi",
     "welcome": "Üdv újra!",
     "lastworkout": "Legutóbbi edzésed dátuma:",
+    "last-login": "Legutóbbi bejelentkezés",
+    "regconfirm": "Regisztráció megerősítve",
+    "yes": "Igen",
+    "no": "Nem",
+    "forceregconf": "Azonnali jóváhagyás",
+    "lastip": "Legutoljára belépett IP",
+    "identifier": "Azonosító:",
+    "deleteuserbtn": "Felhasználó törlése",
+    "undoallert": "Biztos, hogy törölni szeretnéd ezt a felhasználót? A művelet nem vonható vissza!",
     "currentticket": "Jelenlegi bérleted:"
-}   
+}

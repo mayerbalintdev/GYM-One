@@ -1,5 +1,6 @@
 {
     "require": {
-        "swiftmailer/swiftmailer": "^6.3"
+        "swiftmailer/swiftmailer": "^6.3",
+        "tecnickcom/tcpdf": "^6.7"
     }
 }

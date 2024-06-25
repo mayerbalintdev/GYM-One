@@ -73,6 +73,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $hashed_password)) {
             if ($confirmed == 'Yes') {
+                $current_datetime = date('Y-m-d H:i:s');
+                $user_ip = $_SERVER['REMOTE_ADDR'];
+                $update_stmt = $conn->prepare("UPDATE users SET lastlogin = ?, lastip = ? WHERE userid = ?");
+                $update_stmt->bind_param("ssi", $current_datetime, $user_ip, $userid);
+                $update_stmt->execute();
+                $update_stmt->close();
+                session_start();
                 $_SESSION['userid'] = $userid;
                 header("Location: ../dashboard");
                 exit();
