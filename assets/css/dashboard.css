@@ -91,3 +91,11 @@ i.bi.bi-exclamation-circle {
     opacity: 1
 }
 
+.btn-secondary{
+    background-color: #5C636A;
+    color: whitesmoke;
+}
+
+.btn-secondary:hover{
+    color: white
+}

@@ -368,18 +368,17 @@ $conn->close();
         </div>
     </div>
 
-    <!-- EXIT MODAL -->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
+                    <p><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../../logout.php" type="button"
+                    <a href="../logout.php" type="button"
                         class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>

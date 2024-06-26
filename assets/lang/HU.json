@@ -227,7 +227,15 @@
     "forceregconf": "Azonnali jóváhagyás",
     "lastip": "Legutoljára belépett IP",
     "identifier": "Azonosító:",
+    "paygatway": "Jelenlegi fizetési átjárók",
+    "nogatewayadded": "Nincsenek fizetési átjáróid!",
+    "editbtn": "Szerkesztés",
+    "addnewgateway": "Új fizetési átjáró létrehozása",
     "deleteuserbtn": "Felhasználó törlése",
+    "add": "Hozzáadás",
+    "type": "Típus",
+    "makesurepaypal": "Kérlek, győződj meg róla, hogy a PayPal-fiók elsődleges e-mail címét adtads meg.",
+    "notusehttps": " A webhelyed nem https-t használ. Kapcsold be a felhasználók biztonsága érdekében!",
     "undoallert": "Biztos, hogy törölni szeretnéd ezt a felhasználót? A művelet nem vonható vissza!",
     "currentticket": "Jelenlegi bérleted:"
 }

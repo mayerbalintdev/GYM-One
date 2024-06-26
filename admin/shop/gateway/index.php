@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../../.env');
+$env_data = read_env_file('../../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -39,7 +39,7 @@ $version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../../assets/lang/";
+$langDir = __DIR__ . "/../../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -47,61 +47,14 @@ if (!file_exists($langFile)) {
     die("A nyelvi fájl nem található: $langFile");
 }
 
+$alerts_html = "";
+
 $translations = json_decode(file_get_contents($langFile), true);
 
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
-}
-
-$sqlRegistrations = "SELECT DATE_FORMAT(registration_date, '%Y-%m') as reg_month, 
-                            COUNT(*) as count 
-                     FROM users 
-                     WHERE registration_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
-                     GROUP BY reg_month
-                     ORDER BY reg_month";
-$resultRegistrations = $conn->query($sqlRegistrations);
-
-$dataRegistrations = array();
-
-if ($resultRegistrations->num_rows > 0) {
-    while ($row = $resultRegistrations->fetch_assoc()) {
-        $dataRegistrations[] = $row;
-    }
-
-    $months = [
-        "01" => $translations["Jan"],
-        "02" => $translations["Feb"],
-        "03" => $translations["Mar"],
-        "04" => $translations["Apr"],
-        "05" => $translations["May"],
-        "06" => $translations["Jun"],
-        "07" => $translations["Jul"],
-        "08" => $translations["Aug"],
-        "09" => $translations["Sep"],
-        "10" => $translations["Oct"],
-        "11" => $translations["Nov"],
-        "12" => $translations["Dec"]
-    ];
-
-    $categories = array();
-    foreach ($dataRegistrations as $row) {
-        $year_month = explode("-", $row['reg_month']);
-        $year = $year_month[0];
-        $month = $year_month[1];
-        $categories[] = $months[$month] . ' ' . $year;
-    }
-}
-
-$sqlUserCount = "SELECT COUNT(*) as count FROM users";
-$resultUserCount = $conn->query($sqlUserCount);
-
-$userCount = 0;
-
-if ($resultUserCount->num_rows > 0) {
-    $row = $resultUserCount->fetch_assoc();
-    $userCount = $row["count"];
 }
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
@@ -121,6 +74,19 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
+$query = "SELECT type FROM shop_gateway WHERE type IN ('paypal', 'stripe')";
+$result = $conn->query($query);
+
+$existing_types = array();
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $existing_types[] = $row['type'];
+    }
+}
+$sql = "SELECT * FROM `shop_gateway`";
+$result = $conn->query($sql);
+
 
 $conn->close();
 ?>
@@ -135,7 +101,7 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
@@ -166,7 +132,7 @@ $conn->close();
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../../assets/img/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
@@ -290,8 +256,8 @@ $conn->close();
 
                     if ($is_boss == 1 && $is_new_version_available) {
                         ?>
-                        <div class="row">
-                            <div class="col-sm-12">
+                        <div class="row justify-content-center">
+                            <div class="col-sm-5">
                                 <div class="alert alert-danger">
                                     <?php echo $translations["newupdate-text"]; ?>
                                 </div>
@@ -303,63 +269,104 @@ $conn->close();
                 ?>
                 <div class="row">
                     <div class="col-sm-12">
+                        <?php echo $alerts_html; ?>
                         <?php
-                        if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-                            echo '<div id="notHttpsAlert" class="alert alert-warning shadow-sm" role="alert">';
-                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['notusehttps'];
-                            echo '</div>';
+                        if ($stmt->num_rows > 0) {
+                            $stmt->bind_result($is_boss);
+                            $stmt->fetch();
+
+                            if ($is_boss == 1) {
+                                ?>
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h5 class="card-title mb-0">
+                                            <?php echo $translations["paygatway"]; ?>
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <?php
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    ?>
+                                                    <div class="col-md-3" data-id="<?php echo $row["id"]; ?>">
+                                                        <div class="card shadow-sm mb-3">
+                                                            <div class="card-header"><?php echo $row["name"]; ?></div>
+                                                            <div class="card-body text-center">
+                                                                <div class="mb-3">
+                                                                    <img src="../../../assets/img/gatway/<?php echo $row["type"]; ?>.svg"
+                                                                        style="max-height: 45px;" class="img-fluid"
+                                                                        alt="<?php echo $row["name"]; ?>">
+                                                                </div>
+                                                                <a href="edit/<?php echo $row["type"]; ?>" class="btn btn-primary mt-1">
+                                                                    <i class="bi bi-pencil-square"></i>
+                                                                    <?php echo $translations["editbtn"]; ?>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php
+                                                }
+                                            } else {
+                                                echo '<div class="col-5 text-center">' . $translations["nogatewayadded"] . '</div>';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php
+                            } else {
+                                echo $translations["dont-access"];
+                            }
+                        } else {
+                            echo "Users do not exist!";
                         }
                         ?>
-
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["new-users"]; ?>
-                                </h5>
-                                <div id="chart"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-sm-12">
+                        <?php
+                        if ($stmt->num_rows > 0) {
+                            $stmt->bind_result($is_boss);
+                            $stmt->fetch();
 
+                            if ($is_boss == 1) {
+                                ?>
+                                <div class="card card-default">
+                                    <div class="card-heading">
+                                        <h3 class="card-title">
+                                            <?php echo $translations["addnewgateway"]; ?>
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="typeSelect"><?php echo $translations["type"];?></label>
+                                            <select class="form-control" id="typeSelect" name="type" required="">
+                                                <?php if (!in_array('paypal', $existing_types)): ?>
+                                                    <option value="create/paypal">PayPal</option>
+                                                <?php endif; ?>
+                                            </select>
+                                        </div>
+
+                                        <a href="#"
+                                            onclick="document.location.href = document.getElementById('typeSelect').value;"
+                                            class="btn btn-primary">
+                                            <span class="glyphicon glyphicon-plus"></span> <?php echo $translations["add"]; ?>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <?php
+                            } else {
+                                echo $translations["dont-access"];
+                            }
+                        } else {
+                            echo "Users do not exist!";
+                        }
+                        ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -384,47 +391,8 @@ $conn->close();
     </div>
 
     <!-- SCRIPTS! -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let data = <?php echo json_encode($dataRegistrations); ?>;
-            let categories = <?php echo json_encode($categories); ?>;
-            let seriesData = data.map(item => parseInt(item.count));
 
-            var options = {
-                chart: {
-                    type: 'area',
-                    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
-                    toolbar: {
-                        show: false
-                    },
-                    zoom: {
-                        enabled: false
-                    }
-                },
-                colors: ['#59F8E4'],
-                series: [{
-                    name: '<?php echo $translations["reg-number"]; ?>',
-                    data: seriesData
-                }],
-                xaxis: {
-                    categories: categories,
-                },
-                yaxis: {
-                    tickAmount: Math.max(...seriesData),
-                    min: 0,
-                    labels: {
-                        formatter: function (value) {
-                            return Math.floor(value);
-                        }
-                    }
-                },
-            };
-
-            var chart = new ApexCharts(document.querySelector("#chart"), options);
-            chart.render();
-        });
-    </script>
-    <script src="../../assets/js/date-time.js"></script>
+    <script src="../../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
