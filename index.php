@@ -28,6 +28,7 @@ $city = $env_data['CITY'] ?? '';
 $hause_no = $env_data['HOUSE_NUMBER'] ?? '';
 $description = $env_data['DESCRIPTION'] ?? '';
 $metakey = $env_data['META_KEY'] ?? '';
+$gkey = $env_data['GOOGLE_KEY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -68,6 +69,15 @@ $translations = json_decode(file_get_contents($langFile), true);
     <meta name="author" content="<?php echo $business_name; ?>">
 
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $gkey;?>"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', '<?php echo $gkey;?>');
+</script>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">

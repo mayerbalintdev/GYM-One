@@ -298,14 +298,14 @@ $conn->close();
                                             <input type="hidden" name="type" value="paypal">
 
                                             <div class="mb-3">
-                                                <label class="form-label" for="nameInput">Név</label>
+                                                <label class="form-label" for="nameInput"><?php echo $translations["paypalusername"];?></label>
                                                 <input type="text" class="form-control " id="nameInput" name="name"
                                                     value="PayPal">
 
                                             </div>
 
                                             <div class="mb-3">
-                                                <label class="form-label" for="emailInput">PayPal e-mail cím</label>
+                                                <label class="form-label" for="emailInput"><?php echo $translations["paypalemail"];?></label>
                                                 <input type="email" class="form-control " id="emailInput" name="email" value=""
                                                     required="" placeholder="hello@world.com">
 
@@ -318,8 +318,7 @@ $conn->close();
                                             <div class="mb-3 form-check form-switch">
                                                 <input type="checkbox" class="form-check-input" id="enableSwitch"
                                                     name="is_enabled" checked="">
-                                                <label class="form-check-label" for="enableSwitch">Fizetési mód
-                                                    engedélyezése</label>
+                                                <label class="form-check-label" for="enableSwitch"><?php echo $translations["gatewayokey"];?></label>
                                             </div>
 
 

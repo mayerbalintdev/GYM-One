@@ -55,44 +55,49 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+// Előre definiált hónapok tömbje
+$months = [
+    "01" => $translations["Jan"],
+    "02" => $translations["Feb"],
+    "03" => $translations["Mar"],
+    "04" => $translations["Apr"],
+    "05" => $translations["May"],
+    "06" => $translations["Jun"],
+    "07" => $translations["Jul"],
+    "08" => $translations["Aug"],
+    "09" => $translations["Sep"],
+    "10" => $translations["Oct"],
+    "11" => $translations["Nov"],
+    "12" => $translations["Dec"]
+];
+
+$current_month = (int) date('m');
+$current_year = (int) date('Y');
+
+$categories = array();
+$dataRegistrations = array();
+
+for ($i = 11; $i >= 0; $i--) {
+    $timestamp = mktime(0, 0, 0, $current_month - $i, 1, $current_year);
+    $year_month = date("Y-m", $timestamp);
+    $categories[] = $months[date('m', $timestamp)] . ' ' . date('Y', $timestamp);
+    $dataRegistrations[$year_month] = 0;
+}
+
 $sqlRegistrations = "SELECT DATE_FORMAT(registration_date, '%Y-%m') as reg_month, 
                             COUNT(*) as count 
                      FROM users 
-                     WHERE registration_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                     WHERE registration_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
                      GROUP BY reg_month
                      ORDER BY reg_month";
 $resultRegistrations = $conn->query($sqlRegistrations);
 
-$dataRegistrations = array();
-
 if ($resultRegistrations->num_rows > 0) {
     while ($row = $resultRegistrations->fetch_assoc()) {
-        $dataRegistrations[] = $row;
-    }
-
-    $months = [
-        "01" => $translations["Jan"],
-        "02" => $translations["Feb"],
-        "03" => $translations["Mar"],
-        "04" => $translations["Apr"],
-        "05" => $translations["May"],
-        "06" => $translations["Jun"],
-        "07" => $translations["Jul"],
-        "08" => $translations["Aug"],
-        "09" => $translations["Sep"],
-        "10" => $translations["Oct"],
-        "11" => $translations["Nov"],
-        "12" => $translations["Dec"]
-    ];
-
-    $categories = array();
-    foreach ($dataRegistrations as $row) {
-        $year_month = explode("-", $row['reg_month']);
-        $year = $year_month[0];
-        $month = $year_month[1];
-        $categories[] = $months[$month] . ' ' . $year;
+        $dataRegistrations[$row['reg_month']] = $row['count'];
     }
 }
+
 
 $sqlUserCount = "SELECT COUNT(*) as count FROM users";
 $resultUserCount = $conn->query($sqlUserCount);
@@ -326,7 +331,7 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"];?></h5>
                                 <h1><strong><?php echo $userCount; ?></strong></h1>
                             </div>
                         </div>
@@ -359,6 +364,17 @@ $conn->close();
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <p><?php echo $translations["dayopendayclose"];?></p>
+                                <div class="d-flex justify-content-between text-center">
+                                    <a href="" class="btn btn-success"><?php echo $translations["dayopen"]; ?></a>
+                                    <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -386,9 +402,7 @@ $conn->close();
     <!-- SCRIPTS! -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            let data = <?php echo json_encode($dataRegistrations); ?>;
-            let categories = <?php echo json_encode($categories); ?>;
-            let seriesData = data.map(item => parseInt(item.count));
+            let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);
 
             var options = {
                 chart: {
@@ -407,7 +421,7 @@ $conn->close();
                     data: seriesData
                 }],
                 xaxis: {
-                    categories: categories,
+                    categories: <?php echo json_encode($categories); ?>,
                 },
                 yaxis: {
                     tickAmount: Math.max(...seriesData),
@@ -423,6 +437,7 @@ $conn->close();
             var chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
         });
+
     </script>
     <script src="../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"

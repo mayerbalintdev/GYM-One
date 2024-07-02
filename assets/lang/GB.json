@@ -1,0 +1,72 @@
+{
+    "HU": "Hungarian",
+    "GB": "English",
+    "DE": "German",
+    
+    "mainpage": "Main Page",
+    "downloadpage": "Download",
+    "docspage": "Documentation",
+    "installpage": "Installation",
+    "faqpage": "FAQ",
+
+    "heromain": "Optimize your gym system with a comprehensive web solution.",
+    "herotext": "GYM One is a completely <strong>free</strong> and <strong>open-source</strong> web solution for gyms.",
+
+    "downloadbtn": "Download",
+    "download": "Download",
+    "secondbtn": "Learn More",
+
+    "oneclick_install": "Install the website with one click",
+    "info-one" : "Have you ever wondered how easy it would be to manage your gym members simply?",
+    "info-two" : "GYM One offers a solution for all this, and it’s <strong>100% free</strong>!",
+
+    "one-benefit" : "The software’s free nature allows fitness clubs to manage entry and membership records cost-effectively.",
+    "two-benefit" : "As an open-source project, GYM One is continuously developed, offering users the opportunity to customize and expand according to their unique needs.",
+    "three-benefit" : "Support for multiple languages allows fitness clubs to work with global clients, increasing their potential market.",
+    "four-benefit" : "Its simple and intuitive user interface helps clubs manage member entry and data quickly and efficiently.",
+
+    "community-main": "Built for the Community",
+    "community-secondary": "GYM One is an open-source project. You don’t need to worry about expensive development fees or bad hosting. You can host your website wherever you want.",
+    "community-third": "Need help? No problem, we have an active community of hundreds on <a href='discord.com'>Discord</a>. Since GYM One is open-source, anyone can contribute to the project on <a href='discord.com'>GitHub</a>.",
+
+    "worldwide-main": "Trusted by more than <strong>num</strong> gyms.",
+    "worldwide-secondary": "Developed in Hungary, GYM One is trusted by more than a hundred gyms worldwide and has been translated into more than <a href='LEFORDÍT'>2 languages.</a>",
+    "worldwide-third": "The handwritten code makes the system reliable and secure.",
+
+    "links": "Links",
+    "copyright": "All rights reserved",
+    "support-us": "Support Us",
+    
+    "install-one": "Ready to get started? Be sure to check out the <a href='../doc'>documentation</a> for a smooth installation.",
+    "install-two": "Join the community on <a href='LINK'>Discord</a> to get the latest news and help!",
+    "install-three": "Want to help us further develop GYM One? There are several ways you can <a href='LINK'>support</a> us.",
+
+    "support-text": "You can make a difference.",
+    "support-text-two" : "I contribute to the growth of GYM One.",
+    "support-content": "I wholeheartedly enjoy the development of GYM One, and I hope you will also find joy in using it. If you feel like supporting the continued growth of the project, there are many ways you can do so.",
+    "sponsor": "Sponsor",
+    "sponsor-text": "Although GYM One is free, maintaining it is not. Server hosting, domain names, and other services cost money. You can support the project on GitHub to gain <strong>exclusive benefits</strong>.",
+    "sponsor-btn": "Support on GitHub",
+    "star": "Star the project",
+    "star-text": "Can't or don’t want to sponsor us? No problem, you can still support us by starring the project on GitHub. It’s <strong>completely free</strong> and only takes a few seconds, but it helps us a lot.",
+    "star-btn": "Star it!",
+
+    "introduction" : "Introduction",
+    "introduction_first" : "<a href = 'https://gymoneglobal.com/'>GYM One</a> is the next generation gym IT software, a free and open-source, modern, reliable, fast, and secure alternative to any software, providing the best user experience.",
+    "introduction_second": "In this documentation, you will find all the information about <strong>GYM One</strong>!",
+    "introduction_third" : "If you need help or have any questions, you can join our <a href='https://gymoneglobal.com/discord'>Discord server</a>.",
+
+    "credits" : "Contributions",
+    "credits_first" : "GYM One was created by <a href='https://www.mayerbalint.hu/'>Bálint Mayer</a> with full-stack programming!",
+
+    "donors": "Donors",
+    "donors_first": "Donors make the project possible, many thanks to them!",
+
+    "first_faq": "What is GYM One?",
+    "first_faq-ans": "GYM One is an open-source, free gym management software designed to optimize the operations of fitness centers, personal trainers, and sports clubs.",
+    "second_faq": "When will GYM One be released?",
+    "second_faq-ans": "Currently, there is no estimated time of arrival (ETA) for the release of GYM One. Please stay tuned to our official channels for updates.",
+    "third_faq": "What features does GYM One offer?",
+    "third_faq-ans": "GYM One offers client management, access control system, financial tracking, membership management, workout tracking, and online purchasing options."
+    
+}

@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../../../.env');
+$env_data = read_env_file('../../../../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -39,7 +39,7 @@ $version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../../../assets/lang/";
+$langDir = __DIR__ . "/../../../../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -74,30 +74,41 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
-$query = "SELECT type FROM shop_gateway WHERE type IN ('paypal', 'stripe')";
-$result = $conn->query($query);
 
-$existing_types = array();
+$name = "";
+$email = "";
+$is_enabled = 0;
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $existing_types[] = $row['type'];
-    }
-}
-$sql = "SELECT * FROM `shop_gateway`";
+$sql = "SELECT name, data, is_enabled FROM shop_gateway WHERE type = 'paypal'";
 $result = $conn->query($sql);
 
-if (isset($_POST['delete_id'])) {
-    $delete_id = $_POST['delete_id'];
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $name = $row['name'];
+    $email = $row['data'];
+    $is_enabled = $row['is_enabled'];
+}
 
-    $sql = "DELETE FROM shop_gateway WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $delete_id);
-    if ($stmt->execute()) {
-        header("Refresh:0");   
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $is_enabled = isset($_POST['is_enabled']) ? 1 : 0;
+
+    $sql = "UPDATE shop_gateway SET name=?, data=?, is_enabled=?, updated_at=? WHERE type='paypal'";
+    if ($stmt = $conn->prepare($sql)) {
+        $datetime = date('Y-m-d H:i:s');
+        $stmt->bind_param("ssis", $name, $email, $is_enabled, $datetime);
+
+        if ($stmt->execute()) {
+            header("Location: ../../");
+        } else {
+            echo "A mistake was made in the preparation " . $stmt->error;
+        }
+
+        $stmt->close();
+    } else {
+        echo "A mistake was made in the preparation: " . $conn->error;
     }
-
-    $stmt->close();
 }
 
 
@@ -114,7 +125,7 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../../../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
@@ -145,7 +156,7 @@ $conn->close();
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
@@ -291,94 +302,37 @@ $conn->close();
                             if ($is_boss == 1) {
                                 ?>
                                 <div class="card shadow mb-4">
-                                    <div class="card-header py-3">
-                                        <h5 class="card-title mb-0">
-                                            <?php echo $translations["paygatway"]; ?>
-                                        </h5>
-                                    </div>
                                     <div class="card-body">
-                                        <div class="row">
-                                            <?php
-                                            if ($result->num_rows > 0) {
-                                                while ($row = $result->fetch_assoc()) {
-                                                    ?>
-                                                    <div class="col-md-3" data-id="<?php echo $row["id"]; ?>">
-                                                        <div class="card shadow-sm mb-3">
-                                                            <div class="card-header"><?php echo $row["name"]; ?></div>
-                                                            <div class="card-body text-center">
-                                                                <div class="mb-3">
-                                                                    <img src="../../../assets/img/gatway/<?php echo $row["type"]; ?>.svg"
-                                                                        style="max-height: 45px;" class="img-fluid"
-                                                                        alt="<?php echo $row["name"]; ?>">
-                                                                </div>
-                                                                <a href="edit/<?php echo $row["type"]; ?>" class="btn btn-primary mt-1">
-                                                                    <i class="bi bi-pencil-square"></i>
-                                                                    <?php echo $translations["editbtn"]; ?>
-                                                                </a>
-                                                                <form class="delete-form" method="POST">
-                                                                    <input type="hidden" name="delete_id"
-                                                                        value="<?php echo $row["id"]; ?>">
-                                                                    <button type="submit" class="btn btn-danger mt-1">
-                                                                        <i class="bi bi-trash"></i>
-                                                                        <?php echo $translations["delete"];?>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <?php
-                                                }
-                                            } else {
-                                                echo '<div class="col-5 text-center">' . $translations["nogatewayadded"] . '</div>';
-                                            }
-                                            ?>
-                                        </div>
+                                        <form method="POST">
+                                            <input type="hidden" name="type" value="paypal">
+
+                                            <div class="mb-3">
+                                                <label class="form-label" for="nameInput"><?php echo $translations["paypalusername"];?></label>
+                                                <input type="text" class="form-control" id="nameInput" name="name"
+                                                    value="<?php echo $name;?>" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label" for="emailInput"><?php echo $translations["paypalemail"];?></label>
+                                                <input type="email" class="form-control" id="emailInput" name="email" value="<?php echo $email;?>"
+                                                    required>
+                                            </div>
+                                            <br>
+                                            <div class="alert alert-info" role="alert">
+                                                <i class="bi bi-info-circle"></i> <?php echo $translations["makesurepaypal"]; ?>
+                                            </div>
+
+                                            <div class="mb-3 form-check form-switch">
+        <input type="checkbox" class="form-check-input" id="enableSwitch" name="is_enabled" <?php echo $is_enabled ? 'checked' : ''; ?>>
+        <label class="form-check-label" for="enableSwitch"><?php echo $translations["gatewayokey"];?></label>
+    </div>
+
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-save"></i> <?php echo $translations["save"]; ?>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
-                                <?php
-                            } else {
-                                echo $translations["dont-access"];
-                            }
-                        } else {
-                            echo "Users do not exist!";
-                        }
-                        ?>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-12">
-                        <?php
-                        if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($is_boss);
-                            $stmt->fetch();
-
-                            if ($is_boss == 1) {
-                                ?>
-                                <div class="card card-default">
-                                    <div class="card-heading">
-                                        <h3 class="card-title">
-                                            <?php echo $translations["addnewgateway"]; ?>
-                                        </h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label for="typeSelect"><?php echo $translations["type"]; ?></label>
-                                            <select class="form-control" id="typeSelect" name="type" required="">
-                                                <?php if (!in_array('paypal', $existing_types)): ?>
-                                                    <option value="create/paypal">PayPal</option>
-                                                <?php endif; ?>
-                                            </select>
-                                        </div>
-
-                                        <a href="#"
-                                            onclick="document.location.href = document.getElementById('typeSelect').value;"
-                                            class="btn btn-primary">
-                                            <span class="glyphicon glyphicon-plus"></span> <?php echo $translations["add"]; ?>
-                                        </a>
-                                    </div>
-                                </div>
-
                                 <?php
                             } else {
                                 echo $translations["dont-access"];
@@ -391,6 +345,7 @@ $conn->close();
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- EXIT MODAL -->
@@ -404,7 +359,7 @@ $conn->close();
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
+                    <a href="../../../../logout.php" type="button"
                         class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
@@ -413,7 +368,7 @@ $conn->close();
 
     <!-- SCRIPTS! -->
 
-    <script src="../../../assets/js/date-time.js"></script>
+    <script src="../../../../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>

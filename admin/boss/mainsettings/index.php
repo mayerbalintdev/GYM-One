@@ -67,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $metakey_env = $_POST["metakey"] ?? '';
         $langcode_env = $_POST['lang_code'] ?? '';
         $currency_env = $_POST['currency'] ?? '';
+        $gkey_env = $_POST['gkey'] ?? '';
 
         $env_data["BUSINESS_NAME"] = $business_name;
         $env_data['STREET'] = $street_env;
@@ -77,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $env_data['HOUSE_NUMBER'] = $house_no_env;
         $env_data['LANG_CODE'] = $langcode_env;
         $env_data['CURRENCY'] = $currency_env;
+        $env_data['GOOGLE_KEY'] = $gkey_env;
 
         $env_content = '';
         foreach ($env_data as $key => $value) {
@@ -332,12 +334,19 @@ $conn->close();
                                                         value="<?= htmlspecialchars($env_data['HOUSE_NUMBER'] ?? '') ?>">
                                                 </div>
                                                 <div class="form-row">
-                                                    <div class="form-group col-md-5">
+                                                    <div class="form-group col-md-3">
                                                         <label for="currency"><?php echo $translations["currency"]; ?>:</label>
                                                         <input type="text" class="form-control" id="currency" name="currency"
                                                             value="<?= htmlspecialchars($env_data['CURRENCY'] ?? '') ?>">
                                                     </div>
+                                                    <div class="form-group col-md-9">
+                                                        <label for="gkey"><?php echo $translations["googletrakckey"]; ?>:</label>
+                                                        <input type="text" class="form-control" id="gkey" name="gkey"
+                                                            value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
+                                                        <small><?php echo $translations["googlekeyonly"];?></small>
+                                                    </div>
                                                 </div>
+
                                             </div>
                                             <button type="submit"
                                                 class="btn btn-primary"><?php echo $translations["save"]; ?></button>
