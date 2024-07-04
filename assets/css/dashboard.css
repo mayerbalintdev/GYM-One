@@ -27,6 +27,27 @@ p.lead.mb-4.fs-4{
     padding: 1.5rem 1.5rem .375rem;
 }
 
+.roundbg{
+    background-color: #0C9AB9;
+    color: whitesmoke;
+}
+
+.rounded-pill {
+    border-radius: 50rem !important;
+}
+
+.lh-1 {
+    line-height: 1 !important;
+}
+.fs-1 {
+    font-size: calc(1.375rem + 1.5vw) !important;
+}
+.p-4 {
+    padding: 1.2rem !important;
+}
+.d-inline-block {
+    display: inline-block !important;
+}
 
 .sidenav ul.nav.nav-pills.nav-stacked li {
     text-align: center;

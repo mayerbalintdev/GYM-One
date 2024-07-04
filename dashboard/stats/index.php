@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: ../");
+    header("Location: ../../");
     exit();
 }
 
@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../.env');
+$env_data = read_env_file('../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -36,11 +36,10 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
-$currency = $env_data['CURRENCY'] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../assets/lang/";
+$langDir = __DIR__ . "/../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -60,7 +59,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname,$firstname );
+$stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
 $stmt->close();
@@ -77,8 +76,8 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-    <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -97,7 +96,7 @@ $conn->close();
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
+                    <li><a href="#"><?php echo $translations["statspage"]; ?></a></li>
                     <li><a href="#">Gender</a></li>
                     <li><a href="#">Geo</a></li>
                 </ul>
@@ -108,7 +107,7 @@ $conn->close();
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
@@ -117,7 +116,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="sidebar-header">
-                        Információk
+                        <?php echo $translations["statspage"]; ?>
                     </li>
                     <li><a href="#section3">Gender</a></li>
                     <li><a href="#section3">Geo</a></li>
@@ -132,44 +131,80 @@ $conn->close();
                     </button>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"];?></h4>
-                                <h1><strong></strong></h1>
+                            <div class="card-body text-start">
+                                <div class="row">
+                                    <div class="col-xs-10 text-start">
+                                        <h4 class="card-title fw-semibold"><?php echo $translations["latestsessiontime"]; ?></h4>
+                                        <h1><strong></strong></h1>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
+                                            <i class="bi bi-heart-pulse"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <h2><b>88</b> <?php echo $translations["minutes"]; ?></h2>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"];?></h4>
-                                <h1><strong></strong></h1>
+                            <div class="card-body text-start">
+                                <div class="row">
+                                    <div class="col-xs-10 text-start">
+                                        <h4 class="card-title fw-semibold"><?php echo $translations["averagetraintime"]; ?></h4>
+                                        <h1><strong></strong></h1>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
+                                            <i class="bi bi-heart-pulse"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <h2><b>88</b> <?php echo $translations["minutes"];?></h2>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"];?></h4>
-                                <h1><strong></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["profilebalance"];?></h4>
-                                <h1><strong></strong><?php echo $currency;?></h1>
+                            <div class="card-body text-start">
+                                <div class="row">
+                                    <div class="col-xs-10 text-start">
+                                        <h4 class="card-title fw-semibold"><?php echo $translations["latesttraining"]; ?></h4>
+                                        <h1><strong></strong></h1>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
+                                            <i class="bi bi-heart-pulse"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <h2><b>8888.88.88</b></h2>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-
+                    <div class="col-sm-8">
+                        <div class="card shadow">
+                            <div class="card-body text-start">
+                                <h4 class="card-title fw-semibold">
+                                    <?php echo $translations["thirtydaychart"];?>
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -178,18 +213,15 @@ $conn->close();
         </div>
 
         <!-- EXIT MODAL -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
                         <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
                     </div>
                     <div class="modal-footer">
-                        <a type="button" class="btn btn-secondary"
-                            data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                        <a href="../logout.php" type="button"
-                            class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                        <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                        <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                     </div>
                 </div>
             </div>
