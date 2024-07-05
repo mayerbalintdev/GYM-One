@@ -176,7 +176,7 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -198,7 +198,7 @@ $conn->close();
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -220,27 +220,26 @@ $conn->close();
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
                         <?php echo $translations["docs"]; ?>
                     </a>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
                         <?php echo $translations["logout"]; ?>
                     </button>
+                    <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <?php echo $alerts_html; ?>
                         <div class="card shadow">
                             <div class="card-body">
-                                <?php if (isset($delete_message)): ?>
+                                <?php if (isset($delete_message)) : ?>
                                     <div class="alert alert-info"><?php echo $delete_message; ?></div>
                                 <?php endif; ?>
                                 <div class="table-responsive table-striped">
@@ -281,45 +280,33 @@ $conn->close();
                                         ?>
                                     </ul>
                                     <form method="POST">
-                                        <button type="submit" name="delete_old_logs" class="btn btn-danger mb-3"><i
-                                                class="bi bi-trash"></i><?php echo $translations["deletelog"]; ?></button>
+                                        <button type="submit" name="delete_old_logs" class="btn btn-danger mb-3"><i class="bi bi-trash"></i><?php echo $translations["deletelog"]; ?></button>
                                     </form>
                                 </nav>
                             </div>
                         </div>
                     </div>
                 </div>
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <p class="mb-0 py-2 text-center text-body-secondary">
-                            Powered by <a href="https://azuriom.com" target="_blank"
-                                rel="noopener noreferrer">Azuriom</a> ©
-                            2019-2024. Panel designed by <a href="https://adminkit.io/" target="_blank"
-                                rel="noopener noreferrer">AdminKit</a>. </p>
-                    </div>
-                </footer>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <p><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary"
-                        data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
-                        class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 

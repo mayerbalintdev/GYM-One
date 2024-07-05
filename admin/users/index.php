@@ -158,7 +158,7 @@ $result = $conn->query($sql);
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -192,7 +192,7 @@ $result = $conn->query($sql);
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -213,19 +213,19 @@ $result = $conn->query($sql);
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-item active">
                                 <a class="sidebar-ling" href="../updater">
                                     <i class="bi bi-cloud-download"></i>
                                     <span><?php echo $translations["updatepage"]; ?></span>
-                                    <?php if ($is_new_version_available): ?>
+                                    <?php if ($is_new_version_available) : ?>
                                         <span class="sidebar-badge badge">
                                             <i class="bi bi-exclamation-circle"></i>
                                         </span>
                                     <?php endif; ?>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -240,20 +240,19 @@ $result = $conn->query($sql);
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
                         <?php echo $translations["docs"]; ?>
                     </a>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
                         <?php echo $translations["logout"]; ?>
                     </button>
+                    <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
@@ -261,18 +260,16 @@ $result = $conn->query($sql);
                             <form method="GET" class="mb-4">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="Név keresése"
-                                            name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
+                                        <input type="text" class="form-control" placeholder="Név keresése" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
                                     </div>
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="Email cím keresése"
-                                            name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
+                                        <input type="text" class="form-control" placeholder="Email cím keresése" name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
                                     </div>
                                     <div class="col-md-2">
-                                        <button type="submit" class="btn btn-primary"><?php echo $translations["search"];?></button>
+                                        <button type="submit" class="btn btn-primary"><?php echo $translations["search"]; ?></button>
                                     </div>
                                     <div class="col-md-2">
-                                        <a href="index.php" class="btn btn-success"><?php echo $translations["resetbtn"];?></a>
+                                        <a href="index.php" class="btn btn-success"><?php echo $translations["resetbtn"]; ?></a>
                                     </div>
                                 </div>
                             </form>
@@ -280,9 +277,9 @@ $result = $conn->query($sql);
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th><?php echo $translations["firstname"];?></th>
-                                        <th><?php echo $translations["lastname"];?></th>
-                                        <th><?php echo $translations["email"];?></th>
+                                        <th><?php echo $translations["firstname"]; ?></th>
+                                        <th><?php echo $translations["lastname"]; ?></th>
+                                        <th><?php echo $translations["email"]; ?></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -346,24 +343,22 @@ $result = $conn->query($sql);
     </div>
 
     <!-- EXIT MODAL -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary"
-                        data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
-                        class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 

@@ -204,6 +204,7 @@ $conn->close();
                             <div class="card-body text-start">
                                 <h4 class="card-title fw-semibold">
                                     <?php echo $translations["thirtydaychart"];?>
+                                    
                                 </h4>
                             </div>
                         </div>

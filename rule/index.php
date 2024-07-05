@@ -1,0 +1,1 @@
+<iframe src="../admin/boss/rule/rule.html" frameborder="0"></iframe>

@@ -217,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
             $stmt->fetch();
 
             if ($is_boss == 1) {
-              ?>
+          ?>
               <li class="sidebar-header">
                 <?php echo $translations["settings"]; ?>
               </li>
@@ -251,7 +251,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                   <span><?php echo $translations["mailpage"]; ?></span>
                 </a>
               </li>
-              <?php
+          <?php
             }
           }
           ?>
@@ -272,19 +272,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
             $stmt->fetch();
 
             if ($is_boss == 1) {
-              ?>
+          ?>
               <li class="sidebar-item active">
                 <a class="sidebar-ling" href="../updater">
                   <i class="bi bi-cloud-download"></i>
                   <span><?php echo $translations["updatepage"]; ?></span>
-                  <?php if ($is_new_version_available): ?>
+                  <?php if ($is_new_version_available) : ?>
                     <span class="sidebar-badge badge">
                       <i class="bi bi-exclamation-circle"></i>
                     </span>
                   <?php endif; ?>
                 </a>
               </li>
-              <?php
+          <?php
             }
           }
           ?>
@@ -299,8 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
       <br>
       <div class="col-sm-10">
         <div class="d-none topnav d-sm-inline-block">
-          <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-            rel="noopener noreferrer">
+          <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
             <i class="bi bi-question-circle"></i>
             <?php echo $translations["support"]; ?>
           </a>
@@ -312,6 +311,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
             <?php echo $translations["logout"]; ?>
           </button>
+          <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
         </div>
         <div class="row">
           <div class="col-sm-12">
@@ -330,29 +330,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                     <div class="mb-3">
                       <div class="form-group">
                         <label for="firstname"><?php echo $translations["firstname"]; ?></label>
-                        <input type="text" class="form-control" id="firstname" name="firstname"
-                          value="<?php echo $firstname; ?>" required>
+                        <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $firstname; ?>" required>
                       </div>
                     </div>
                     <div class="mb-3">
                       <div class="form-group">
                         <label for="lastname"><?php echo $translations["lastname"]; ?></label>
-                        <input type="text" class="form-control" id="lastname" name="lastname"
-                          value="<?php echo $lastname; ?>" required>
+                        <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $lastname; ?>" required>
                       </div>
                     </div>
                   </div>
 
                   <div class="col-md-3 text-center">
-                    <img src="../../../assets/img/profiles/<?php echo $useridgymuser;?>.png" alt="User" class="img-rounded img-fluid mb-3"
-                      height="150">
+                    <img src="../../../assets/img/profiles/<?php echo $useridgymuser; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
                   </div>
                 </div>
                 <div class="mb-3">
                   <div class="form-group">
                     <label for="email"><?php echo $translations["email"]; ?></label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>"
-                      required>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" required>
                   </div>
 
                 </div>
@@ -364,15 +360,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                   $stmt->fetch();
 
                   if ($is_boss == 1) {
-                    ?>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"
-                      data-userid="1">
+                ?>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-userid="1">
                       <i class="bi bi-trash"></i>
                       <?php echo $translations["deleteuserbtn"]; ?>
                     </button> <?php
-                  }
-                }
-                ?>
+                            }
+                          }
+                              ?>
 
               </form>
             </div>
@@ -389,19 +384,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                 </div>
                 <div class="form-group">
                   <label for="lastLoginInput"><?php echo $translations["last-login"]; ?></label>
-                  <input type="text" class="form-control" id="lastLoginInput" value="<?php echo $lastlogin; ?>"
-                    disabled>
+                  <input type="text" class="form-control" id="lastLoginInput" value="<?php echo $lastlogin; ?>" disabled>
                 </div>
                 <div class="form-group">
                   <label for="emailVerifiedInput"><?php echo $translations["regconfirm"]; ?></label>
                   <form method="post">
                     <div class="input-group">
-                      <input type="text" class="form-control text-danger" id="emailVerifiedInput"
-                        value="<?php echo ($verify == "Yes") ? $translations["yes"] : $translations["no"]; ?>" disabled>
+                      <input type="text" class="form-control text-danger" id="emailVerifiedInput" value="<?php echo ($verify == "Yes") ? $translations["yes"] : $translations["no"]; ?>" disabled>
                       <span class="input-group-btn">
                         <button class="btn btn-success" type="submit" <?php if ($verify == "Yes") {
-                          echo "disabled";
-                        } ?>>
+                                                                        echo "disabled";
+                                                                      } ?>>
                           <?php echo $translations["forceregconf"]; ?>
                         </button>
                         <input type="hidden" name="userid" value="<?php echo $useridgymuser; ?>">
@@ -423,8 +416,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
   </div>
 
   <!-- EXIT MODAL -->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-    aria-hidden="true">
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-body">
@@ -432,7 +424,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
         </div>
         <div class="modal-footer">
           <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-          <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+          <a href="../../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
         </div>
       </div>
     </div>
@@ -440,8 +432,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
   <!-- DELETE USER MODAL -->
 
   <!-- Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-    aria-hidden="true">
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -465,6 +456,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
   </div>
 
   <!-- SCRIPTS! -->
+  <script src="../../assets/js/date-time.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 

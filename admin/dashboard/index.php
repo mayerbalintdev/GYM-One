@@ -185,7 +185,7 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -219,7 +219,7 @@ $conn->close();
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -230,7 +230,7 @@ $conn->close();
                         <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["updatepage"]; ?></span>
-                            <?php if ($is_new_version_available): ?>
+                            <?php if ($is_new_version_available) : ?>
                                 <span class="sidebar-badge badge">
                                     <i class="bi bi-exclamation-circle"></i>
                                 </span>
@@ -245,19 +245,19 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-item">
                                 <a class="sidebar-ling" href="../updater">
                                     <i class="bi bi-cloud-download"></i>
                                     <span><?php echo $translations["updatepage"]; ?></span>
-                                    <?php if ($is_new_version_available): ?>
+                                    <?php if ($is_new_version_available) : ?>
                                         <span class="sidebar-badge badge">
                                             <i class="bi bi-exclamation-circle"></i>
                                         </span>
                                     <?php endif; ?>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -272,14 +272,12 @@ $conn->close();
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
                         <?php echo $translations["docs"]; ?>
                     </a>
@@ -294,7 +292,7 @@ $conn->close();
                     $stmt->fetch();
 
                     if ($is_boss == 1 && $is_new_version_available) {
-                        ?>
+                ?>
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="alert alert-danger">
@@ -302,7 +300,7 @@ $conn->close();
                                 </div>
                             </div>
                         </div>
-                        <?php
+                <?php
                     }
                 }
                 ?>
@@ -312,6 +310,15 @@ $conn->close();
                         if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
                             echo '<div id="notHttpsAlert" class="alert alert-warning shadow-sm" role="alert">';
                             echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['notusehttps'];
+                            echo '</div>';
+                        }
+                        ?>
+                        <?php
+                        $ruleContent = file_get_contents('../boss/rule/rule.html');
+
+                        if (empty($ruleContent)) {
+                            echo '<div class="alert alert-danger">';
+                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['gymrulenotset'];
                             echo '</div>';
                         }
                         ?>
@@ -331,7 +338,7 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"];?></h5>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
                                 <h1><strong><?php echo $userCount; ?></strong></h1>
                             </div>
                         </div>
@@ -367,7 +374,7 @@ $conn->close();
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <p><?php echo $translations["dayopendayclose"];?></p>
+                                <p><?php echo $translations["dayopendayclose"]; ?></p>
                                 <div class="d-flex justify-content-between text-center">
                                     <a href="" class="btn btn-success"><?php echo $translations["dayopen"]; ?></a>
                                     <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a>
@@ -382,18 +389,15 @@ $conn->close();
     </div>
 
     <!-- EXIT MODAL -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <p><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary"
-                        data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
-                        class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>
@@ -401,7 +405,7 @@ $conn->close();
 
     <!-- SCRIPTS! -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);
 
             var options = {
@@ -427,7 +431,7 @@ $conn->close();
                     tickAmount: Math.max(...seriesData),
                     min: 0,
                     labels: {
-                        formatter: function (value) {
+                        formatter: function(value) {
                             return Math.floor(value);
                         }
                     }
@@ -437,12 +441,9 @@ $conn->close();
             var chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
         });
-
     </script>
     <script src="../../assets/js/date-time.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 
 </html>

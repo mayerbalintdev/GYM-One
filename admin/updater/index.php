@@ -130,7 +130,7 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -164,7 +164,7 @@ $conn->close();
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -180,19 +180,19 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-item active">
                                 <a class="sidebar-ling" href="../updater">
                                     <i class="bi bi-cloud-download"></i>
                                     <span><?php echo $translations["updatepage"]; ?></span>
-                                    <?php if ($is_new_version_available): ?>
+                                    <?php if ($is_new_version_available) : ?>
                                         <span class="sidebar-badge badge">
                                             <i class="bi bi-exclamation-circle"></i>
                                         </span>
                                     <?php endif; ?>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -206,26 +206,25 @@ $conn->close();
             </div>
             <br>
             <div class="col-sm-10">
-                <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
+            <div class="d-none topnav d-sm-inline-block">
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
                         <?php echo $translations["docs"]; ?>
                     </a>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
                         <?php echo $translations["logout"]; ?>
                     </button>
+                    <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <?php if ($is_new_version_available) { ?>
-                            <div class="card shadow mb-4">
+                            <div class="card fireworks shadow mb-4">
                                 <div class="card-body">
                                     <h2><?php echo $translations["updateavilable"]; ?></h2>
                                     <div class="alert alert-warning mt-3" role="alert">
@@ -239,7 +238,7 @@ $conn->close();
                                         <code><?php echo $latest_version; ?></code>
                                     </p>
                                     <p><?php echo $translations["readytoupdate"]; ?></p>
-                                    <!-- <a href="" class="btn btn-primary" download>Letöltés</a> -->
+                                    <a href="" class="btn btn-primary" download>Letöltés</a> 
                                 </div>
                             </div>
                         <?php } else { ?>
@@ -264,24 +263,48 @@ $conn->close();
     </div>
 
     <!-- EXIT MODAL -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary"
-                        data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
-                        class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
+    <script>
+        const container = document.querySelector('.fireworks');
+        const fireworks = new Fireworks.default(container, {
+            autoresize: false,
+            opacity: 0.5,
+            acceleration: 1.05,
+            friction: 0.97,
+            gravity: 1.5,
+            particles: 50,
+            traceLength: 3,
+            traceSpeed: 10,
+            explosion: 5,
+            intensity: 60,
+            flickering: 50,
+            lineStyle: 'round',
+            hue: {
+                min: 0,
+                max: 360
+            }
+        })
+        fireworks.start();
+        setTimeout(() => {
+            fireworks.stop();
+        }, 5000);
+    </script>
+    <script src="../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
