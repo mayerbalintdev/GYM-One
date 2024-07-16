@@ -258,7 +258,7 @@ $initial_content = file_get_contents('rule.html');
                 </div>
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a href="../../../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>

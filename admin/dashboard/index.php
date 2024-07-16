@@ -128,7 +128,39 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
 
 
 $conn->close();
+
+$ipInfoUrl = 'https://ipinfo.io/json';
+
+$ipInfo = json_decode(file_get_contents($ipInfoUrl), true);
+$countryCode = $ipInfo['country'];
+
+$jsonFile = 'https://emergencynumberapi.com/api/data/all';
+
+$jsonData = @file_get_contents($jsonFile);
+if (!$jsonData) {
+    exit;
+}
+
+$data = json_decode($jsonData, true);
+if (!$data) {
+    exit;
+}
+
+$ambulanceNumbers = $translations["unknown"];
+$fireNumbers = $translations["unknown"];
+$policeNumbers = $translations["unknown"];
+
+foreach ($data as $item) {
+    if (isset($item['Country']['ISOCode']) && $item['Country']['ISOCode'] == $countryCode) {
+        $ambulanceNumbers = isset($item['Ambulance']['All']) ? implode(', ', $item['Ambulance']['All']) : "Ismeretlen";
+        $fireNumbers = isset($item['Fire']['All']) ? implode(', ', $item['Fire']['All']) : "Ismeretlen";
+        $policeNumbers = isset($item['Police']['All']) ? implode(', ', $item['Police']['All']) : "Ismeretlen";
+        break;
+    }
+}
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -381,8 +413,17 @@ $conn->close();
                                 </div>
                             </div>
                         </div>
+                        <div class="card bg-danger">
+                            <div class="card-body">
+                                <p><?php echo $translations["emernumtext"]; ?></p>
+                                <div class="justify-content-between text-center">
+                                    <h2><?php echo $translations["ambulance"]; ?> <b class="text-danger"><?php echo $ambulanceNumbers; ?></b></h2>
+                                    <h2><?php echo $translations["fireresistor"]; ?> <b class="text-danger"><?php echo $fireNumbers; ?></b></h2>
+                                    <h2><?php echo $translations["police"]; ?> <b class="text-danger"><?php echo $policeNumbers; ?></b></h2>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

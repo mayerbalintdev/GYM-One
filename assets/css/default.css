@@ -1,3 +1,29 @@
-footer{
-    background-color: #252525;
+body{
+    background-color: #333333;
 }
+
+nav.navbar,.nav-link{
+    background-color: #333333;
+    color: #fff;
+}
+
+.bg-imageback {
+    background-image: url(../img/brand/background.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 500px;
+    background-position: center;
+}
+
+.footer{
+    color: whitesmoke;
+}
+a{
+    text-decoration: none;
+    color: whitesmoke;
+    font-weight: bold;
+}
+i:hover,i:active{
+    color: rgba(255, 255, 255, 0.75);
+}
+
