@@ -44,6 +44,26 @@ if (!file_exists($langFile)) {
 }
 
 $translations = json_decode(file_get_contents($langFile), true);
+
+$conn = new mysqli($db_host, $db_username, $db_password, $db_name);
+
+if ($conn->connect_error) {
+    die("Kapcsolódási hiba: " . $conn->connect_error);
+}
+
+$sql = "SELECT * FROM opening_hours";
+$result = $conn->query($sql);
+$opening_hours = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $opening_hours[$row["day_of_week"]] = [
+            "open_time" => $row["open_time"],
+            "close_time" => $row["close_time"]
+        ];
+    }
+}
+
+$days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 ?>
 
 
@@ -96,18 +116,15 @@ $translations = json_decode(file_get_contents($langFile), true);
                         <a class="nav-link" href="#"><?php echo $translations["mainpage"]; ?></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
+                        <a class="nav-link" href="trainers/"><?php echo $translations["trainerspage"]; ?></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Disabled</a>
+                        <a class="nav-link" href="prices/"><?php echo $translations["pricespage"]; ?></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="login/" target="_blank" rel="noopener noreferrer" title="Login" class="nav-link ps-0 ps-lg-3 pe-3">
+                        <a href="login/" rel="noopener noreferrer" title="Login" class="nav-link ps-0 ps-lg-3 pe-3">
                             <i class="bi bi-person-circle"></i>
                         </a>
                     </li>
@@ -122,7 +139,24 @@ $translations = json_decode(file_get_contents($langFile), true);
         </div>
         <div class="row">
             <div class="col">
-
+                <table class="table table-striped table-bordered">
+                    <thead class="table-white">
+                        <tr>
+                            <th><?php echo $translations["day"];?></th>
+                            <th><?php echo $translations["opentime"];?></th>
+                            <th><?php echo $translations["closetime"];?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($days as $key => $day) : ?>
+                            <tr>
+                                <td><?php echo $day; ?></td>
+                                <td><?php echo isset($opening_hours[$key]['open_time']) ? $opening_hours[$key]['open_time'] : $translations["closed"]; ?></td>
+                                <td><?php echo isset($opening_hours[$key]['close_time']) ? $opening_hours[$key]['close_time'] : $translations["closed"]; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

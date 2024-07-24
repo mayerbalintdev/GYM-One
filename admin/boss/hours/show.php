@@ -83,8 +83,8 @@
         $days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
         ?>
 
-        <table class="table">
-            <thead>
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
                 <tr>
                     <th>Day</th>
                     <th>Open Time</th>
@@ -92,13 +92,11 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($days as $key => $day): ?>
+                <?php foreach ($days as $key => $day) : ?>
                     <tr>
                         <td><?php echo $day; ?></td>
-                        <td><?php echo isset($opening_hours[$key]['open_time']) ? $opening_hours[$key]['open_time'] : 'Closed'; ?>
-                        </td>
-                        <td><?php echo isset($opening_hours[$key]['close_time']) ? $opening_hours[$key]['close_time'] : 'Closed'; ?>
-                        </td>
+                        <td><?php echo isset($opening_hours[$key]['open_time']) ? $opening_hours[$key]['open_time'] : 'Closed'; ?></td>
+                        <td><?php echo isset($opening_hours[$key]['close_time']) ? $opening_hours[$key]['close_time'] : 'Closed'; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
