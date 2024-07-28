@@ -1,6 +1,13 @@
 #login{
     background-color: #252525;
 }
+#register{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    background-color: #252525;
+}
 
 svg{
     background-color: #252525;
@@ -15,6 +22,7 @@ svg{
 
 .card{
     margin-top: 50vh;
+    margin-bottom: 20px;
 }
 
 body{

@@ -26,20 +26,28 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../../.env');
+$copyright_year = date("Y");
+
+$env_data = read_env_file('.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
+$country = $env_data['COUNTRY'] ?? '';
+$street = $env_data['STREET'] ?? '';
+$city = $env_data['CITY'] ?? '';
+$hause_no = $env_data['HOUSE_NUMBER'] ?? '';
+$description = $env_data['DESCRIPTION'] ?? '';
+$metakey = $env_data['META_KEY'] ?? '';
+$gkey = $env_data['GOOGLE_KEY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
-$version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../../assets/lang/";
+$langDir = __DIR__ . "/assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -48,6 +56,7 @@ if (!file_exists($langFile)) {
 }
 
 $translations = json_decode(file_get_contents($langFile), true);
+
 
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
@@ -348,57 +357,19 @@ foreach ($data as $item) {
                 }
                 ?>
                 <div class="row">
-                    <div class="col-sm-12">
-                        <?php
-                        if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-                            echo '<div id="notHttpsAlert" class="alert alert-warning shadow-sm" role="alert">';
-                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['notusehttps'];
-                            echo '</div>';
-                        }
-                        ?>
-                        <?php
-                        $ruleContent = file_get_contents('../boss/rule/rule.html');
-
-                        if (empty($ruleContent)) {
-                            echo '<div class="alert alert-danger">';
-                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['gymrulenotset'];
-                            echo '</div>';
-                        }
-                        ?>
-
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allregisters"]; ?></h5>
+                                <div id="regusers"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
-                                <h1><strong><?php echo $row["total_people"]; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                                <div id="dailyusers"></div>
                             </div>
                         </div>
                     </div>
@@ -407,37 +378,23 @@ foreach ($data as $item) {
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold">
-                                    <?php echo $translations["new-users"]; ?>
-                                </h5>
-                                <div id="chart"></div>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allregisters"]; ?></h5>
+                                <div id="regusers"></div>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <p><?php echo $translations["dayopendayclose"]; ?></p>
-                                <div class="d-flex justify-content-between text-center">
-                                    <a href="" class="btn btn-success"><?php echo $translations["dayopen"]; ?></a>
-                                    <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card bg-danger">
-                            <div class="card-body">
-                                <p><?php echo $translations["emernumtext"]; ?></p>
-                                <div class="justify-content-between text-center">
-                                    <h2><?php echo $translations["ambulance"]; ?> <b class="text-danger"><?php echo $ambulanceNumbers; ?></b></h2>
-                                    <h2><?php echo $translations["fireresistor"]; ?> <b class="text-danger"><?php echo $fireNumbers; ?></b></h2>
-                                    <h2><?php echo $translations["police"]; ?> <b class="text-danger"><?php echo $policeNumbers; ?></b></h2>
-                                </div>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
+                                <div id="dailyusers"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- EXIT MODAL -->
@@ -468,7 +425,7 @@ foreach ($data as $item) {
                         show: false
                     },
                     zoom: {
-                        enabled: false
+                        enabled: true
                     }
                 },
                 colors: ['#59F8E4'],
@@ -490,7 +447,43 @@ foreach ($data as $item) {
                 },
             };
 
-            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            var chart = new ApexCharts(document.querySelector("#regusers"), options);
+            chart.render();
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);
+
+            var options = {
+                chart: {
+                    type: 'area',
+                    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+                    toolbar: {
+                        show: false
+                    },
+                    zoom: {
+                        enabled: true
+                    }
+                },
+                colors: ['#59F8E4'],
+                series: [{
+                    name: '<?php echo $translations["reg-number"]; ?>',
+                    data: seriesData
+                }],
+                xaxis: {
+                    categories: <?php echo json_encode($categories); ?>,
+                },
+                yaxis: {
+                    tickAmount: Math.max(...seriesData),
+                    min: 0,
+                    labels: {
+                        formatter: function(value) {
+                            return Math.floor(value);
+                        }
+                    }
+                },
+            };
+
+            var chart = new ApexCharts(document.querySelector("#dailyusers"), options);
             chart.render();
         });
     </script>

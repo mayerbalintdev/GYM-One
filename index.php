@@ -15,6 +15,7 @@
 
     return $env_data;
 }
+$copyright_year = date("Y");
 
 $env_data = read_env_file('.env');
 
@@ -142,9 +143,9 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
                 <table class="table table-striped table-bordered">
                     <thead class="table-white">
                         <tr>
-                            <th><?php echo $translations["day"];?></th>
-                            <th><?php echo $translations["opentime"];?></th>
-                            <th><?php echo $translations["closetime"];?></th>
+                            <th><?php echo $translations["day"]; ?></th>
+                            <th><?php echo $translations["opentime"]; ?></th>
+                            <th><?php echo $translations["closetime"]; ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -185,7 +186,7 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
 
             <div class="border-top border-secondary pt-3 mt-3">
                 <p class="small text-center mb-0">
-                    Copyright © 2024 <?php echo $business_name; ?> - <?php echo $translations["copyright"]; ?>
+                    Copyright © <?php echo $copyright_year; ?> <?php echo $business_name; ?> - <?php echo $translations["copyright"]; ?>
                     &nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314">
                         </path>
