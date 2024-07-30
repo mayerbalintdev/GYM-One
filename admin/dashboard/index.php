@@ -222,6 +222,16 @@ foreach ($data as $item) {
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../users">
+                            <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../statistics">
+                            <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
+                    </li>
                     <?php
                     if ($stmt->num_rows > 0) {
                         $stmt->bind_result($is_boss);
@@ -260,6 +270,24 @@ foreach ($data as $item) {
                                 <a class="sidebar-link" href="../boss/smtp">
                                     <i class="bi bi-envelope-at"></i>
                                     <span><?php echo $translations["mailpage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/chroom">
+                                    <i class="bi bi-duffle"></i>
+                                    <span><?php echo $translations["chroompage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/rule">
+                                    <i class="bi bi-file-ruled"></i>
+                                    <span><?php echo $translations["rulepage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/tickets">
+                                    <i class="bi bi-ticket"></i>
+                                    <span><?php echo $translations["ticketspage"]; ?></span>
                                 </a>
                             </li>
                     <?php

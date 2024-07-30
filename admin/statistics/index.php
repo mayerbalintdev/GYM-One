@@ -26,28 +26,20 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$copyright_year = date("Y");
-
-$env_data = read_env_file('.env');
+$env_data = read_env_file('../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
-$country = $env_data['COUNTRY'] ?? '';
-$street = $env_data['STREET'] ?? '';
-$city = $env_data['CITY'] ?? '';
-$hause_no = $env_data['HOUSE_NUMBER'] ?? '';
-$description = $env_data['DESCRIPTION'] ?? '';
-$metakey = $env_data['META_KEY'] ?? '';
-$gkey = $env_data['GOOGLE_KEY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
+$version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/assets/lang/";
+$langDir = __DIR__ . "/../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -56,7 +48,6 @@ if (!file_exists($langFile)) {
 }
 
 $translations = json_decode(file_get_contents($langFile), true);
-
 
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
@@ -134,16 +125,24 @@ curl_close($ch);
 $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
-// SUM DAILY USERS
 
-$sql = "SELECT COALESCE(SUM(number_of_people), 0) AS total_people FROM temp_dailyworkout";
-
+// Query to get gender count
+$sql = "SELECT gender, COUNT(*) as count FROM users GROUP BY gender";
 $result = $conn->query($sql);
 
+$maleCount = 0;
+$femaleCount = 0;
+
 if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+    // Output data of each row
+    while ($row = $result->fetch_assoc()) {
+        if ($row["gender"] == "Male") {
+            $maleCount = $row["count"];
+        } elseif ($row["gender"] == "Female") {
+            $femaleCount = $row["count"];
+        }
+    }
 }
-// SUM DAILY USERS !!!!END!!!!
 
 
 $conn->close();
@@ -231,6 +230,16 @@ foreach ($data as $item) {
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../users">
+                            <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../statistics">
+                            <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
+                    </li>
                     <?php
                     if ($stmt->num_rows > 0) {
                         $stmt->bind_result($is_boss);
@@ -269,6 +278,24 @@ foreach ($data as $item) {
                                 <a class="sidebar-link" href="../boss/smtp">
                                     <i class="bi bi-envelope-at"></i>
                                     <span><?php echo $translations["mailpage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/chroom">
+                                    <i class="bi bi-duffle"></i>
+                                    <span><?php echo $translations["chroompage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/rule">
+                                    <i class="bi bi-file-ruled"></i>
+                                    <span><?php echo $translations["rulepage"]; ?></span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a class="sidebar-link" href="../boss/tickets">
+                                    <i class="bi bi-ticket"></i>
+                                    <span><?php echo $translations["ticketspage"]; ?></span>
                                 </a>
                             </li>
                     <?php
@@ -357,44 +384,45 @@ foreach ($data as $item) {
                 }
                 ?>
                 <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allregisters"]; ?></h5>
-                                <div id="regusers"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
-                                <div id="dailyusers"></div>
-                            </div>
-                        </div>
+                    <div class="col-sm-12">
+                        <?php
+                        if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+                            echo '<div id="notHttpsAlert" class="alert alert-warning shadow-sm" role="alert">';
+                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['notusehttps'];
+                            echo '</div>';
+                        }
+                        ?>
+                        <?php
+                        $ruleContent = file_get_contents('../boss/rule/rule.html');
+
+                        if (empty($ruleContent)) {
+                            echo '<div class="alert alert-danger">';
+                            echo '<i class="bi bi-exclamation-triangle"></i> ' . $translations['gymrulenotset'];
+                            echo '</div>';
+                        }
+                        ?>
+
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["allregisters"]; ?></h5>
-                                <div id="regusers"></div>
+                                <div class="text-center" id="userschart"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
-                                <div id="dailyusers"></div>
+                                <div class="text-center" id="malefamalechart"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- EXIT MODAL -->
@@ -425,7 +453,7 @@ foreach ($data as $item) {
                         show: false
                     },
                     zoom: {
-                        enabled: true
+                        enabled: false
                     }
                 },
                 colors: ['#59F8E4'],
@@ -447,43 +475,57 @@ foreach ($data as $item) {
                 },
             };
 
-            var chart = new ApexCharts(document.querySelector("#regusers"), options);
+            var chart = new ApexCharts(document.querySelector("#userschart"), options);
             chart.render();
         });
-        document.addEventListener("DOMContentLoaded", function() {
-            let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);
-
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             var options = {
+                series: [<?php echo $maleCount; ?>, <?php echo $femaleCount; ?>],
                 chart: {
-                    type: 'area',
-                    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+                    type: 'donut',
+                    width: '100%',
+                    height: 'auto',
                     toolbar: {
                         show: false
-                    },
-                    zoom: {
-                        enabled: true
                     }
                 },
-                colors: ['#59F8E4'],
-                series: [{
-                    name: '<?php echo $translations["reg-number"]; ?>',
-                    data: seriesData
-                }],
-                xaxis: {
-                    categories: <?php echo json_encode($categories); ?>,
+                colors: ['#1E90FF', '#FF69B4'],
+                labels: ['<?php echo $translations["boy"]; ?>', '<?php echo $translations["girl"]; ?>'],
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val, opts) {
+                        return val.toFixed(2) + '%';
+                    }
                 },
-                yaxis: {
-                    tickAmount: Math.max(...seriesData),
-                    min: 0,
-                    labels: {
-                        formatter: function(value) {
-                            return Math.floor(value);
+                tooltip: {
+                    y: {
+                        formatter: function(val, opts) {
+                            var total = opts.globals.series.reduce((a, b) => a + b, 0);
+                            var percent = (val / total) * 100;
+                            return percent.toFixed(2) + '%';
                         }
                     }
                 },
+                legend: {
+                    show: true,
+                    position: 'bottom'
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: '100%'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
             };
 
-            var chart = new ApexCharts(document.querySelector("#dailyusers"), options);
+            var chart = new ApexCharts(document.querySelector("#malefamalechart"), options);
             chart.render();
         });
     </script>

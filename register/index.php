@@ -42,6 +42,11 @@ $hause_no = $env_data['HOUSE_NUMBER'] ?? '';
 $description = $env_data['DESCRIPTION'] ?? '';
 $metakey = $env_data['META_KEY'] ?? '';
 $gkey = $env_data['GOOGLE_KEY'] ?? '';
+$smtp_password = $env_data['MAIL_PASSWORD'] ?? '';
+$smtp_port = $env_data['MAIL_PORT'] ?? '';
+$smtp_username = $env_data["MAIL_USERNAME"] ?? '';
+$smtp_encryption = $env_data['MAIL_ENCRYPTION'] ?? '';
+$smtp_host = $env_data['MAIL_HOST'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -98,9 +103,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             $alerts_html .= '<div class="alert alert-success">Sikeres regisztráció!</div>';
             header("Refresh: 5");
-            $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
-                ->setUsername('12345@gmail.com')
-                ->setPassword('HAHA YOU FEEL ME?');
+            $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
+                ->setUsername($smtp_username)
+                ->setPassword($smtp_password);
 
             $mailer = new Swift_Mailer($transport);
 
@@ -354,7 +359,7 @@ EOD;
 
             if ($isRegistrationSuccessful) {
                 $message = (new Swift_Message($subject))
-                    ->setFrom(['12345@gmail.com' => "{$business_name} - {$translations['confirmemailpage']}"])
+                    ->setFrom(["{$smtp_username}" => "{$business_name} - {$translations['confirmemailpage']}"])
                     ->setTo([$recipientEmail])
                     ->setBody($successEmailContent, 'text/html');
             }
@@ -377,6 +382,7 @@ EOD;
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/login-register.css">
+    <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 
 <body>
@@ -426,7 +432,7 @@ EOD;
                                     <label for="gender"><?php echo $translations["gender"]; ?></label>
                                     <select class="form-control" id="gender" name="gender" required>
                                         <option value="Male"><?php echo $translations["boy"]; ?></option>
-                                        <option value="Famale"><?php echo $translations["girl"]; ?></option>
+                                        <option value="Female"><?php echo $translations["girl"]; ?></option>
                                     </select>
                                 </div>
                                 <div class="form-group">
