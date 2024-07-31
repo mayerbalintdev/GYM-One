@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['userid'])) {
+if (!isset($_SESSION['adminuser'])) {
   header("Location: ../");
   exit();
 }
 
-$userid = $_SESSION['userid'];
+$userid = $_SESSION['adminuser'];
 
 function read_env_file($file_path)
 {

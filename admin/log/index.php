@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['userid'])) {
+if (!isset($_SESSION['adminuser'])) {
     header("Location: ../");
     exit();
 }
 
-$userid = $_SESSION['userid'];
+$userid = $_SESSION['adminuser'];
 
 $alerts_html = "";
 
@@ -153,7 +153,7 @@ $conn->close();
                     <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
                     <li><a href="#">Age</a></li>
                     <li><a href="#">Gender</a></li>
-                    <li><a href="#"><?php echo $_SESSION["userid"]; ?></a></li>
+                    <li><a href="#"><?php echo $_SESSION["adminuser"]; ?></a></li>
                 </ul>
             </div>
         </div>

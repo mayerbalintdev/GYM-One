@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
             if (password_verify($password, $row['password_hash'])) {
-                $_SESSION['userid'] = $row['userid'];
+                $_SESSION['adminuser'] = $row['userid'];
                 header("Location: dashboard/");
                 exit();
             } else {
