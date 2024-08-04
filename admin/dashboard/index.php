@@ -136,6 +136,11 @@ if ($result->num_rows > 0) {
 }
 // SUM DAILY USERS !!!!END!!!!
 
+// TEMP USERS TABLE!!!
+
+$sql = "SELECT name, userid, login_date FROM temp_loggeduser";
+$result = $conn->query($sql);
+
 
 $conn->close();
 
@@ -460,6 +465,48 @@ foreach ($data as $item) {
                                     <h2><?php echo $translations["fireresistor"]; ?> <b class="text-danger"><?php echo $fireNumbers; ?></b></h2>
                                     <h2><?php echo $translations["police"]; ?> <b class="text-danger"><?php echo $policeNumbers; ?></b></h2>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="table table-dark table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th><?php echo $translations["fullname"];?></th>
+                                            <th><?php echo $translations["logintime"];?></th>
+                                            <th><?php echo $translations["userlogout"];?></th>
+                                            <th><?php echo $translations["editbtn"];?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        if ($result->num_rows > 0) {
+                                            $counter = 1;
+                                            while ($row = $result->fetch_assoc()) {
+                                                $current_time = new DateTime();
+                                                $login_time = new DateTime($row["login_date"]);
+                                                $interval = $current_time->diff($login_time);
+
+                                                $elapsed_time = $interval->format(' %h óra %i perc');
+
+                                                echo "<tr>";
+                                                echo "<td>" . $counter . "</td>";
+                                                echo "<td>" . $row["name"] . "</td>";
+                                                echo "<td>" . $elapsed_time . "</td>";
+                                                // KILÉPTETÉST MEGCSINÁLNI!
+                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">Kiléptetés ERROR!</a></td>';
+                                                echo '<td><a class= "btn btn-secondary" href="../users/edit/?user=' . $row["userid"] . '">' . $translations["editbtn"] . '</a></td>';
+                                                echo "</tr>";
+
+                                                $counter++;
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='5'>No results found</td></tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
