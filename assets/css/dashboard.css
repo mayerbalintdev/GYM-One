@@ -121,3 +121,26 @@ i.bi.bi-exclamation-circle {
 .btn-secondary:hover{
     color: white
 }
+
+#video-container {
+    width: 200px;
+    height: 100%;
+}
+
+#video.scanned {
+    filter: sepia(100%);
+}
+#checkmark, #error {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4em;
+}
+#checkmark {
+    color: green;
+}
+#error {
+    color: red;
+}

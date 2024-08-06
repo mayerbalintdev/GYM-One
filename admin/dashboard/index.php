@@ -189,10 +189,50 @@ foreach ($data as $item) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<style>
+    #video-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+
+    #video {
+        width: 100%;
+        height: 100%;
+    }
+
+    #video.scanned {
+        filter: brightness(0.5) sepia(100%);
+    }
+
+    #video.error {
+        filter: brightness(0.5) contrast(1.5) sepia(1) hue-rotate(-50deg);
+    }
+
+    #checkmark,
+    #error {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 4em;
+    }
+
+    #checkmark {
+        color: green;
+    }
+
+    #error {
+        color: red;
+    }
+</style>
 
 <body>
     <nav class="navbar navbar-inverse visible-xs">
@@ -430,8 +470,12 @@ foreach ($data as $item) {
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["users"]; ?></h5>
-                                <h1><strong><?php echo $userCount; ?></strong></h1>
+                                <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["userlogginer"]; ?></h5>
+                                <div class="text-center">
+                                    <a data-toggle="modal" data-target="#Logginer_MODAL" class="btn btn-success">
+                                        <h4>BELEPTETÉS</h4>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -473,10 +517,10 @@ foreach ($data as $item) {
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th><?php echo $translations["fullname"];?></th>
-                                            <th><?php echo $translations["logintime"];?></th>
-                                            <th><?php echo $translations["userlogout"];?></th>
-                                            <th><?php echo $translations["editbtn"];?></th>
+                                            <th><?php echo $translations["fullname"]; ?></th>
+                                            <th><?php echo $translations["logintime"]; ?></th>
+                                            <th><?php echo $translations["userlogout"]; ?></th>
+                                            <th><?php echo $translations["editbtn"]; ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -502,7 +546,7 @@ foreach ($data as $item) {
                                                 $counter++;
                                             }
                                         } else {
-                                            echo "<tr><td colspan='5'>No results found</td></tr>";
+                                            echo "<tr><td colspan='5'>" . $translations["noonetraining"] . "</td></tr>";
                                         }
                                         ?>
                                     </tbody>
@@ -529,8 +573,134 @@ foreach ($data as $item) {
             </div>
         </div>
     </div>
+    <!-- BELÉPTETŐ MODAL -->
+    <div class="modal fade" id="Logginer_MODAL" tabindex="-1" role="dialog" aria-labelledby="LogginerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="LogginerModalLabel">QR Code Scanner</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <div id="video-container">
+                                <video id="video" width="500px" autoplay></video>
+                                <div id="checkmark">✔</div>
+                                <div id="error">✘</div>
+                            </div>
+                            <p id="result">Scan a QR code</p>
+                        </div>
+                        <h1>----VAGY----</h1>
+                        <form class="form-inline my-2 my-lg-0">
+                            <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search by name..." aria-label="Search">
+                        </form>
+                        <div id="results" class="mt-4"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- SCRIPTS! -->
+    <script>
+    $(document).ready(function(){
+        $("#search").on("input", function() {
+            var query = $(this).val();
+            if (query.length > 2) { 
+                $.ajax({
+                    url: 'search.php',
+                    method: 'POST',
+                    data: { search: query },
+                    success: function(data) {
+                        $("#results").html(data);
+                    }
+                });
+            } else {
+                $("#results").html('');
+            }
+        });
+    });
+</script>
+    <script>
+        const codeReader = new ZXing.BrowserQRCodeReader();
+        const video = document.getElementById('video');
+        const resultElement = document.getElementById('result');
+        const checkmark = document.getElementById('checkmark');
+        const error = document.getElementById('error');
+
+        let scanCompleted = false;
+        let scanning = false;
+
+        function startScanning() {
+            if (scanCompleted || scanning) return;
+
+            scanning = true;
+            codeReader.decodeFromVideoDevice(null, video, (result, error) => {
+                    if (result && !scanCompleted) {
+                        scanCompleted = true; // Prevent further scans
+                        const qrCodeText = result.text;
+                        resultElement.textContent = `QR Code Result: ${qrCodeText}`;
+
+                        // Send the result to the PHP backend
+                        fetch('process.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: `qrcode=${encodeURIComponent(qrCodeText)}`
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    resultElement.innerHTML = `First Name: ${data.firstname}<br>Last Name: ${data.lastname}`;
+                                    // Change video container background color and show checkmark
+                                    video.classList.add('scanned');
+                                    checkmark.style.display = 'block';
+                                } else {
+                                    // No user found, show error
+                                    resultElement.textContent = 'User not found.';
+                                    video.classList.add('error');
+                                    error.style.display = 'block';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                resultElement.textContent = 'Error occurred.';
+                                video.classList.add('error');
+                                error.style.display = 'block';
+                            });
+                    }
+                    if (error && !scanCompleted) {
+                        console.error(error);
+                    }
+                })
+                .catch(error => console.error(error));
+        }
+
+        function stopScanning() {
+            if (scanning) {
+                codeReader.reset(); // Stop the scanner
+                video.srcObject = null; // Stop the video stream
+                scanning = false;
+                scanCompleted = false;
+                resultElement.textContent = '';
+                checkmark.style.display = 'none';
+                error.style.display = 'none';
+                video.classList.remove('scanned', 'error'); // Remove the scanned and error classes
+            }
+        }
+
+        $('#Logginer_MODAL').on('shown.bs.modal', startScanning);
+        $('#Logginer_MODAL').on('hidden.bs.modal', stopScanning);
+    </script>
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);

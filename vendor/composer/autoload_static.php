@@ -26,12 +26,18 @@ class ComposerStaticInit566d94f2b83dbb60f29552a8a8cb3dc9
         ),
         'E' => 
         array (
+            'Endroid\\QrCode\\' => 15,
             'Egulias\\EmailValidator\\' => 23,
         ),
         'D' => 
         array (
             'Doctrine\\Deprecations\\' => 22,
             'Doctrine\\Common\\Lexer\\' => 22,
+            'DASPRiD\\Enum\\' => 13,
+        ),
+        'B' => 
+        array (
+            'BaconQrCode\\' => 12,
         ),
     );
 
@@ -56,6 +62,10 @@ class ComposerStaticInit566d94f2b83dbb60f29552a8a8cb3dc9
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
+        'Endroid\\QrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/endroid/qr-code/src',
+        ),
         'Egulias\\EmailValidator\\' => 
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/src',
@@ -67,6 +77,14 @@ class ComposerStaticInit566d94f2b83dbb60f29552a8a8cb3dc9
         'Doctrine\\Common\\Lexer\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/lexer/src',
+        ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
