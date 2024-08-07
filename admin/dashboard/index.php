@@ -578,7 +578,7 @@ foreach ($data as $item) {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="LogginerModalLabel">QR Code Scanner</h5>
+                    <h5 class="modal-title" id="LogginerModalLabel"><?php echo $translations["userlogginer"];?></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -591,17 +591,38 @@ foreach ($data as $item) {
                                 <div id="checkmark">✔</div>
                                 <div id="error">✘</div>
                             </div>
-                            <p id="result">Scan a QR code</p>
+                            <p id="result"><?php echo $translations["qrscann"];?></p>
                         </div>
-                        <h1>----VAGY----</h1>
+                        <h1><?php echo $translations["or"];?></h1>
                         <form class="form-inline my-2 my-lg-0">
-                            <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search by name..." aria-label="Search">
+                            <input id="search" class="form-control mr-sm-2" type="search" placeholder="<?php echo $translations["name-search"];?> " aria-label="Search">
                         </form>
                         <div id="results" class="mt-4"></div>
+                        <input hidden id="qrcodeContent">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
+                    <a type="button" id="continueButton" class="btn btn-primary" style="display: none;"><?php echo $translations["next"];?></a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"]; ?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="UserDetails_MODAL" tabindex="-1" role="dialog" aria-labelledby="userDetailsLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userDetailsLabel">Felhasználó Adatok</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Bezárás">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="userDetails"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Bezárás</button>
                 </div>
             </div>
         </div>
@@ -609,78 +630,88 @@ foreach ($data as $item) {
 
     <!-- SCRIPTS! -->
     <script>
-    $(document).ready(function(){
-        $("#search").on("input", function() {
-            var query = $(this).val();
-            if (query.length > 2) { 
-                $.ajax({
-                    url: 'search.php',
-                    method: 'POST',
-                    data: { search: query },
-                    success: function(data) {
-                        $("#results").html(data);
-                    }
-                });
-            } else {
-                $("#results").html('');
-            }
+        $(document).ready(function() {
+            $("#search").on("input", function() {
+                var query = $(this).val();
+                if (query.length > 2) {
+                    $.ajax({
+                        url: 'search.php',
+                        method: 'POST',
+                        data: {
+                            search: query
+                        },
+                        success: function(data) {
+                            $("#results").html(data);
+                        }
+                    });
+                } else {
+                    $("#results").html('');
+                }
+            });
         });
-    });
-</script>
-    <script>
+
         const codeReader = new ZXing.BrowserQRCodeReader();
         const video = document.getElementById('video');
         const resultElement = document.getElementById('result');
         const checkmark = document.getElementById('checkmark');
         const error = document.getElementById('error');
+        const qrCodeContent = document.getElementById('qrcodeContent');
+        const continueButton = document.getElementById('continueButton');
+        const userDetails = document.getElementById('userDetails');
 
         let scanCompleted = false;
         let scanning = false;
 
+        let userData = {}; // Új változó a felhasználói adatok tárolására
+
+        var translations = <?php echo json_encode($translations); ?>;
         function startScanning() {
             if (scanCompleted || scanning) return;
 
             scanning = true;
             codeReader.decodeFromVideoDevice(null, video, (result, error) => {
-                    if (result && !scanCompleted) {
-                        scanCompleted = true; // Prevent further scans
-                        const qrCodeText = result.text;
-                        resultElement.textContent = `QR Code Result: ${qrCodeText}`;
+                if (result && !scanCompleted) {
+                    scanCompleted = true;
+                    const qrCodeText = result.text;
+                    resultElement.textContent = `QR Code Result: ${qrCodeText}`;
+                    qrCodeContent.value = qrCodeText;
+                    continueButton.style.display = 'inline';
 
-                        // Send the result to the PHP backend
-                        fetch('process.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                },
-                                body: `qrcode=${encodeURIComponent(qrCodeText)}`
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    resultElement.innerHTML = `First Name: ${data.firstname}<br>Last Name: ${data.lastname}`;
-                                    // Change video container background color and show checkmark
-                                    video.classList.add('scanned');
-                                    checkmark.style.display = 'block';
-                                } else {
-                                    // No user found, show error
-                                    resultElement.textContent = 'User not found.';
-                                    video.classList.add('error');
-                                    error.style.display = 'block';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                resultElement.textContent = 'Error occurred.';
+                    fetch('process.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `qrcode=${encodeURIComponent(qrCodeText)}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                userData = {
+                                    firstname: data.firstname,
+                                    lastname: data.lastname,
+                                    birthdate: data.birthdate
+                                };
+                                resultElement.innerHTML = `${translations.firstname}: ${data.firstname}<br>${translations.lastname}: ${data.lastname}`;
+                                video.classList.add('scanned');
+                                checkmark.style.display = 'block';
+                            } else {
+                                resultElement.textContent = `${translations['qr-error']}`;
                                 video.classList.add('error');
                                 error.style.display = 'block';
-                            });
-                    }
-                    if (error && !scanCompleted) {
-                        console.error(error);
-                    }
-                })
-                .catch(error => console.error(error));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            resultElement.textContent = `${translations['qr-error']}`;
+                            video.classList.add('error');
+                            error.style.display = 'block';
+                        });
+                }
+                if (error && !scanCompleted) {
+                    console.error(error);
+                }
+            }).catch(error => console.error(error));
         }
 
         function stopScanning() {
@@ -693,14 +724,27 @@ foreach ($data as $item) {
                 checkmark.style.display = 'none';
                 error.style.display = 'none';
                 video.classList.remove('scanned', 'error'); // Remove the scanned and error classes
+                continueButton.style.display = 'none'; // Hide the continue button
             }
         }
+
+        $('#continueButton').on('click', function() {
+            $('#Logginer_MODAL').modal('hide'); // Hide the current modal
+            stopScanning(); // Reset the scanner
+
+            // Frissítsd a userDetails modal tartalmát az userData változó alapján
+            userDetails.innerHTML = `
+            First Name: ${userData.firstname}<br>
+            Last Name: ${userData.lastname}<br>
+            Birthday: ${userData.birthdate}
+        `;
+
+            $('#UserDetails_MODAL').modal('show'); // Show the next modal
+        });
 
         $('#Logginer_MODAL').on('shown.bs.modal', startScanning);
         $('#Logginer_MODAL').on('hidden.bs.modal', stopScanning);
     </script>
-
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);

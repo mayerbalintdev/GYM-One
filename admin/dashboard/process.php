@@ -1,7 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Database configuration
 $host = 'localhost';
 $db = 'gymone';
 $user = 'root';
@@ -15,7 +14,7 @@ if ($conn->connect_error) {
 
 $qrCode = isset($_POST['qrcode']) ? $conn->real_escape_string($_POST['qrcode']) : '';
 
-$sql = "SELECT firstname, lastname FROM users WHERE userid = '$qrCode'";
+$sql = "SELECT firstname, lastname,birthdate, gender FROM users WHERE userid = '$qrCode'";
 $result = $conn->query($sql);
 
 $response = ['success' => false];
@@ -25,6 +24,8 @@ if ($result && $result->num_rows > 0) {
     $response['success'] = true;
     $response['firstname'] = $row['firstname'];
     $response['lastname'] = $row['lastname'];
+    $response['birthdate'] = $row['birthdate'];
+    $response['gender'] = $row["gender"];
 } else {
     $response['error'] = 'User not found';
 }

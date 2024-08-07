@@ -55,6 +55,31 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $szekreny_szam = $_POST['szekreny_szam'];
+    $oltozo = $_POST['oltozo'];
+
+    $sql = "INSERT INTO lockers (lockernum, gender) VALUES ('$szekreny_szam', '$oltozo')";
+    if ($conn->query($sql) === TRUE) {
+        echo "Új szekrény sikeresen hozzáadva.";
+    } else {
+        echo "Hiba: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+$sql = "SELECT * FROM lockers";
+$result = $conn->query($sql);
+
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    $sql = "DELETE FROM lockers WHERE id=$id";
+    if ($conn->query($sql) === TRUE) {
+        echo "Szekrény sikeresen törölve.";
+    } else {
+        echo "Hiba: " . $conn->error;
+    }
+}
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -89,6 +114,7 @@ $conn->close();
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../../assets/css/dashboard.css">
+
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
@@ -133,7 +159,7 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -155,7 +181,7 @@ $conn->close();
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -172,26 +198,17 @@ $conn->close();
                         </a>
                     </li>
                 </ul><br>
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <p class="mb-0 py-2 text-center text-body-secondary">
-                            Powered by GYM One © 2019-2024. Panel designed by Mayer Bálint.
-                        </p>
-                    </div>
-                </footer>
             </div>
 
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
                     </a>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
+                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-journals"></i>
                         <?php echo $translations["docs"]; ?>
                     </a>
@@ -211,14 +228,63 @@ $conn->close();
                                     $stmt->fetch();
 
                                     if ($is_boss == 1) {
-                                        ?>
-                                        asd
-                                        <?php
+                                ?>
+                                        <h2 class="mt-4"><?php echo $translations["newlocker"]; ?></h2>
+                                        <form method="post" action="">
+                                            <div class="form-group">
+                                                <label for="szekreny_szam"><?php echo $translations["lockernum"]; ?></label>
+                                                <input type="number" class="form-control" id="szekreny_szam" name="szekreny_szam" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="oltozo"><?php echo $translations["lockergender"]; ?></label>
+                                                <select class="form-control" id="oltozo" name="oltozo" required>
+                                                    <option value="Male"><?php echo $translations["boy"]; ?></option>
+                                                    <option value="Female"><?php echo $translations["girl"]; ?></option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" name="add" class="btn btn-primary mt-5"><?php echo $translations["add"]; ?></button>
+                                        </form>
+
+                                        <table class="table table-bordered mt-5">
+                                            <thead>
+                                                <tr>
+                                                    <th><?php echo $translations["lockernum"]; ?></th>
+                                                    <th><?php echo $translations["lockergender"]; ?></th>
+                                                    <th><?php echo $translations["interact"]; ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                if ($result->num_rows > 0) {
+                                                    while ($row = $result->fetch_assoc()) {
+                                                        echo "<tr>
+            <td>{$row['lockernum']}</td>
+            <td>";
+
+                                                        if ($row['gender'] == 'Male') {
+                                                            echo $translations['boy'];
+                                                        } elseif ($row['gender'] == 'Female') {
+                                                            echo $translations['girl'];
+                                                        }
+                                                        echo "</td>
+            <td>
+                <a href='?delete={$row['id']}' class='btn btn-danger btn-sm'>{$translations["delete"]}</a>
+            </td>
+        </tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='4'>{$translations["notlockers"]}</td></tr>";
+                                                }
+                                                ?>
+
+                                            </tbody>
+                                        </table>
+                                <?php
                                     } else {
                                         echo $translations["dont-access"];
                                     }
                                 } else {
-                                    echo "Users do not exist!";
+                                    echo $translations["user-notexist"];
                                 }
                                 ?>
 
@@ -230,18 +296,15 @@ $conn->close();
         </div>
     </div>
 
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <p><?php echo $translations["exit-modal"]; ?></p>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary"
-                        data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
-                        class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>
