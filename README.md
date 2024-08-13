@@ -20,6 +20,8 @@ Here're some of the project's best features:
 <h2>⏰ Expected arrival:</h2>
 The very first version of GYM One is expected to be released in <strong>mid-October 2024</strong>.
 
+*   For the first 2 weeks only the Hungarian Public-HunBeta version will be released, after that all other available languages will be released with PublicBeta 1.0 version number
+
 <a href="https://buymeacoffee.com/mayerbalint" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
   
 <h2>💻 Built with</h2>
@@ -31,4 +33,4 @@ Technologies used in the project:
 
 <h2>🛡️ License:</h2>
 
-This project is licensed under the Creative Commons (CC)
+This project is licensed under the Custom License (CL)

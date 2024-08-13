@@ -38,6 +38,7 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
+$capacity = $env_data["CAPACITY"] ?? '';
 
 $lang = $lang_code;
 
@@ -68,6 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $langcode_env = $_POST['lang_code'] ?? '';
         $currency_env = $_POST['currency'] ?? '';
         $gkey_env = $_POST['gkey'] ?? '';
+        $capacity_env = $_POST["capacity"] ?? '';
 
         $env_data["BUSINESS_NAME"] = $business_name;
         $env_data['STREET'] = $street_env;
@@ -79,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $env_data['LANG_CODE'] = $langcode_env;
         $env_data['CURRENCY'] = $currency_env;
         $env_data['GOOGLE_KEY'] = $gkey_env;
+        $env_data["CAPACITY"] = $capacity_env;
 
         $env_content = '';
         foreach ($env_data as $key => $value) {
@@ -203,7 +206,7 @@ $conn->close();
                         $stmt->fetch();
 
                         if ($is_boss == 1) {
-                            ?>
+                    ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
                             </li>
@@ -225,7 +228,7 @@ $conn->close();
                                     <span><?php echo $translations["mailpage"]; ?></span>
                                 </a>
                             </li>
-                            <?php
+                    <?php
                         }
                     }
                     ?>
@@ -274,7 +277,7 @@ $conn->close();
                                     $stmt->fetch();
 
                                     if ($is_boss == 1) {
-                                        ?>
+                                ?>
                                         <form method="POST">
                                             <div class="form-row">
                                                 <div class="form-group col-md-6">
@@ -299,11 +302,16 @@ $conn->close();
                                                 </div>
                                             </div>
                                             <div class="form-row">
-                                                <div class="form-group col-md-12">
+                                                <div class="form-group col-md-8">
                                                     <label
                                                         for="description"><?php echo $translations["websitedescription"]; ?>:</label>
                                                     <input type="text" class="form-control" id="description" name="description"
                                                         value="<?= htmlspecialchars($env_data['DESCRIPTION'] ?? '') ?>">
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label for="capacity"><?php echo $translations["capacityenv"]; ?>:</label>
+                                                    <input type="text" class="form-control" id="capacity" name="capacity"
+                                                        value="<?= htmlspecialchars($env_data['CAPACITY'] ?? '') ?>">
                                                 </div>
                                             </div>
                                             <div class="form-row">
@@ -343,7 +351,7 @@ $conn->close();
                                                         <label for="gkey"><?php echo $translations["googletrakckey"]; ?>:</label>
                                                         <input type="text" class="form-control" id="gkey" name="gkey"
                                                             value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
-                                                        <small><?php echo $translations["googlekeyonly"];?></small>
+                                                        <small><?php echo $translations["googlekeyonly"]; ?></small>
                                                     </div>
                                                 </div>
 
@@ -352,7 +360,7 @@ $conn->close();
                                                 class="btn btn-primary"><?php echo $translations["save"]; ?></button>
 
                                         </form>
-                                        <?php
+                                <?php
                                     } else {
                                         echo $translations["dont-access"];
                                     }
@@ -371,7 +379,7 @@ $conn->close();
                             $stmt->fetch();
 
                             if ($is_boss == 1) {
-                                ?>
+                        ?>
                                 <div class="col-md-4">
                                     <div class="card shadow">
                                         <div class="card-header">
@@ -447,7 +455,7 @@ $conn->close();
                                         </div>
                                     </div>
                                 </div>
-                                <?php
+                        <?php
                             } else {
                                 echo $translations["dont-access"];
                             }

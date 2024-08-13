@@ -7,6 +7,8 @@ if (!isset($_SESSION['adminuser'])) {
 }
 
 $userid = $_SESSION['adminuser'];
+$alerts_html = '';
+
 
 function read_env_file($file_path)
 {
@@ -61,9 +63,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $sql = "INSERT INTO lockers (lockernum, gender) VALUES ('$szekreny_szam', '$oltozo')";
     if ($conn->query($sql) === TRUE) {
-        echo "Új szekrény sikeresen hozzáadva.";
+        $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["successaddlocker"] . '
+                        </div>';
+        header("Refresh:1");
     } else {
-        echo "Hiba: " . $sql . "<br>" . $conn->error;
+        $alerts_html .= "Error: " . $sql . "<br>" . $conn->error;
     }
 }
 
@@ -74,19 +79,21 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $sql = "DELETE FROM lockers WHERE id=$id";
     if ($conn->query($sql) === TRUE) {
-        echo "Szekrény sikeresen törölve.";
+        $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["successdeletelocker"] . '
+                        </div>';
+        header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
     } else {
-        echo "Hiba: " . $conn->error;
+        $alerts_html .= "Error: " . $conn->error;
     }
 }
+
 
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
-
-$alerts_html = '';
 
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
@@ -245,7 +252,7 @@ $conn->close();
                                             <button type="submit" name="add" class="btn btn-primary mt-5"><?php echo $translations["add"]; ?></button>
                                         </form>
 
-                                        <table class="table table-bordered mt-5">
+                                        <table class="mt-4 table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th><?php echo $translations["lockernum"]; ?></th>

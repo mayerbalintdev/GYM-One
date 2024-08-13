@@ -36,6 +36,7 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
+$capacity = $env_data["CAPACITY"] ?? '';
 
 $lang = $lang_code;
 
@@ -108,6 +109,7 @@ if ($resultUserCount->num_rows > 0) {
     $row = $resultUserCount->fetch_assoc();
     $userCount = $row["count"];
 }
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -141,6 +143,19 @@ if ($result->num_rows > 0) {
 $sql = "SELECT name, userid, login_date FROM temp_loggeduser";
 $result = $conn->query($sql);
 
+$sql_count = "SELECT COUNT(*) AS total_count FROM temp_loggeduser";
+$result_count = $conn->query($sql_count);
+
+if ($result_count) {
+    $row_count = $result_count->fetch_assoc();
+    $total_count = $row_count['total_count'];
+
+    if ($capacity > 0) {
+        $capacityPercent = ($total_count / $capacity) * 100;
+    } else {
+        $capacityPercent = 0;
+    }
+}
 
 $conn->close();
 
@@ -555,6 +570,18 @@ foreach ($data as $item) {
                         </div>
                     </div>
                 </div>
+                <div class="row justify-content-between text-center">
+                    <div class="col-sm-2">
+                        <div class="card">
+                            <p>Az edzőterem telitettsége:</p>
+                            <div class="card-body">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: <?php echo number_format($capacityPercent, 2); ?>%;" aria-valuenow="<?php echo number_format($capacityPercent, 2); ?>" aria-valuemin="0" aria-valuemax="100"><?php echo number_format($capacityPercent, 0); ?>%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -578,7 +605,7 @@ foreach ($data as $item) {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="LogginerModalLabel"><?php echo $translations["userlogginer"];?></h5>
+                    <h5 class="modal-title" id="LogginerModalLabel"><?php echo $translations["userlogginer"]; ?></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -591,18 +618,18 @@ foreach ($data as $item) {
                                 <div id="checkmark">✔</div>
                                 <div id="error">✘</div>
                             </div>
-                            <p id="result"><?php echo $translations["qrscann"];?></p>
+                            <p id="result"><?php echo $translations["qrscann"]; ?></p>
                         </div>
-                        <h1><?php echo $translations["or"];?></h1>
+                        <h1><?php echo $translations["or"]; ?></h1>
                         <form class="form-inline my-2 my-lg-0">
-                            <input id="search" class="form-control mr-sm-2" type="search" placeholder="<?php echo $translations["name-search"];?> " aria-label="Search">
+                            <input id="search" class="form-control mr-sm-2" type="search" placeholder="<?php echo $translations["name-search"]; ?> " aria-label="Search">
                         </form>
                         <div id="results" class="mt-4"></div>
                         <input hidden id="qrcodeContent">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a type="button" id="continueButton" class="btn btn-primary" style="display: none;"><?php echo $translations["next"];?></a>
+                    <a type="button" id="continueButton" class="btn btn-primary" style="display: none;"><?php echo $translations["next"]; ?></a>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"]; ?></button>
                 </div>
             </div>
@@ -665,6 +692,7 @@ foreach ($data as $item) {
         let userData = {}; // Új változó a felhasználói adatok tárolására
 
         var translations = <?php echo json_encode($translations); ?>;
+
         function startScanning() {
             if (scanCompleted || scanning) return;
 

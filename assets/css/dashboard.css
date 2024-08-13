@@ -3,7 +3,8 @@ body {
     background-color: #F5F7FB;
 }
 
-.sidenav{
+
+.sidenav {
     background: rgb(9, 80, 220);
     background: -moz-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
@@ -12,11 +13,11 @@ body {
     height: 100vh;
 }
 
-p.lead.mb-4.fs-4{
+p.lead.mb-4.fs-4 {
     color: #f5f7fb;
 }
 
-.topnav{
+.topnav {
     margin-bottom: 24px;
 }
 
@@ -27,7 +28,7 @@ p.lead.mb-4.fs-4{
     padding: 1.5rem 1.5rem .375rem;
 }
 
-.roundbg{
+.roundbg {
     background-color: #0C9AB9;
     color: whitesmoke;
 }
@@ -40,12 +41,15 @@ p.lead.mb-4.fs-4{
 .lh-1 {
     line-height: 1 !important;
 }
+
 .fs-1 {
     font-size: calc(1.375rem + 1.5vw) !important;
 }
+
 .p-4 {
     padding: 1.2rem !important;
 }
+
 .d-inline-block {
     display: inline-block !important;
 }
@@ -63,15 +67,16 @@ a {
     color: #f5f7fb;
 }
 
-.blacka{
+.blacka {
     color: #242424 !important;
 }
 
-.shadow{
-    box-shadow: 0 0.1rem 0.2rem rgba(0,0,0,.05);;
+.shadow {
+    box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, .05);
+    ;
 }
 
-span.sidebar-badge.badge{
+span.sidebar-badge.badge {
     background-color: #DC3545 !important;
 }
 
@@ -87,7 +92,7 @@ i.bi.bi-exclamation-circle {
     padding: 10px;
 }
 
-.footer{
+.footer {
     color: whitesmoke;
 }
 
@@ -98,12 +103,15 @@ i.bi.bi-exclamation-circle {
 .tree {
     padding-left: 20px;
 }
+
 .tree ul {
     padding-left: 20px;
 }
+
 .tree li {
     list-style-type: none;
 }
+
 .tree .fas {
     margin-right: 5px;
 }
@@ -113,12 +121,12 @@ i.bi.bi-exclamation-circle {
     opacity: 1
 }
 
-.btn-secondary{
+.btn-secondary {
     background-color: #5C636A;
     color: whitesmoke;
 }
 
-.btn-secondary:hover{
+.btn-secondary:hover {
     color: white
 }
 
@@ -130,7 +138,9 @@ i.bi.bi-exclamation-circle {
 #video.scanned {
     filter: sepia(100%);
 }
-#checkmark, #error {
+
+#checkmark,
+#error {
     display: none;
     position: absolute;
     top: 50%;
@@ -138,9 +148,11 @@ i.bi.bi-exclamation-circle {
     transform: translate(-50%, -50%);
     font-size: 4em;
 }
+
 #checkmark {
     color: green;
 }
+
 #error {
     color: red;
 }
