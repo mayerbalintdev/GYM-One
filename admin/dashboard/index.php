@@ -156,6 +156,22 @@ if ($result_count) {
         $capacityPercent = 0;
     }
 }
+$progresscolor = '';
+
+if ($capacityPercent >= 0 && $capacityPercent < 70) {
+    $progresscolor = 'success';
+} elseif ($capacityPercent >= 70 && $capacityPercent < 90) {
+    $progresscolor = 'warning';
+} elseif ($capacityPercent >= 90) {
+    $progresscolor = 'danger';
+}
+
+// $sql = "SELECT lastname FROM workers WHERE userid = ?";
+// $stmt = $conn->prepare($sql);
+// $stmt->bind_param('i', $userid);
+// $stmt->execute();
+// $stmt->bind_result($username);
+// $stmt->fetch();
 
 $conn->close();
 
@@ -576,7 +592,7 @@ foreach ($data as $item) {
                             <p>Az edzőterem telitettsége:</p>
                             <div class="card-body">
                                 <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: <?php echo number_format($capacityPercent, 2); ?>%;" aria-valuenow="<?php echo number_format($capacityPercent, 2); ?>" aria-valuemin="0" aria-valuemax="100"><?php echo number_format($capacityPercent, 0); ?>%</div>
+                                    <div class="progress-bar-<?php echo $progresscolor; ?>" role="progressbar" style="width: <?php echo number_format($capacityPercent, 2); ?>%;" aria-valuenow="<?php echo number_format($capacityPercent, 2); ?>" aria-valuemin="0" aria-valuemax="100"><?php echo number_format($capacityPercent, 0); ?>%</div>
                                 </div>
                             </div>
                         </div>
@@ -592,10 +608,31 @@ foreach ($data as $item) {
             <div class="modal-content">
                 <div class="modal-body">
                     <p><?php echo $translations["exit-modal"]; ?></p>
+                    <div class="footer text-center">
+                        <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                        <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- WELCOME MODAL -->
+
+    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <img src="../../assets/img/brand/logo.png" width="50%" class="img img-fluid" alt="Logo">
+                            <h1 id="modalMessage"></h1>
+                            <p class="lead"><?php echo $translations["haveagoodday"]; ?></p>
+                        </div>
+                    </div>
+                    <div class="footer text-center">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["next"]; ?></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -809,6 +846,34 @@ foreach ($data as $item) {
 
             var chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            let message = '';
+
+            if ((hours === 0 && minutes >= 0) || (hours < 11) || (hours === 11 && minutes < 30)) {
+                message = '<?php echo $translations["morninghello"]; ?>';
+            } else if ((hours === 11 && minutes >= 30) || (hours < 17)) {
+                message = '<?php echo $translations["dayhello"]; ?>';
+            } else {
+                message = '<?php echo $translations["nighthello"]; ?>';
+            }
+            const username = "<?php echo $username; ?>";
+            const finalMessage = `${message} ${username}!`;
+
+            const today = new Date().toISOString().split('T')[0];
+
+            if (localStorage.getItem('modalShownDate') !== today) {
+                document.getElementById('modalMessage').innerText = finalMessage;
+                $('#welcomeModal').modal('show');
+                localStorage.setItem('modalShownDate', today);
+            }
         });
     </script>
     <script src="../../assets/js/date-time.js"></script>
