@@ -62,6 +62,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $message = "";
 
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
@@ -151,11 +159,7 @@ $initial_content = file_get_contents('rule.html');
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
@@ -186,7 +190,6 @@ $initial_content = file_get_contents('rule.html');
                             </li>
                     <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt

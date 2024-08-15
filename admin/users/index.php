@@ -54,11 +54,21 @@ $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
+
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 // API!
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
@@ -153,11 +163,7 @@ $result = $conn->query($sql);
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
@@ -194,7 +200,6 @@ $result = $conn->query($sql);
                             </li>
                     <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -207,12 +212,7 @@ $result = $conn->query($sql);
                     </li>
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
-                    <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    <?php if ($is_boss == 1) {
                     ?>
                             <li class="sidebar-item active">
                                 <a class="sidebar-ling" href="../updater">
@@ -227,7 +227,6 @@ $result = $conn->query($sql);
                             </li>
                     <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../log">

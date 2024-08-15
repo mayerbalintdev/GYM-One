@@ -62,6 +62,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $message = "";
 
 // Kategória hozzáadása
@@ -294,10 +302,7 @@ $category_result = $conn->query($category_sql);
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
+                    
                         if ($is_boss == 1) {
                             ?>
                             <li class="sidebar-header">
@@ -329,7 +334,6 @@ $category_result = $conn->query($category_sql);
                             </li>
                             <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt

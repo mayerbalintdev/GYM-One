@@ -137,6 +137,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
 $ch = curl_init();
@@ -201,35 +209,30 @@ $conn->close();
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-link" href="#">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="#">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
-                        }
                     }
                     ?>
                     <li class="sidebar-header">
@@ -272,101 +275,95 @@ $conn->close();
                             <div class="card-body">
 
                                 <?php
-                                if ($stmt->num_rows > 0) {
-                                    $stmt->bind_result($is_boss);
-                                    $stmt->fetch();
-
-                                    if ($is_boss == 1) {
+                                if ($is_boss == 1) {
                                 ?>
-                                        <form method="POST">
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="business_name"><?php echo $translations["gym-name"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="business_name"
-                                                        name="business_name"
-                                                        value="<?= htmlspecialchars($env_data['BUSINESS_NAME'] ?? '') ?>">
+                                    <form method="POST">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="business_name"><?php echo $translations["gym-name"]; ?>:</label>
+                                                <input type="text" class="form-control" id="business_name"
+                                                    name="business_name"
+                                                    value="<?= htmlspecialchars($env_data['BUSINESS_NAME'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="lang_code"><?php echo $translations["lang"] ?>:</label>
+                                                <select class="form-control" id="lang_code" name="lang_code">
+                                                    <option value="HU" <?= ($env_data['LANG_CODE'] ?? '') == 'HU' ? 'selected' : '' ?>><?php echo $translations["HU"]; ?></option>
+                                                    <option value="GB" <?= ($env_data['LANG_CODE'] ?? '') == 'GB' ? 'selected' : '' ?>><?php echo $translations["GB"]; ?></option>
+                                                    <option value="DE" <?= ($env_data['LANG_CODE'] ?? '') == 'DE' ? 'selected' : '' ?>><?php echo $translations["DE"]; ?></option>
+
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="alert alert-danger">
+                                                    <?php echo $translations["restartserver"]; ?>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-8">
+                                                <label
+                                                    for="description"><?php echo $translations["websitedescription"]; ?>:</label>
+                                                <input type="text" class="form-control" id="description" name="description"
+                                                    value="<?= htmlspecialchars($env_data['DESCRIPTION'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="capacity"><?php echo $translations["capacityenv"]; ?>:</label>
+                                                <input type="text" class="form-control" id="capacity" name="capacity"
+                                                    value="<?= htmlspecialchars($env_data['CAPACITY'] ?? '') ?>">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-12">
+                                                <label for="metakey"><?php echo $translations["metakeys"]; ?>:</label>
+                                                <input type="text" class="form-control" id="metakey" name="metakey"
+                                                    value="<?= htmlspecialchars($env_data['META_KEY'] ?? '') ?>">
+                                                <small id="keywordsInfo"
+                                                    class="form-text"><?php echo $translations["metakeys-separeate"]; ?>
+                                                    <code>(,)</code></small>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-4">
+                                                <label for="country"><?php echo $translations["country"]; ?>:</label>
+                                                <input type="text" class="form-control" id="country" name="country"
+                                                    value="<?= htmlspecialchars($env_data['COUNTRY'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="street"><?php echo $translations["street"]; ?>:</label>
+                                                <input type="text" class="form-control" id="street" name="street"
+                                                    value="<?= htmlspecialchars($env_data['STREET'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="house_number"><?php echo $translations["hause-no"]; ?>:</label>
+                                                <input type="text" class="form-control" id="house_number"
+                                                    name="house_number"
+                                                    value="<?= htmlspecialchars($env_data['HOUSE_NUMBER'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-row">
                                                 <div class="form-group col-md-3">
-                                                    <label for="lang_code"><?php echo $translations["lang"] ?>:</label>
-                                                    <select class="form-control" id="lang_code" name="lang_code">
-                                                        <option value="HU" <?= ($env_data['LANG_CODE'] ?? '') == 'HU' ? 'selected' : '' ?>><?php echo $translations["HU"]; ?></option>
-                                                        <option value="GB" <?= ($env_data['LANG_CODE'] ?? '') == 'GB' ? 'selected' : '' ?>><?php echo $translations["GB"]; ?></option>
-                                                        <option value="DE" <?= ($env_data['LANG_CODE'] ?? '') == 'DE' ? 'selected' : '' ?>><?php echo $translations["DE"]; ?></option>
+                                                    <label for="currency"><?php echo $translations["currency"]; ?>:</label>
+                                                    <input type="text" class="form-control" id="currency" name="currency"
+                                                        value="<?= htmlspecialchars($env_data['CURRENCY'] ?? '') ?>">
+                                                </div>
+                                                <div class="form-group col-md-9">
+                                                    <label for="gkey"><?php echo $translations["googletrakckey"]; ?>:</label>
+                                                    <input type="text" class="form-control" id="gkey" name="gkey"
+                                                        value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
+                                                    <small><?php echo $translations["googlekeyonly"]; ?></small>
+                                                </div>
+                                            </div>
 
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="alert alert-danger">
-                                                        <?php echo $translations["restartserver"]; ?>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-8">
-                                                    <label
-                                                        for="description"><?php echo $translations["websitedescription"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="description" name="description"
-                                                        value="<?= htmlspecialchars($env_data['DESCRIPTION'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="capacity"><?php echo $translations["capacityenv"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="capacity" name="capacity"
-                                                        value="<?= htmlspecialchars($env_data['CAPACITY'] ?? '') ?>">
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-12">
-                                                    <label for="metakey"><?php echo $translations["metakeys"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="metakey" name="metakey"
-                                                        value="<?= htmlspecialchars($env_data['META_KEY'] ?? '') ?>">
-                                                    <small id="keywordsInfo"
-                                                        class="form-text"><?php echo $translations["metakeys-separeate"]; ?>
-                                                        <code>(,)</code></small>
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-4">
-                                                    <label for="country"><?php echo $translations["country"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="country" name="country"
-                                                        value="<?= htmlspecialchars($env_data['COUNTRY'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="street"><?php echo $translations["street"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="street" name="street"
-                                                        value="<?= htmlspecialchars($env_data['STREET'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-4">
-                                                    <label for="house_number"><?php echo $translations["hause-no"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="house_number"
-                                                        name="house_number"
-                                                        value="<?= htmlspecialchars($env_data['HOUSE_NUMBER'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-row">
-                                                    <div class="form-group col-md-3">
-                                                        <label for="currency"><?php echo $translations["currency"]; ?>:</label>
-                                                        <input type="text" class="form-control" id="currency" name="currency"
-                                                            value="<?= htmlspecialchars($env_data['CURRENCY'] ?? '') ?>">
-                                                    </div>
-                                                    <div class="form-group col-md-9">
-                                                        <label for="gkey"><?php echo $translations["googletrakckey"]; ?>:</label>
-                                                        <input type="text" class="form-control" id="gkey" name="gkey"
-                                                            value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
-                                                        <small><?php echo $translations["googlekeyonly"]; ?></small>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary"><?php echo $translations["save"]; ?></button>
 
-                                            </div>
-                                            <button type="submit"
-                                                class="btn btn-primary"><?php echo $translations["save"]; ?></button>
-
-                                        </form>
+                                    </form>
                                 <?php
-                                    } else {
-                                        echo $translations["dont-access"];
-                                    }
                                 } else {
-                                    echo "Users do not exist!";
+                                    echo $translations["dont-access"];
                                 }
+
                                 ?>
 
                             </div>
@@ -374,93 +371,86 @@ $conn->close();
                     </div>
                     <div class="col">
                         <?php
-                        if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($is_boss);
-                            $stmt->fetch();
-
-                            if ($is_boss == 1) {
+                        if ($is_boss == 1) {
                         ?>
-                                <div class="col-md-4">
-                                    <div class="card shadow">
-                                        <div class="card-header">
-                                            <?php echo $translations["logo-upload"]; ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <form action="" method="post" enctype="multipart/form-data">
-                                                <div class="form-group">
-                                                    <label
-                                                        for="logoFile"><?php echo $translations["select-upload-logo"]; ?></label>
-                                                    <input type="file" class="form-control-file" id="logoFile" name="logoFile"
-                                                        accept="image/png, image/jpeg">
-                                                </div>
-                                                <button type="submit" class="btn btn-primary"
-                                                    name="uploadLogo"><?php echo $translations["logo-upload"]; ?></button>
-                                            </form>
-                                            <div class="row text-center">
-                                                <div class="col">
-                                                    <img class="img img-fluid" width="150px"
-                                                        src="../../../assets/img/brand/logo.png" alt="Logo Preview">
-                                                </div>
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-header">
+                                        <?php echo $translations["logo-upload"]; ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label
+                                                    for="logoFile"><?php echo $translations["select-upload-logo"]; ?></label>
+                                                <input type="file" class="form-control-file" id="logoFile" name="logoFile"
+                                                    accept="image/png, image/jpeg">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary"
+                                                name="uploadLogo"><?php echo $translations["logo-upload"]; ?></button>
+                                        </form>
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <img class="img img-fluid" width="150px"
+                                                    src="../../../assets/img/brand/logo.png" alt="Logo Preview">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow">
-                                        <div class="card-header">
-                                            <?php echo $translations["background-upload"]; ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <form action="" method="post" enctype="multipart/form-data">
-                                                <div class="form-group">
-                                                    <label
-                                                        for="backgroundFile"><?php echo $translations["select-upload-background"]; ?></label>
-                                                    <input type="file" class="form-control-file" id="backgroundFile"
-                                                        name="backgroundFile" accept="image/png, image/jpeg">
-                                                </div>
-                                                <button type="submit" class="btn btn-primary"
-                                                    name="uploadBackground"><?php echo $translations["background-upload"]; ?></button>
-                                            </form>
-                                            <div class="row text-center">
-                                                <div class="col">
-                                                    <img class="img img-fluid" width="150px"
-                                                        src="../../../assets/img/brand/background.png" alt="Background Preview">
-                                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-header">
+                                        <?php echo $translations["background-upload"]; ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label
+                                                    for="backgroundFile"><?php echo $translations["select-upload-background"]; ?></label>
+                                                <input type="file" class="form-control-file" id="backgroundFile"
+                                                    name="backgroundFile" accept="image/png, image/jpeg">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary"
+                                                name="uploadBackground"><?php echo $translations["background-upload"]; ?></button>
+                                        </form>
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <img class="img img-fluid" width="150px"
+                                                    src="../../../assets/img/brand/background.png" alt="Background Preview">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow">
-                                        <div class="card-header">
-                                            <?php echo $translations["favicon-upload"]; ?>
-                                        </div>
-                                        <div class="card-body">
-                                            <form action="" method="post" enctype="multipart/form-data">
-                                                <div class="form-group">
-                                                    <label
-                                                        for="faviconFile"><?php echo $translations["select-upload-favicon"]; ?></label>
-                                                    <input type="file" class="form-control-file" id="faviconFile"
-                                                        name="faviconFile" accept="image/png, image/jpeg">
-                                                </div>
-                                                <button type="submit" class="btn btn-primary"
-                                                    name="uploadFavicon"><?php echo $translations["favicon-upload"]; ?></button>
-                                            </form>
-                                            <div class="row text-center">
-                                                <div class="col">
-                                                    <img class="img img-fluid" width="150px"
-                                                        src="../../../assets/img/brand/favicon.png" alt="Favicon Preview">
-                                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow">
+                                    <div class="card-header">
+                                        <?php echo $translations["favicon-upload"]; ?>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="" method="post" enctype="multipart/form-data">
+                                            <div class="form-group">
+                                                <label
+                                                    for="faviconFile"><?php echo $translations["select-upload-favicon"]; ?></label>
+                                                <input type="file" class="form-control-file" id="faviconFile"
+                                                    name="faviconFile" accept="image/png, image/jpeg">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary"
+                                                name="uploadFavicon"><?php echo $translations["favicon-upload"]; ?></button>
+                                        </form>
+                                        <div class="row text-center">
+                                            <div class="col">
+                                                <img class="img img-fluid" width="150px"
+                                                    src="../../../assets/img/brand/favicon.png" alt="Favicon Preview">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         <?php
-                            } else {
-                                echo $translations["dont-access"];
-                            }
                         } else {
-                            echo "Users do not exist!";
+                            echo $translations["dont-access"];
                         }
                         ?>
 

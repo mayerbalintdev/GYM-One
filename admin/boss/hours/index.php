@@ -61,6 +61,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $alerts_html = '';
 
 $sql = "SELECT userid, Firstname, Lastname, username, is_boss FROM workers";
@@ -159,11 +167,7 @@ $conn->close();
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                             ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
@@ -188,7 +192,6 @@ $conn->close();
                             </li>
                             <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -230,11 +233,7 @@ $conn->close();
                             <div class="card-body">
 
                                 <?php
-                                if ($stmt->num_rows > 0) {
-                                    $stmt->bind_result($is_boss);
-                                    $stmt->fetch();
-
-                                    if ($is_boss == 1) {
+                                if ($is_boss == 1) {
                                         ?>
                                         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                                             <table class="table">
@@ -285,9 +284,6 @@ $conn->close();
                                     } else {
                                         echo $translations["dont-access"];
                                     }
-                                } else {
-                                    echo "Users do not exist!";
-                                }
                                 ?>
 
                             </div>

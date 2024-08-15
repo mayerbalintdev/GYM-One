@@ -61,6 +61,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $alerts_html = '';
 
 $sql = "SELECT userid, Firstname, Lastname, username, is_boss FROM workers";
@@ -72,38 +80,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_user"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $is_boss = isset($_POST["is_boss"]) ? 1 : 0;
+    $is_this_boss = isset($_POST["is_boss"]) ? 1 : 0;
 
-    $userid = mt_rand(1000000000, 9999999999);
+    $newuserid = mt_rand(1000000000, 9999999999);
 
     $sql = "INSERT INTO workers (userid, Firstname, Lastname, username, password_hash, is_boss)
-            VALUES ($userid, '$firstname', '$lastname', '$username', '$hashed_password', $is_boss)";
+            VALUES ($newuserid, '$firstname', '$lastname', '$username', '$hashed_password', $is_this_boss)";
 
     if ($conn->query($sql) === TRUE) {
         $alerts_html .= "<div class='alert alert-success'>{$translations["success-add"]}</div>";
+        $action = $translations['success-add-new-worker'] . ' ' . $newuserid;
+        $actioncolor = 'success';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
         header("Refresh:2");
     } else {
-        $alerts_html .= "<div class='alert alert-danger'>Hiba történt a felhasználó hozzáadása közben: " . $conn->error . "</div>";
+        $alerts_html .= "<div class='alert alert-danger'>An error occurred while adding a user: " . $conn->error . "</div>";
     }
 }
 
 // FELHASZNÁLÓ TÖRLÉSE
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_user"])) {
-    $userid = $_POST["userid"];
+    $deleteuserid = $_POST["userid"];
 
-    if ($userid != 9999999999) {
-        $sql = "DELETE FROM workers WHERE userid = $userid";
+    if ($deleteuserid != 9999999999) {
+        $sql = "DELETE FROM workers WHERE userid = $deleteuserid";
 
         if ($conn->query($sql) === TRUE) {
             $alerts_html .= "<div class='alert alert-success'>{$translations["success-delete"]}</div>";
+            $action = $translations['success-delete-worker'] . ' ' . $deleteuserid;
+            $actioncolor = 'success';
+            $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iss", $userid, $action, $actioncolor);
+            $stmt->execute();
             header("Refresh:2");
         } else {
-            $alerts_html .= "<div class='alert alert-danger'>Hiba történt a felhasználó törlése közben: " . $conn->error . "</div>";
+            $alerts_html .= "<div class='alert alert-danger'>An error occurred while deleting the user:: " . $conn->error . "</div>";
         }
     } else {
         $alerts_html .= "<div class='alert alert-warning'> {$translations["cant-delete-main"]}</div>";
         header("Refresh:2");
-
     }
 }
 
@@ -172,35 +193,30 @@ $conn->close();
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
-                            ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-link" href="#">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
-                            <?php
-                        }
+                    if ($is_boss == 1) {
+                    ?>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="#">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
+                    <?php
                     }
                     ?>
                     <li class="sidebar-header">
@@ -243,39 +259,35 @@ $conn->close();
                             <div class="card-body">
 
                                 <?php
-                                if ($stmt->num_rows > 0) {
-                                    $stmt->bind_result($is_boss);
-                                    $stmt->fetch();
-
-                                    if ($is_boss == 1) {
-                                        ?>
-                                        <table class="table table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col"><?php echo $translations["firstname"]; ?></th>
-                                                    <th scope="col"><?php echo $translations["lastname"]; ?></th>
-                                                    <th scope="col"><?php echo $translations["username"]; ?></th>
-                                                    <th scope="col"><?php echo $translations["position"]; ?></th>
-                                                    <th scope="col"><?php echo $translations["action"]; ?></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        echo "<tr>
+                                if ($is_boss == 1) {
+                                ?>
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"><?php echo $translations["firstname"]; ?></th>
+                                                <th scope="col"><?php echo $translations["lastname"]; ?></th>
+                                                <th scope="col"><?php echo $translations["username"]; ?></th>
+                                                <th scope="col"><?php echo $translations["position"]; ?></th>
+                                                <th scope="col"><?php echo $translations["action"]; ?></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo "<tr>
                                 <td>{$row["Firstname"]}</td>
                                 <td>{$row["Lastname"]}</td>
                                 <td>{$row["username"]}</td>
                                 <td>";
 
-                                                        if ($row["is_boss"] == 1) {
-                                                            echo $translations["boss"];
-                                                        } else {
-                                                            echo $translations["worker"];
-                                                        }
+                                                    if ($row["is_boss"] == 1) {
+                                                        echo $translations["boss"];
+                                                    } else {
+                                                        echo $translations["worker"];
+                                                    }
 
-                                                        echo "</td>
+                                                    echo "</td>
                                 <td>
                                     <form method='post' style='display: inline;'>
                                         <input type='hidden' name='userid' value='{$row["userid"]}'>
@@ -283,20 +295,18 @@ $conn->close();
                                     </form>
                                 </td>
                               </tr>";
-                                                    }
-                                                } else {
-                                                    echo "<tr><td colspan='5'>Users do not exist!</td></tr>";
                                                 }
-                                                ?>
-                                            </tbody>
-                                        </table>
-                                        <?php
-                                    } else {
-                                        echo $translations["dont-access"];
-                                    }
+                                            } else {
+                                                echo "<tr><td colspan='5'>Users do not exist!</td></tr>";
+                                            }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                <?php
                                 } else {
-                                    echo "Users do not exist!";
+                                    echo $translations["dont-access"];
                                 }
+
                                 ?>
 
                             </div>
@@ -306,48 +316,41 @@ $conn->close();
                                 <div class="card">
                                     <div class="card-body">
                                         <?php
-                                        if ($stmt->num_rows > 0) {
-                                            $stmt->bind_result($is_boss);
-                                            $stmt->fetch();
-
-                                            if ($is_boss == 1) {
-                                                ?>
-                                                <form method="post"
-                                                    action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                                    <div class="form-row">
-                                                        <div class="form-group col-md-3">
-                                                            <input type="text" class="form-control" name="firstname"
-                                                                placeholder="<?php echo $translations["firstname"]; ?>"
-                                                                required>
-                                                        </div>
-                                                        <div class="form-group col-md-3">
-                                                            <input type="text" class="form-control" name="lastname"
-                                                                placeholder="<?php echo $translations["lastname"]; ?>" required>
-                                                        </div>
-                                                        <div class="form-group col-md-3">
-                                                            <input type="text" class="form-control" name="username"
-                                                                placeholder="<?php echo $translations["username"]; ?>" required>
-                                                        </div>
-                                                        <div class="form-group col-md-3">
-                                                            <input type="password" class="form-control" name="password"
-                                                                placeholder="<?php echo $translations["password"]; ?>" required>
-                                                        </div>
+                                        if ($is_boss == 1) {
+                                        ?>
+                                            <form method="post"
+                                                action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-3">
+                                                        <input type="text" class="form-control" name="firstname"
+                                                            placeholder="<?php echo $translations["firstname"]; ?>"
+                                                            required>
                                                     </div>
-                                                    <div class="form-group form-check">
-                                                        <input type="checkbox" class="form-check-input" id="is_boss"
-                                                            name="is_boss" value="1">
-                                                        <label class="form-check-label"
-                                                            for="is_boss"><?php echo $translations["isboss-or-not"]; ?></label>
+                                                    <div class="form-group col-md-3">
+                                                        <input type="text" class="form-control" name="lastname"
+                                                            placeholder="<?php echo $translations["lastname"]; ?>" required>
                                                     </div>
-                                                    <button type="submit" class="btn btn-primary"
-                                                        name="add_user"><?php echo $translations["register"]; ?></button>
-                                                </form>
-                                                <?php
-                                            } else {
-                                                echo $translations["dont-access"];
-                                            }
+                                                    <div class="form-group col-md-3">
+                                                        <input type="text" class="form-control" name="username"
+                                                            placeholder="<?php echo $translations["username"]; ?>" required>
+                                                    </div>
+                                                    <div class="form-group col-md-3">
+                                                        <input type="password" class="form-control" name="password"
+                                                            placeholder="<?php echo $translations["password"]; ?>" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-check">
+                                                    <input type="checkbox" class="form-check-input" id="is_boss"
+                                                        name="is_boss" value="1">
+                                                    <label class="form-check-label"
+                                                        for="is_boss"><?php echo $translations["isboss-or-not"]; ?></label>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary"
+                                                    name="add_user"><?php echo $translations["register"]; ?></button>
+                                            </form>
+                                        <?php
                                         } else {
-                                            echo "Users do not exist!";
+                                            echo $translations["dont-access"];
                                         }
                                         ?>
                                     </div>

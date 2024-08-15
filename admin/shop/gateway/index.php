@@ -62,6 +62,14 @@ $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
 
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
 $ch = curl_init();
@@ -153,12 +161,7 @@ $conn->close();
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
-                    <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    <?php if ($is_boss == 1) {
                             ?>
                             <li class="sidebar-header">
                                 <?php echo $translations["settings"]; ?>
@@ -195,7 +198,6 @@ $conn->close();
                             </li>
                             <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -214,11 +216,7 @@ $conn->close();
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                             ?>
                             <li class="sidebar-item">
                                 <a class="sidebar-ling" href="../updater">
@@ -233,7 +231,6 @@ $conn->close();
                             </li>
                             <?php
                         }
-                    }
                     ?>
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../log">
@@ -263,11 +260,7 @@ $conn->close();
                     <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
                 </div>
                 <?php
-                if ($stmt->num_rows > 0) {
-                    $stmt->bind_result($is_boss);
-                    $stmt->fetch();
-
-                    if ($is_boss == 1 && $is_new_version_available) {
+                if ($is_boss == 1 && $is_new_version_available) {
                         ?>
                         <div class="row justify-content-center">
                             <div class="col-sm-5">
@@ -278,17 +271,12 @@ $conn->close();
                         </div>
                         <?php
                     }
-                }
                 ?>
                 <div class="row">
                     <div class="col-sm-12">
                         <?php echo $alerts_html; ?>
                         <?php
-                        if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($is_boss);
-                            $stmt->fetch();
-
-                            if ($is_boss == 1) {
+                        if ($is_boss == 1) {
                                 ?>
                                 <div class="card shadow mb-4">
                                     <div class="card-header py-3">
@@ -339,9 +327,6 @@ $conn->close();
                             } else {
                                 echo $translations["dont-access"];
                             }
-                        } else {
-                            echo "Users do not exist!";
-                        }
                         ?>
                     </div>
                 </div>
@@ -349,11 +334,7 @@ $conn->close();
                 <div class="row">
                     <div class="col-sm-12">
                         <?php
-                        if ($stmt->num_rows > 0) {
-                            $stmt->bind_result($is_boss);
-                            $stmt->fetch();
-
-                            if ($is_boss == 1) {
+                        if ($is_boss == 1) {
                                 ?>
                                 <div class="card card-default">
                                     <div class="card-heading">
@@ -383,9 +364,6 @@ $conn->close();
                             } else {
                                 echo $translations["dont-access"];
                             }
-                        } else {
-                            echo "Users do not exist!";
-                        }
                         ?>
                     </div>
                 </div>

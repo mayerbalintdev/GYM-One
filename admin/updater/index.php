@@ -54,11 +54,21 @@ $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
+
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
+
 // API!
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
@@ -125,47 +135,42 @@ $conn->close();
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/mainsettings">
-                                    <i class="bi bi-gear"></i>
-                                    <span><?php echo $translations["businesspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/packages">
-                                    <i class="bi bi-box-seam"></i>
-                                    <span><?php echo $translations["packagepage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/mainsettings">
+                                <i class="bi bi-gear"></i>
+                                <span><?php echo $translations["businesspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/packages">
+                                <i class="bi bi-box-seam"></i>
+                                <span><?php echo $translations["packagepage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
-                        }
                     }
                     ?>
                     <li class="sidebar-header">
@@ -175,25 +180,20 @@ $conn->close();
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-ling" href="../updater">
-                                    <i class="bi bi-cloud-download"></i>
-                                    <span><?php echo $translations["updatepage"]; ?></span>
-                                    <?php if ($is_new_version_available) : ?>
-                                        <span class="sidebar-badge badge">
-                                            <i class="bi bi-exclamation-circle"></i>
-                                        </span>
-                                    <?php endif; ?>
-                                </a>
-                            </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-ling" href="../updater">
+                                <i class="bi bi-cloud-download"></i>
+                                <span><?php echo $translations["updatepage"]; ?></span>
+                                <?php if ($is_new_version_available) : ?>
+                                    <span class="sidebar-badge badge">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
                     <?php
-                        }
                     }
                     ?>
                     <li class="sidebar-item">
@@ -206,7 +206,7 @@ $conn->close();
             </div>
             <br>
             <div class="col-sm-10">
-            <div class="d-none topnav d-sm-inline-block">
+                <div class="d-none topnav d-sm-inline-block">
                     <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">
                         <i class="bi bi-question-circle"></i>
                         <?php echo $translations["support"]; ?>
@@ -238,7 +238,7 @@ $conn->close();
                                         <code><?php echo $latest_version; ?></code>
                                     </p>
                                     <p><?php echo $translations["readytoupdate"]; ?></p>
-                                    <a href="" class="btn btn-primary" download>Letöltés</a> 
+                                    <a href="" class="btn btn-primary" download>Letöltés</a>
                                 </div>
                             </div>
                         <?php } else { ?>

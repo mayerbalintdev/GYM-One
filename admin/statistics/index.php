@@ -108,11 +108,20 @@ if ($resultUserCount->num_rows > 0) {
     $row = $resultUserCount->fetch_assoc();
     $userCount = $row["count"];
 }
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->store_result();
+
+$is_boss = null;
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($is_boss);
+    $stmt->fetch();
+}
+$stmt->close();
 
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
@@ -241,65 +250,60 @@ foreach ($data as $item) {
                         </a>
                     </li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/mainsettings">
-                                    <i class="bi bi-gear"></i>
-                                    <span><?php echo $translations["businesspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/packages">
-                                    <i class="bi bi-box-seam"></i>
-                                    <span><?php echo $translations["packagepage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/chroom">
-                                    <i class="bi bi-duffle"></i>
-                                    <span><?php echo $translations["chroompage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/rule">
-                                    <i class="bi bi-file-ruled"></i>
-                                    <span><?php echo $translations["rulepage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../boss/tickets">
-                                    <i class="bi bi-ticket"></i>
-                                    <span><?php echo $translations["ticketspage"]; ?></span>
-                                </a>
-                            </li>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/mainsettings">
+                                <i class="bi bi-gear"></i>
+                                <span><?php echo $translations["businesspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/packages">
+                                <i class="bi bi-box-seam"></i>
+                                <span><?php echo $translations["packagepage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/chroom">
+                                <i class="bi bi-duffle"></i>
+                                <span><?php echo $translations["chroompage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/rule">
+                                <i class="bi bi-file-ruled"></i>
+                                <span><?php echo $translations["rulepage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/tickets">
+                                <i class="bi bi-ticket"></i>
+                                <span><?php echo $translations["ticketspage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
-                        }
                     }
                     ?>
                     <li class="sidebar-header">
@@ -319,25 +323,20 @@ foreach ($data as $item) {
                     <li><a href="#section3">Geo</a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
-                    if ($stmt->num_rows > 0) {
-                        $stmt->bind_result($is_boss);
-                        $stmt->fetch();
-
-                        if ($is_boss == 1) {
+                    if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-item">
-                                <a class="sidebar-ling" href="../updater">
-                                    <i class="bi bi-cloud-download"></i>
-                                    <span><?php echo $translations["updatepage"]; ?></span>
-                                    <?php if ($is_new_version_available) : ?>
-                                        <span class="sidebar-badge badge">
-                                            <i class="bi bi-exclamation-circle"></i>
-                                        </span>
-                                    <?php endif; ?>
-                                </a>
-                            </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-ling" href="../updater">
+                                <i class="bi bi-cloud-download"></i>
+                                <span><?php echo $translations["updatepage"]; ?></span>
+                                <?php if ($is_new_version_available) : ?>
+                                    <span class="sidebar-badge badge">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
                     <?php
-                        }
                     }
                     ?>
                     <li class="sidebar-item">
@@ -366,21 +365,17 @@ foreach ($data as $item) {
                     <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
                 </div>
                 <?php
-                if ($stmt->num_rows > 0) {
-                    $stmt->bind_result($is_boss);
-                    $stmt->fetch();
 
-                    if ($is_boss == 1 && $is_new_version_available) {
+                if ($is_boss == 1 && $is_new_version_available) {
                 ?>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="alert alert-danger">
-                                    <?php echo $translations["newupdate-text"]; ?>
-                                </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="alert alert-danger">
+                                <?php echo $translations["newupdate-text"]; ?>
                             </div>
                         </div>
+                    </div>
                 <?php
-                    }
                 }
                 ?>
                 <div class="row">
