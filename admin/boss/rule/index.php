@@ -92,6 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (file_put_contents('rule.html', $content) !== false) {
         $saved = true;
+        $action = $translations['success-update-rule'];
+        $actioncolor = 'success';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
         header("Refresh:2");
     }
 }
@@ -161,35 +168,35 @@ $initial_content = file_get_contents('rule.html');
                     <?php
                     if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link active" href="#">
-                                    <i class="bi bi-box-seam"></i>
-                                    <span><?php echo $translations["packagepage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link active" href="#">
+                                <i class="bi bi-box-seam"></i>
+                                <span><?php echo $translations["packagepage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
-                        }
+                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -224,7 +231,7 @@ $initial_content = file_get_contents('rule.html');
                 <div class="row text-center">
                     <div class="col-sm-12">
                         <h4>
-                            <?php echo $translations["ruleheader"];?>
+                            <?php echo $translations["ruleheader"]; ?>
                         </h4>
                     </div>
                 </div>
@@ -234,14 +241,14 @@ $initial_content = file_get_contents('rule.html');
                             <div class="card-body">
                                 <?php if ($saved) : ?>
                                     <div class="alert alert-success" role="alert">
-                                        <?php echo $translations["ruleupdated"];?>
+                                        <?php echo $translations["ruleupdated"]; ?>
                                     </div>
                                 <?php endif; ?>
                                 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                                     <div class="form-group">
                                         <textarea id="editor" name="content"><?php echo htmlspecialchars($initial_content); ?></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-primary"><?php echo $translations["save"];?></button>
+                                    <button type="submit" class="btn btn-primary"><?php echo $translations["save"]; ?></button>
                                 </form>
 
                             </div>

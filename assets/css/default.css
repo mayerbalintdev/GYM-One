@@ -1,5 +1,6 @@
 body{
     background-color: #333333;
+    color: whitesmoke;
 }
 
 nav.navbar,.nav-link{
@@ -29,4 +30,10 @@ i:hover,i:active{
 
 #bussinessnameh2{
     color: whitesmoke !important;
+}
+
+.svg,.bi{
+    height: 1em;
+    width: 1em;
+    vertical-align: -0.125em;
 }

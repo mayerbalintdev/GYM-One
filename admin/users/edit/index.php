@@ -64,8 +64,8 @@ $stmt->store_result();
 $is_boss = null;
 
 if ($stmt->num_rows > 0) {
-    $stmt->bind_result($is_boss);
-    $stmt->fetch();
+  $stmt->bind_result($is_boss);
+  $stmt->fetch();
 }
 $stmt->close();
 
@@ -123,6 +123,13 @@ if (isset($_POST['save'])) {
       $alerts_html .= '<div class="alert alert-success" role="alert">
                                     ' . $translations["success-update"] . '
                                 </div>';
+      $action = $translations['success-edit-user'] . ' ID: ' . $useridgymuser . ' Mail: ' . $new_email;
+      $actioncolor = 'warning';
+      $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+                            VALUES (?, ?, ?, NOW())";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("iss", $userid, $action, $actioncolor);
+      $stmt->execute();
       header("Refresh:2");
       exit;
     } else {
@@ -139,6 +146,13 @@ if (isset($_POST['delete_user'])) {
   if ($stmt = $conn->prepare($sql)) {
     $stmt->bind_param("i", $useridgymuser);
     if ($stmt->execute()) {
+      $action = $translations['success-delete-user'] . ' ID: ' . $useridgymuser . ' ' . $firstname . ' ' . $lastname;
+      $actioncolor = 'danger';
+      $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+                            VALUES (?, ?, ?, NOW())";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("iss", $userid, $action, $actioncolor);
+      $stmt->execute();
       header("Location: ../");
     } else {
       $alerts_html .= '<div class="alert alert-danger" role="alert">
@@ -224,41 +238,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
           <?php
           if ($is_boss == 1) {
           ?>
-              <li class="sidebar-header">
-                <?php echo $translations["settings"]; ?>
-              </li>
-              <li class="sidebar-item">
-                <a class="sidebar-link" href="../boss/mainsettings">
-                  <i class="bi bi-gear"></i>
-                  <span><?php echo $translations["businesspage"]; ?></span>
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a class="sidebar-link" href="../boss/workers">
-                  <i class="bi bi-people"></i>
-                  <span><?php echo $translations["workers"]; ?></span>
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a class="sidebar-link" href="../boss/packages">
-                  <i class="bi bi-box-seam"></i>
-                  <span><?php echo $translations["packagepage"]; ?></span>
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a class="sidebar-link" href="../boss/hours">
-                  <i class="bi bi-clock"></i>
-                  <span><?php echo $translations["openhourspage"]; ?></span>
-                </a>
-              </li>
-              <li class="sidebar-item">
-                <a class="sidebar-link" href="../boss/smtp">
-                  <i class="bi bi-envelope-at"></i>
-                  <span><?php echo $translations["mailpage"]; ?></span>
-                </a>
-              </li>
+            <li class="sidebar-header">
+              <?php echo $translations["settings"]; ?>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="../boss/mainsettings">
+                <i class="bi bi-gear"></i>
+                <span><?php echo $translations["businesspage"]; ?></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="../boss/workers">
+                <i class="bi bi-people"></i>
+                <span><?php echo $translations["workers"]; ?></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="../boss/packages">
+                <i class="bi bi-box-seam"></i>
+                <span><?php echo $translations["packagepage"]; ?></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="../boss/hours">
+                <i class="bi bi-clock"></i>
+                <span><?php echo $translations["openhourspage"]; ?></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="../boss/smtp">
+                <i class="bi bi-envelope-at"></i>
+                <span><?php echo $translations["mailpage"]; ?></span>
+              </a>
+            </li>
           <?php
-            }
+          }
           ?>
           <li class="sidebar-header">
             Bolt
@@ -274,19 +288,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
           <?php
           if ($is_boss == 1) {
           ?>
-              <li class="sidebar-item active">
-                <a class="sidebar-ling" href="../updater">
-                  <i class="bi bi-cloud-download"></i>
-                  <span><?php echo $translations["updatepage"]; ?></span>
-                  <?php if ($is_new_version_available) : ?>
-                    <span class="sidebar-badge badge">
-                      <i class="bi bi-exclamation-circle"></i>
-                    </span>
-                  <?php endif; ?>
-                </a>
-              </li>
+            <li class="sidebar-item active">
+              <a class="sidebar-ling" href="../updater">
+                <i class="bi bi-cloud-download"></i>
+                <span><?php echo $translations["updatepage"]; ?></span>
+                <?php if ($is_new_version_available) : ?>
+                  <span class="sidebar-badge badge">
+                    <i class="bi bi-exclamation-circle"></i>
+                  </span>
+                <?php endif; ?>
+              </a>
+            </li>
           <?php
-            }
+          }
           ?>
           <li class="sidebar-item">
             <a class="sidebar-ling" href="../log">
@@ -357,12 +371,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                 <?php
                 if ($is_boss == 1) {
                 ?>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-userid="1">
-                      <i class="bi bi-trash"></i>
-                      <?php echo $translations["deleteuserbtn"]; ?>
-                    </button> <?php
-                            }
-                              ?>
+                  <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-userid="1">
+                    <i class="bi bi-trash"></i>
+                    <?php echo $translations["deleteuserbtn"]; ?>
+                  </button> <?php
+                          }
+                            ?>
 
               </form>
             </div>

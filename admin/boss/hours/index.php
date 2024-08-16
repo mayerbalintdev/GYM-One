@@ -290,15 +290,6 @@ $conn->close();
                         </div>
                     </div>
                 </div>
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <p class="mb-0 py-2 text-center text-body-secondary">
-                            Powered by <a href="https://azuriom.com" target="_blank"
-                                rel="noopener noreferrer">Azuriom</a> ©
-                            2019-2024. Panel designed by <a href="https://adminkit.io/" target="_blank"
-                                rel="noopener noreferrer">AdminKit</a>. </p>
-                    </div>
-                </footer>
             </div>
         </div>
     </div>

@@ -64,8 +64,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO lockers (lockernum, gender) VALUES ('$szekreny_szam', '$oltozo')";
     if ($conn->query($sql) === TRUE) {
         $alerts_html .= '<div class="alert alert-success" role="alert">
-                            ' . $translations["successaddlocker"] . '
+                            ' . $translations["success-add-locker"] . '
                         </div>';
+        $action = $translations['success-add-locker'] . ' ' . $szekreny_szam . ' ' . $oltozo;
+        $actioncolor = 'warning';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+                            VALUES (?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
         header("Refresh:1");
     } else {
         $alerts_html .= "Error: " . $sql . "<br>" . $conn->error;
@@ -80,8 +87,15 @@ if (isset($_GET['delete'])) {
     $sql = "DELETE FROM lockers WHERE id=$id";
     if ($conn->query($sql) === TRUE) {
         $alerts_html .= '<div class="alert alert-success" role="alert">
-                            ' . $translations["successdeletelocker"] . '
+                            ' . $translations["success-delete-locker"] . '
                         </div>';
+        $action = $translations['success-delete-locker'] . ' ' . $id;
+        $actioncolor = 'warning';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+                            VALUES (?, ?, ?, NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
         header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
     } else {
         $alerts_html .= "Error: " . $conn->error;
@@ -170,29 +184,29 @@ $conn->close();
                     <?php
                     if ($is_boss == 1) {
                     ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-link" href="#">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="#">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
-                        }
+                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -234,60 +248,60 @@ $conn->close();
                                 <?php
                                 if ($is_boss == 1) {
                                 ?>
-                                        <h2 class="mt-4"><?php echo $translations["newlocker"]; ?></h2>
-                                        <form method="post" action="">
-                                            <div class="form-group">
-                                                <label for="szekreny_szam"><?php echo $translations["lockernum"]; ?></label>
-                                                <input type="number" class="form-control" id="szekreny_szam" name="szekreny_szam" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="oltozo"><?php echo $translations["lockergender"]; ?></label>
-                                                <select class="form-control" id="oltozo" name="oltozo" required>
-                                                    <option value="Male"><?php echo $translations["boy"]; ?></option>
-                                                    <option value="Female"><?php echo $translations["girl"]; ?></option>
-                                                </select>
-                                            </div>
-                                            <button type="submit" name="add" class="btn btn-primary mt-5"><?php echo $translations["add"]; ?></button>
-                                        </form>
+                                    <h2 class="mt-4"><?php echo $translations["newlocker"]; ?></h2>
+                                    <form method="post" action="">
+                                        <div class="form-group">
+                                            <label for="szekreny_szam"><?php echo $translations["lockernum"]; ?></label>
+                                            <input type="number" class="form-control" id="szekreny_szam" name="szekreny_szam" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="oltozo"><?php echo $translations["lockergender"]; ?></label>
+                                            <select class="form-control" id="oltozo" name="oltozo" required>
+                                                <option value="Male"><?php echo $translations["boy"]; ?></option>
+                                                <option value="Female"><?php echo $translations["girl"]; ?></option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" name="add" class="btn btn-primary mt-5"><?php echo $translations["add"]; ?></button>
+                                    </form>
 
-                                        <table class="mt-4 table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th><?php echo $translations["lockernum"]; ?></th>
-                                                    <th><?php echo $translations["lockergender"]; ?></th>
-                                                    <th><?php echo $translations["interact"]; ?></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        echo "<tr>
+                                    <table class="mt-4 table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th><?php echo $translations["lockernum"]; ?></th>
+                                                <th><?php echo $translations["lockergender"]; ?></th>
+                                                <th><?php echo $translations["interact"]; ?></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            if ($result->num_rows > 0) {
+                                                while ($row = $result->fetch_assoc()) {
+                                                    echo "<tr>
             <td>{$row['lockernum']}</td>
             <td>";
 
-                                                        if ($row['gender'] == 'Male') {
-                                                            echo $translations['boy'];
-                                                        } elseif ($row['gender'] == 'Female') {
-                                                            echo $translations['girl'];
-                                                        }
-                                                        echo "</td>
+                                                    if ($row['gender'] == 'Male') {
+                                                        echo $translations['boy'];
+                                                    } elseif ($row['gender'] == 'Female') {
+                                                        echo $translations['girl'];
+                                                    }
+                                                    echo "</td>
             <td>
                 <a href='?delete={$row['id']}' class='btn btn-danger btn-sm'>{$translations["delete"]}</a>
             </td>
         </tr>";
-                                                    }
-                                                } else {
-                                                    echo "<tr><td colspan='4'>{$translations["notlockers"]}</td></tr>";
                                                 }
-                                                ?>
+                                            } else {
+                                                echo "<tr><td colspan='4'>{$translations["notlockers"]}</td></tr>";
+                                            }
+                                            ?>
 
-                                            </tbody>
-                                        </table>
+                                        </tbody>
+                                    </table>
                                 <?php
-                                    } else {
-                                        echo $translations["dont-access"];
-                                    }
+                                } else {
+                                    echo $translations["dont-access"];
+                                }
                                 ?>
 
                             </div>

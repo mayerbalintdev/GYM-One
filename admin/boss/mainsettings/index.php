@@ -70,6 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $currency_env = $_POST['currency'] ?? '';
         $gkey_env = $_POST['gkey'] ?? '';
         $capacity_env = $_POST["capacity"] ?? '';
+        $phoneno_env = $_POST["phone_no"] ?? '';
 
         $env_data["BUSINESS_NAME"] = $business_name;
         $env_data['STREET'] = $street_env;
@@ -82,6 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $env_data['CURRENCY'] = $currency_env;
         $env_data['GOOGLE_KEY'] = $gkey_env;
         $env_data["CAPACITY"] = $capacity_env;
+        $env_data["PHONE_NO"] = $phoneno_env;
 
         $env_content = '';
         foreach ($env_data as $key => $value) {
@@ -329,24 +331,34 @@ $conn->close();
                                                 <input type="text" class="form-control" id="country" name="country"
                                                     value="<?= htmlspecialchars($env_data['COUNTRY'] ?? '') ?>">
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="form-group col-md-3">
+                                                <label for="city"><?php echo $translations["city"]; ?>:</label>
+                                                <input type="text" class="form-control" id="city" name="city"
+                                                    value="<?= htmlspecialchars($env_data['CITY'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-3">
                                                 <label for="street"><?php echo $translations["street"]; ?>:</label>
                                                 <input type="text" class="form-control" id="street" name="street"
                                                     value="<?= htmlspecialchars($env_data['STREET'] ?? '') ?>">
                                             </div>
-                                            <div class="form-group col-md-4">
+                                            <div class="form-group col-md-2">
                                                 <label for="house_number"><?php echo $translations["hause-no"]; ?>:</label>
                                                 <input type="text" class="form-control" id="house_number"
                                                     name="house_number"
                                                     value="<?= htmlspecialchars($env_data['HOUSE_NUMBER'] ?? '') ?>">
                                             </div>
                                             <div class="form-row">
-                                                <div class="form-group col-md-3">
+                                                <div class="form-group col-md-4">
                                                     <label for="currency"><?php echo $translations["currency"]; ?>:</label>
                                                     <input type="text" class="form-control" id="currency" name="currency"
                                                         value="<?= htmlspecialchars($env_data['CURRENCY'] ?? '') ?>">
                                                 </div>
-                                                <div class="form-group col-md-9">
+                                                <div class="form-group col-md-4">
+                                                    <label for="phone_no"><?php echo $translations["phoneno"]; ?>:</label>
+                                                    <input type="tel" class="form-control" id="phone_no" name="phone_no"
+                                                        value="<?= htmlspecialchars($env_data['PHONE_NO'] ?? '') ?>">
+                                                </div>
+                                                <div class="form-group col-md-4">
                                                     <label for="gkey"><?php echo $translations["googletrakckey"]; ?>:</label>
                                                     <input type="text" class="form-control" id="gkey" name="gkey"
                                                         value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
