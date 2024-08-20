@@ -1,10 +1,16 @@
+:root{
+    --main-color: #E30713;
+    --secondary-color: #333333;
+    --active-color: rgb(231, 86, 86);
+}
+
 body{
-    background-color: #333333;
+    background-color: var(--secondary-color);
     color: whitesmoke;
 }
 
 nav.navbar,.nav-link{
-    background-color: #333333;
+    background-color: var(--secondary-color);
     color: #fff;
 }
 
@@ -26,6 +32,23 @@ a{
 }
 i:hover,i:active{
     color: rgba(255, 255, 255, 0.75);
+}
+
+.active{
+    color: var(--active-color) !important;
+    font-weight: bold;
+}
+
+.nav-link:hover{
+    color: white;
+}
+
+#contact{
+    background-color: var(--main-color) !important;
+}
+
+.custom-toggler .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='whitesmoke' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
 #bussinessnameh2{

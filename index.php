@@ -108,13 +108,13 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light">
             <img class="img" src="assets/img/brand/logo.png" width="148px" alt="<?php echo $business_name; ?> Logo">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#"><?php echo $translations["mainpage"]; ?></a>
+                    <li class="nav-item">
+                        <a class="nav-link active" href=""><?php echo $translations["mainpage"]; ?></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="trainers/"><?php echo $translations["trainerspage"]; ?></a>
@@ -139,6 +139,16 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
     <div class="container-fluid">
         <div class="row">
             <div class="col bg-imageback">
+            </div>
+        </div>
+        <div class="row text-center justify-content-center">
+            <div class="col-sm-6">
+                <h1>Rólunk</h1>
+                <p>CMSTEXT</p>
+            </div>
+            <div class="col-sm-6">
+                <h1>Jelenleg:</h1>
+                <p>22 ember tartózkodik bent</p>
             </div>
         </div>
         <div class="row">
@@ -200,7 +210,7 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
         </div>
     </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </html>

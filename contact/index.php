@@ -30,6 +30,8 @@ $hause_no = $env_data['HOUSE_NUMBER'] ?? '';
 $description = $env_data['DESCRIPTION'] ?? '';
 $metakey = $env_data['META_KEY'] ?? '';
 $gkey = $env_data['GOOGLE_KEY'] ?? '';
+$mailadress = $env_data['MAIL_USERNAME'] ?? '';
+$phoneno = $env_data['PHONE_NO'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -63,14 +65,14 @@ if ($conn->connect_error) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $business_name; ?> - <?php echo $translations["mainpage"]; ?></title>
+    <title><?php echo $business_name; ?> - <?php echo $translations["contactpage"]; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- CUSTOM STYLE INSERT HERE! -->
     <link rel="stylesheet" href="../assets/css/default.css">
     <!-- CUSTOM STYLE INSERT HERE! -->
     <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
-    <meta name="title" content="<?php echo $business_name; ?> - <?php echo $translations["mainpage"]; ?>">
+    <meta name="title" content="<?php echo $business_name; ?> - <?php echo $translations["contactpage"]; ?>">
     <meta name="description" content="<?php echo $description; ?>">
     <meta name="keywords" content="<?php echo $metakey; ?>">
     <meta name="robots" content="index, follow">
@@ -95,19 +97,22 @@ if ($conn->connect_error) {
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light">
             <img class="img" src="../assets/img/brand/logo.png" width="148px" alt="<?php echo $business_name; ?> Logo">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#"><?php echo $translations["mainpage"]; ?></a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../"><?php echo $translations["mainpage"]; ?></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="trainers/"><?php echo $translations["trainerspage"]; ?></a>
+                        <a class="nav-link" href="../trainers/"><?php echo $translations["trainerspage"]; ?></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="prices/"><?php echo $translations["pricespage"]; ?></a>
+                        <a class="nav-link" href="../prices/"><?php echo $translations["pricespage"]; ?></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href=""><?php echo $translations["contactpage"]; ?></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -138,6 +143,8 @@ if ($conn->connect_error) {
                     </svg>
                 </div>
                 <h3 class="mt-1"><?php echo $translations["location"]; ?></h3>
+                <p class="lead"></p>
+                <p class="lead"><?php echo $city; ?>, <?php echo $street; ?> <?php echo $hause_no; ?></p>
             </div>
             <div class="col-4">
                 <div class="d-inline-block fs-1 lh-1 text-primary bg-primary bg-opacity-25 p-4 rounded-pill">
@@ -147,6 +154,7 @@ if ($conn->connect_error) {
                     </svg>
                 </div>
                 <h3 class="mt-1"><?php echo $translations["email"]; ?></h3>
+                <p class="lead"><?php echo $mailadress; ?></p>
             </div>
             <div class="col-4">
                 <div class="d-inline-block fs-1 lh-1 text-primary bg-primary bg-opacity-25 p-4 rounded-pill">
@@ -155,6 +163,27 @@ if ($conn->connect_error) {
                     </svg>
                 </div>
                 <h3 class="mt-1"><?php echo $translations["phoneno"]; ?></h3>
+                <p class="lead"><?php echo $phoneno; ?></p>
+            </div>
+        </div>
+        <div id="contact" class="row text-center justify-content-center">
+            <div class="col-sm-4 py-3">
+                <h1><?php echo $translations["contactform"]; ?></h1>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label"><?php echo $translations["fullname"]; ?>:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label"><?php echo $translations["email"]; ?>:</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label"><?php echo $translations["message"]; ?>:</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><?php echo $translations["send"]; ?></button>
+                </form>
             </div>
         </div>
     </div>
@@ -168,7 +197,7 @@ if ($conn->connect_error) {
                         <img src="../assets/img/brand/logo.png" alt="<?php echo $business_name; ?> - Logo" height="105">
                     </h2>
 
-                    <p><?php echo $country; ?>, <?php echo $city; ?></p>
+                    <p><?php echo $city; ?></p>
                     <p><?php echo $street; ?> <?php echo $hause_no; ?></p>
                 </div>
                 <div class="col-md-3 offset-md-1">
@@ -194,7 +223,7 @@ if ($conn->connect_error) {
         </div>
     </div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 </html>
