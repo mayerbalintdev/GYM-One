@@ -28,6 +28,33 @@ p.lead.mb-4.fs-4 {
     padding: 1.5rem 1.5rem .375rem;
 }
 
+.time-cell {
+    border: 1px solid #ddd;
+    height: 60px !important;
+    vertical-align: top;
+    position: relative;
+    overflow: hidden;
+}
+
+.event {
+    position: absolute;
+    left: 0; 
+    right: 0;
+    padding: 2px; 
+    box-sizing: border-box;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px; 
+    overflow: hidden; 
+    white-space: nowrap;
+    text-overflow: ellipsis; 
+}
+
+.calendar-table th, .calendar-table td {
+    vertical-align: top;
+}
+
+
 .roundbg {
     background-color: #0C9AB9;
     color: whitesmoke;

@@ -387,7 +387,13 @@ foreach ($data as $item) {
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-header">
+                        <?php echo $translations["trainersclass"]; ?>
+                    </li>
+                    <li><a class="sidebar-link" href="../trainers/timetable">
+                            <i class="bi bi-calendar-event"></i>
+                            <span><?php echo $translations["timetable"]; ?></span>
+                        </a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
                     if ($is_boss === 1) {
