@@ -359,6 +359,7 @@
     "addpackage": "Termék hozzáadása",
     "packagedelete": "Termék törlése",
     "deletefail": "Sikertelen a felhasználó törlése! Váratlan hiba történt",
+    "deleteerror": "Sikertelen törlés!",
     "piecechange": "Mennyiség módosítása",
     "pricechange": "Ár módosítása",
     "overview": "Áttekintés",

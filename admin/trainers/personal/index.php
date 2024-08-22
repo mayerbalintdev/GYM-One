@@ -318,7 +318,7 @@ $conn->close();
                                                             <p class="card-text"><strong><?php echo $translations["price"];?> (1 <?php echo $translations["hour"];?>):</strong> <?php echo $row['price_1hour']; ?> <?php echo $currency;?></p>
                                                             <p class="card-text"><strong><?php echo $translations["price"];?> (10 <?php echo $translations["occasions"];?>):</strong> <?php echo $row['price_10sessions']; ?> <?php echo $currency;?></p>
                                                             <a href="edit/?id=<?php echo $row['id']; ?>" class="btn btn-primary"><?php echo $translations["editbtn"];?></a>
-                                                            <a href="/delete.php?id=<?php echo $row['id']; ?>" class="btn btn-danger"><?php echo $translations["delete"];?></a>
+                                                            <a href="delete/?id=<?php echo $row['id']; ?>" class="btn btn-danger"><?php echo $translations["delete"];?></a>
                                                         </div>
                                                     </div>
                                                 </div>

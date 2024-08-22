@@ -57,41 +57,6 @@ if ($conn->connect_error) {
 
 $translations = json_decode(file_get_contents($langFile), true);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['business_name'])) {
-        $business_name = $_POST['business_name'] ?? '';
-        $street_env = $_POST['street'] ?? '';
-        $country_env = $_POST['country'] ?? '';
-        $city_env = $_POST['city'] ?? '';
-        $house_no_env = $_POST['house_number'] ?? '';
-        $description_env = $_POST["description"] ?? '';
-        $metakey_env = $_POST["metakey"] ?? '';
-        $langcode_env = $_POST['lang_code'] ?? '';
-        $currency_env = $_POST['currency'] ?? '';
-        $gkey_env = $_POST['gkey'] ?? '';
-        $capacity_env = $_POST["capacity"] ?? '';
-        $phoneno_env = $_POST["phone_no"] ?? '';
-
-        $env_data["BUSINESS_NAME"] = $business_name;
-        $env_data['STREET'] = $street_env;
-        $env_data['COUNTRY'] = $country_env;
-        $env_data['CITY'] = $city_env;
-        $env_data['DESCRIPTION'] = $description_env;
-        $env_data['META_KEY'] = $metakey_env;
-        $env_data['HOUSE_NUMBER'] = $house_no_env;
-        $env_data['LANG_CODE'] = $langcode_env;
-        $env_data['CURRENCY'] = $currency_env;
-        $env_data['GOOGLE_KEY'] = $gkey_env;
-        $env_data["CAPACITY"] = $capacity_env;
-        $env_data["PHONE_NO"] = $phoneno_env;
-
-        $env_content = '';
-        foreach ($env_data as $key => $value) {
-            $env_content .= "$key=$value\n";
-        }
-    }
-}
-
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -337,7 +302,7 @@ $conn->close();
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn mt-5 btn-primary">Update Trainer</button>
+                                        <button type="submit" class="btn mt-5 btn-primary"><?php echo $translations["traineredit"];?></button>
                                     </form>
                                 <?php
                                 } else {
