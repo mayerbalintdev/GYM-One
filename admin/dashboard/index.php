@@ -394,6 +394,10 @@ foreach ($data as $item) {
                             <i class="bi bi-calendar-event"></i>
                             <span><?php echo $translations["timetable"]; ?></span>
                         </a></li>
+                    <li><a class="sidebar-link" href="../trainers/personal">
+                            <i class="bi bi-award"></i>
+                            <span><?php echo $translations["trainers"]; ?></span>
+                        </a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
                     if ($is_boss === 1) {
