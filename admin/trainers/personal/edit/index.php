@@ -271,13 +271,13 @@ $conn->close();
                                             <div class="form-group">
                                                 <div class="mb-3">
                                                     <label for="image" class="form-label"><?php echo $translations["profileimg"]; ?> <?php echo $translations["optional"]; ?></label>
-                                                    <input type="file" class="form-control" id="image" name="image">
+                                                    <input type="file" accept="image/png" class="form-control" id="image" name="image">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-3 text-center">
                                             <?php if (!empty($trainer['image'])): ?>
-                                                <img src="<?php echo htmlspecialchars($trainer['image']); ?>" alt="<?php echo htmlspecialchars($trainer['name']); ?>" class="img-fluid mt-3" style="max-height: 200px;">
+                                                <img src="../../../../assets/img/trainers/trainer_<?php echo $trainer["id"];?>.png" alt="<?php echo htmlspecialchars($trainer['name']); ?>" class="img-fluid mt-3" style="max-height: 200px;">
                                             <?php endif; ?>
                                         </div>
                                         <div class="form-group">

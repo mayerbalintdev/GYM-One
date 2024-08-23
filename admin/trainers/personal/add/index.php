@@ -96,19 +96,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $trainer_id = $conn->insert_id;
 
         $target_dir = "../../../../assets/img/trainers/";
-        $image_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-        $target_file = $target_dir . "trainer_" . $trainer_id . "." . $image_extension;
+        $image_extension = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
 
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $sql = "UPDATE trainers SET image='$target_file' WHERE id='$trainer_id'";
-            if ($conn->query($sql) === TRUE) {
-                echo "New trainer added successfully!";
-                header("Location: ../");
+        if ($image_extension === 'png') {
+            $target_file = $target_dir . "trainer_" . $trainer_id . ".png";
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                $sql = "UPDATE trainers SET image='$target_file' WHERE id='$trainer_id'";
+                if ($conn->query($sql) === TRUE) {
+                    echo "New trainer added successfully!";
+                    header("Location: ../");
+                } else {
+                    echo "Error updating record: " . $conn->error;
+                }
             } else {
-                echo "Error updating record: " . $conn->error;
+                echo "Error uploading file.";
             }
         } else {
-            echo "Error uploading file.";
+            echo "Error: Only PNG files are allowed.";
         }
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
@@ -254,7 +259,7 @@ $conn->close();
                                         </div>
                                         <div class="mb-3">
                                             <label for="image" class="form-label"><?php echo $translations["profileimg"];?></label>
-                                            <input type="file" class="form-control" id="image" name="image" required>
+                                            <input type="file" class="form-control" accept="image/png" id="image" name="image" required>
                                         </div>
                                         <div class="mb-3">
                                             <label for="description" class="form-label"><?php echo $translations["description"];?></label>
