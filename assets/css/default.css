@@ -60,3 +60,32 @@ i:hover,i:active{
     width: 1em;
     vertical-align: -0.125em;
 }
+
+.status-bar {
+    position: fixed;
+    right: -300px;
+    top: 90px;
+    width: 250px;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: right 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+.status-bar.visible {
+    right: 20px;
+}
+
+.status-bar h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.status-bar p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}

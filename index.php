@@ -30,6 +30,7 @@ $hause_no = $env_data['HOUSE_NUMBER'] ?? '';
 $description = $env_data['DESCRIPTION'] ?? '';
 $metakey = $env_data['META_KEY'] ?? '';
 $gkey = $env_data['GOOGLE_KEY'] ?? '';
+$capacity = $env_data['CAPACITY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -63,6 +64,33 @@ if ($result->num_rows > 0) {
         ];
     }
 }
+
+$sql = "SELECT COUNT(*) AS total FROM temp_loggeduser";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $workoutpeoplenow = $row['total'];
+} else {
+    $workoutpeoplenow = 0;
+}
+
+if ($capacity > 0) {
+    $capacityPercent = ($workoutpeoplenow / $capacity) * 100;
+} else {
+    $capacityPercent = 0;
+}
+
+$progresscolor = '';
+
+if ($capacityPercent >= 0 && $capacityPercent < 70) {
+    $progresscolor = 'success';
+} elseif ($capacityPercent >= 70 && $capacityPercent < 90) {
+    $progresscolor = 'warning';
+} elseif ($capacityPercent >= 90) {
+    $progresscolor = 'danger';
+}
+
 
 $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 ?>
@@ -146,9 +174,12 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
                 <h1>Rólunk</h1>
                 <p>CMSTEXT</p>
             </div>
-            <div class="col-sm-6">
-                <h1>Jelenleg:</h1>
-                <p>22 ember tartózkodik bent</p>
+            <div class="status-bar" id="statusBar">
+                <h2><?php echo $translations["capacitytext"];?></h2>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-<?php echo $progresscolor;?>" style="width: <?php echo $capacityPercent;?>%" role="progressbar"></div>
+                </div>
+                <p id="peopleCount"><?php echo $workoutpeoplenow; ?> <?php echo $translations["people"];?></p>
             </div>
         </div>
         <div class="row">
@@ -212,5 +243,10 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
 </body>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    setTimeout(function() {
+        document.getElementById('statusBar').classList.add('visible');
+    }, 500);
+</script>
 
 </html>

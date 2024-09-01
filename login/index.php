@@ -141,6 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                         </div>
                     </div>
+                    <small><?php echo $translations["adminaccountlogin"];?> <span><a href="../admin/"><?php echo $translations["login"];?></a></span></small>
                 </div>
             </div>
         </div>

@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../.env');
+$env_data = read_env_file('../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -36,11 +36,10 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
-$currency = $env_data['CURRENCY'] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../assets/lang/";
+$langDir = __DIR__ . "/../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -60,7 +59,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname,$firstname );
+$stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
 $stmt->close();
@@ -77,8 +76,8 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-    <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -108,17 +107,12 @@ $conn->close();
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
                         <a class="sidebar-link" href="#">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["profilepage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-header">
@@ -137,44 +131,94 @@ $conn->close();
                     </button>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"];?></h4>
-                                <h1><strong></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"];?></h4>
-                                <h1><strong></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"];?></h4>
-                                <h1><strong></strong></h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["profilebalance"];?></h4>
-                                <h1><strong></strong><?php echo $currency;?></h1>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
+                                <form method="POST">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="firstname"><?php echo $translations["firstname"]; ?></label>
+                                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $firstname; ?>" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="lastname"><?php echo $translations["lastname"]; ?></label>
+                                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $lastname; ?>" required>
+                                                </div>
+                                            </div>
+                                        </div>
 
+                                        <div class="col-md-3 text-center">
+                                            <img src="../../assets/img/profiles/<?php echo $userid; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-group">
+                                            <label for="email"><?php echo $translations["email"]; ?></label>
+                                            <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" required>
+                                        </div>
+
+                                    </div>
+                                    <button type="submit" name="save" class="btn btn-primary"><i class="bi bi-save"></i>
+                                        <?php echo $translations["save"]; ?></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="uploadForm">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="profilePicture" class="form-label">Válasszon ki egy profilképet (PNG formátum):</label>
+                                                    <input type="file" class="form-control" id="profilePicture" accept=".png" required>
+                                                    <div id="fileHelp" class="form-text">Csak PNG formátumú fájlokat tölthet fel.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Feltöltés</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="passwordChangeForm">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="currentPassword" class="form-label">Eredeti jelszó:</label>
+                                                    <input type="password" class="form-control" id="currentPassword" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="newPassword" class="form-label">Új jelszó:</label>
+                                                    <input type="password" class="form-control" id="newPassword" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-group">
+                                                    <label for="confirmPassword" class="form-label">Új jelszó megerősítése:</label>
+                                                    <input type="password" class="form-control" id="confirmPassword" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Jelszó módosítása</button>
+                                </form>
                             </div>
                         </div>
                     </div>
