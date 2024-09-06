@@ -13,6 +13,42 @@ body {
     height: 100vh;
 }
 
+.navbar-header {
+    background: rgb(9, 80, 220);
+    background: -moz-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
+}
+
+ul.nav.navbar-nav {
+    background: rgb(9, 80, 220);
+    background: -moz-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
+}
+
+.navbar-inverse .navbar-collapse,
+.navbar-inverse .navbar-form {
+    background: rgb(9, 80, 220);
+    background: -moz-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
+}
+
+.navbar-inverse .navbar-nav>.active>a,
+.navbar-inverse .navbar-nav>.active>a:focus,
+.navbar-inverse .navbar-nav>.active>a:hover {
+    color: #fff;
+    background-color: #337ab7
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #f5f7fb;
+}
+
 p.lead.mb-4.fs-4 {
     color: #f5f7fb;
 }
@@ -38,19 +74,20 @@ p.lead.mb-4.fs-4 {
 
 .event {
     position: absolute;
-    left: 0; 
+    left: 0;
     right: 0;
-    padding: 2px; 
+    padding: 2px;
     box-sizing: border-box;
     border-radius: 4px;
     color: white;
-    font-size: 12px; 
-    overflow: hidden; 
+    font-size: 12px;
+    overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 
-.calendar-table th, .calendar-table td {
+.calendar-table th,
+.calendar-table td {
     vertical-align: top;
 }
 

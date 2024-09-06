@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../.env');
+$env_data = read_env_file('../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -39,7 +39,7 @@ $version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../assets/lang/";
+$langDir = __DIR__ . "/../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -59,7 +59,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname,$firstname );
+$stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
 $stmt->close();
@@ -76,8 +76,8 @@ $conn->close();
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
-    <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -91,14 +91,14 @@ $conn->close();
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="70px" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
+                    <li><a href="../"><i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?></a></li>
+                    <li><a href="../stats/"><i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?></a></li>
+                    <li><a href="../profile/"><i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?></a></li>
+                    <li class="active"><a href=""><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
                 </ul>
             </div>
         </div>
@@ -107,19 +107,29 @@ $conn->close();
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../">
+                            <i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
-                    <li class="sidebar-header">
-                        Információk
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../stats/">
+                            <i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
                     </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../profile/">
+                            <i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                 </ul><br>
             </div>
             <br>
@@ -131,7 +141,7 @@ $conn->close();
                     </button>
                 </div>
                 <div class="row">
-                    
+
                 </div>
                 <div class="row">
                     <div class="col-sm-6">

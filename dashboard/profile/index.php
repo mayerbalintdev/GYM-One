@@ -5,28 +5,28 @@ require_once '../../vendor/autoload.php'; // COMPOSER!
 
 
 if (!isset($_SESSION['userid'])) {
-    header("Location: ../");
-    exit();
+  header("Location: ../");
+  exit();
 }
 
 $userid = $_SESSION['userid'];
 
 function read_env_file($file_path)
 {
-    $env_file = file_get_contents($file_path);
-    $env_lines = explode("\n", $env_file);
-    $env_data = [];
+  $env_file = file_get_contents($file_path);
+  $env_lines = explode("\n", $env_file);
+  $env_data = [];
 
-    foreach ($env_lines as $line) {
-        $line_parts = explode('=', $line);
-        if (count($line_parts) == 2) {
-            $key = trim($line_parts[0]);
-            $value = trim($line_parts[1]);
-            $env_data[$key] = $value;
-        }
+  foreach ($env_lines as $line) {
+    $line_parts = explode('=', $line);
+    if (count($line_parts) == 2) {
+      $key = trim($line_parts[0]);
+      $value = trim($line_parts[1]);
+      $env_data[$key] = $value;
     }
+  }
 
-    return $env_data;
+  return $env_data;
 }
 
 $env_data = read_env_file('../../.env');
@@ -52,7 +52,7 @@ $langDir = __DIR__ . "/../../assets/lang/";
 $langFile = $langDir . "$lang.json";
 
 if (!file_exists($langFile)) {
-    die("A nyelvi fájl nem található: $langFile");
+  die("A nyelvi fájl nem található: $langFile");
 }
 
 $translations = json_decode(file_get_contents($langFile), true);
@@ -60,7 +60,7 @@ $translations = json_decode(file_get_contents($langFile), true);
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
-    die("Kapcsolódási hiba: " . $conn->connect_error);
+  die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
 $sql = "SELECT firstname, lastname, email FROM users WHERE userid = ?";
@@ -79,48 +79,48 @@ $domain_url = $protocol . $host;
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['currentPassword'], $_POST['newPassword'], $_POST['confirmPassword'])) {
-        $userid = $_SESSION['userid'];
-        $currentPassword = $_POST['currentPassword'];
-        $newPassword = $_POST['newPassword'];
-        $confirmPassword = $_POST['confirmPassword'];
+  if (isset($_POST['currentPassword'], $_POST['newPassword'], $_POST['confirmPassword'])) {
+    $userid = $_SESSION['userid'];
+    $currentPassword = $_POST['currentPassword'];
+    $newPassword = $_POST['newPassword'];
+    $confirmPassword = $_POST['confirmPassword'];
 
-        if ($newPassword !== $confirmPassword) {
-            $alerts_html .= '<div class="alert alert-warning" role="alert">
+    if ($newPassword !== $confirmPassword) {
+      $alerts_html .= '<div class="alert alert-warning" role="alert">
                             ' . $translations["twopasswordnot"] . '
                         </div>';
-            header("Refresh:2");
-        } else {
-            $sql = "SELECT password FROM users WHERE userid = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $userid);
-            $stmt->execute();
-            $stmt->store_result();
-            $stmt->bind_result($hashedPassword);
-            $stmt->fetch();
+      header("Refresh:2");
+    } else {
+      $sql = "SELECT password FROM users WHERE userid = ?";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("i", $userid);
+      $stmt->execute();
+      $stmt->store_result();
+      $stmt->bind_result($hashedPassword);
+      $stmt->fetch();
 
-            if (!password_verify($currentPassword, $hashedPassword)) {
-                $alerts_html .= '<div class="alert alert-danger" role="alert">
+      if (!password_verify($currentPassword, $hashedPassword)) {
+        $alerts_html .= '<div class="alert alert-danger" role="alert">
                                     ' . $translations["error-old-password"] . '
                                 </div>';
-                header("Refresh:2");
-            } else {
-                $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-                $updateSql = "UPDATE users SET password = ? WHERE userid = ?";
-                $updateStmt = $conn->prepare($updateSql);
-                $updateStmt->bind_param("si", $newHashedPassword, $userid);
+        header("Refresh:2");
+      } else {
+        $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $updateSql = "UPDATE users SET password = ? WHERE userid = ?";
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->bind_param("si", $newHashedPassword, $userid);
 
-                if ($updateStmt->execute()) {
-                    $alerts_html .= '<div class="alert alert-success" role="alert">
+        if ($updateStmt->execute()) {
+          $alerts_html .= '<div class="alert alert-success" role="alert">
                                     ' . $translations["success-new-password"] . '
                                 </div>';
-                    $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
-                        ->setUsername($smtp_username)
-                        ->setPassword($smtp_password);
+          $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
+            ->setUsername($smtp_username)
+            ->setPassword($smtp_password);
 
-                    $mailer = new Swift_Mailer($transport);
+          $mailer = new Swift_Mailer($transport);
 
-                    $editedcontent = <<<EOD
+          $editedcontent = <<<EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -340,31 +340,31 @@ ol ol ol ol {
 </html>
 EOD;
 
-                    $message = (new Swift_Message($translations["passwordedited"]))
-                        ->setFrom(["{$smtp_username}" => "{$business_name} - {$translations['passwordedited']}"])
-                        ->setTo([$mail => '{$firstname}'])
-                        ->setBody($editedcontent, 'text/html');
+          $message = (new Swift_Message($translations["passwordedited"]))
+            ->setFrom(["{$smtp_username}" => "{$business_name} - {$translations['passwordedited']}"])
+            ->setTo([$mail => '{$firstname}'])
+            ->setBody($editedcontent, 'text/html');
 
-                    $result = $mailer->send($message);
-                    header("Refresh:2");
-                } else {
-                    $alerts_html .= '<div class="alert alert-danger" role="alert">
+          $result = $mailer->send($message);
+          header("Refresh:2");
+        } else {
+          $alerts_html .= '<div class="alert alert-danger" role="alert">
                                     ' . $translations["error-old-password"] . '
                                 </div>';
-                    header("Refresh:2");
-                }
-
-                $updateStmt->close();
-            }
-
-            $stmt->close();
+          header("Refresh:2");
         }
-    } else {
-        $alerts_html .= '<div class="alert alert-danger" role="alert">
+
+        $updateStmt->close();
+      }
+
+      $stmt->close();
+    }
+  } else {
+    $alerts_html .= '<div class="alert alert-danger" role="alert">
                         ' . $translations["unexpected-error"] . '
                     </div>';
-        header("Refresh:2");
-    }
+    header("Refresh:2");
+  }
 }
 
 
@@ -376,183 +376,189 @@ $conn->close();
 <html lang="<?php echo $lang_code; ?>">
 
 <head>
-    <meta charset="UTF-8">
-    <title><?php echo $business_name; ?> - <?php echo $translations["dashboard"]; ?></title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../assets/css/dashboard.css">
-    <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
+  <meta charset="UTF-8">
+  <title><?php echo $business_name; ?> - <?php echo $translations["dashboard"]; ?></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../../assets/css/dashboard.css">
+  <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <body>
-    <nav class="navbar navbar-inverse visible-xs">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
-            </div>
-            <div class="collapse navbar-collapse" id="myNavbar">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+  <nav class="navbar navbar-inverse visible-xs">
     <div class="container-fluid">
-        <div class="row content">
-            <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
-                <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
-                        </a>
-                    </li>
-                    <li class="sidebar-header">
-                        Információk
-                    </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
-                </ul><br>
-            </div>
-            <br>
-            <div class="col-sm-10">
-                <div class="d-none topnav d-sm-inline-block">
-                    <h4><?php echo $translations["welcome"]; ?> <?php echo $lastname; ?> <?php echo $firstname; ?></h4>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-                        <?php echo $translations["logout"]; ?>
-                    </button>
-                </div>
-                <div class="row">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href=""><img src="../../assets/img/logo.png" width="70px" alt="Logo"></a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li><a href="../"><i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?></a></li>
+          <li><a href="../stats/"><i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?></a></li>
+          <li class="active"><a href=""><i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?></a></li>
+          <li><a href="../invoices/"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-                </div>
-                <?php echo $alerts_html; ?>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <form method="POST">
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="firstname"><?php echo $translations["firstname"]; ?></label>
-                                                    <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo $firstname; ?>" required>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="lastname"><?php echo $translations["lastname"]; ?></label>
-                                                    <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo $lastname; ?>" required>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-3 text-center">
-                                            <img src="../../assets/img/profiles/<?php echo $userid; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="form-group">
-                                            <label for="email"><?php echo $translations["email"]; ?></label>
-                                            <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" required>
-                                        </div>
-
-                                    </div>
-                                    <button type="submit" name="save" class="btn btn-primary"><i class="bi bi-save"></i>
-                                        <?php echo $translations["save"]; ?></button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <form id="uploadForm">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="profilePicture" class="form-label">Válasszon ki egy profilképet (PNG formátum):</label>
-                                                    <input type="file" class="form-control" id="profilePicture" accept=".png" required>
-                                                    <div id="fileHelp" class="form-text">Csak PNG formátumú fájlokat tölthet fel.</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Feltöltés</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <form id="passwordChangeForm" method="POST" action="">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="currentPassword" class="form-label">Eredeti jelszó:</label>
-                                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="newPassword" class="form-label">Új jelszó:</label>
-                                                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label for="confirmPassword" class="form-label">Új jelszó megerősítése:</label>
-                                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Jelszó módosítása</button>
-                                </form>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="container-fluid">
+    <div class="row content">
+      <div class="col-sm-2 sidenav hidden-xs text-center">
+        <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
+        <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
+        <ul class="nav nav-pills nav-stacked">
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="../">
+              <i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="../stats/">
+              <i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?>
+            </a>
+          </li>
+          <li class="sidebar-item active">
+            <a class="sidebar-link" href="">
+              <i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a class="sidebar-link" href="../invoices/">
+              <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+            </a>
+          </li>
+        </ul><br>
+      </div>
+      <br>
+      <div class="col-sm-10">
+        <div class="d-none topnav d-sm-inline-block">
+          <h4><?php echo $translations["welcome"]; ?> <?php echo $lastname; ?> <?php echo $firstname; ?></h4>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
+            <?php echo $translations["logout"]; ?>
+          </button>
         </div>
+        <div class="row">
 
-        <!-- EXIT MODAL -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
-                    </div>
-                    <div class="modal-footer">
-                        <a type="button" class="btn btn-secondary"
-                            data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                        <a href="../logout.php" type="button"
-                            class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
-                    </div>
-                </div>
-            </div>
         </div>
+        <?php echo $alerts_html; ?>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="card">
+              <div class="card-body">
+                <form id="uploadForm">
+                  <div class="row">
+                    <div class="col-md-9">
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="profilePicture" class="form-label"><?php echo $translations["select-upload-profile"]; ?></label>
+                          <input type="file" class="form-control" id="profilePicture" accept=".png" required>
+                          <div id="fileHelp" class="form-text"><small><?php echo $translations["onlypng"]; ?></small></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                      <img src="../../assets/img/profiles/<?php echo $userid; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary"><?php echo $translations["upload"]; ?></button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card">
+              <div class="card-body">
+                <form id="passwordChangeForm" method="POST" action="">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="currentPassword" class="form-label"><?php echo $translations["curpassword"]; ?></label>
+                          <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="newPassword" class="form-label"><?php echo $translations["newpassword"]; ?></label>
+                          <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="confirmPassword" class="form-label"><?php echo $translations["password-confirm"]; ?>:</label>
+                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary"><?php echo $translations["save"]; ?></button>
+                </form>
 
-        <!-- SCRIPTS! -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="card">
+              <div class="card-body">
+                <form action="" method="post">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="email" class="form-label"><?php echo $translations["newemailaddress"]; ?></label>
+                          <input type="email" class="form-control" id="newemail" name="newemail" required>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <div class="form-group">
+                          <label for="password" class="form-label"><?php echo $translations["curpassword"]; ?></label>
+                          <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100"><?php echo $translations["save"]; ?></button>
+                </form>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="btn btn-danger"><i class="bi bi-x-lg"></i>Fiók végleges törlése</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXIT MODAL -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
+          </div>
+          <div class="modal-footer">
+            <a type="button" class="btn btn-secondary"
+              data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+            <a href="../logout.php" type="button"
+              class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS! -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

@@ -60,7 +60,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname,$firstname );
+$stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
 $stmt->close();
@@ -92,14 +92,14 @@ $conn->close();
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href=""><img width="70px" src="../assets/img/logo.png" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
+                    <li class="active"><a href=""><i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?></a></li>
+                    <li><a href="stats/"><i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?></a></li>
+                    <li><a href="profile/"><i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?></a></li>
+                    <li><a href="invoices/"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"];?></a></li>
                 </ul>
             </div>
         </div>
@@ -113,19 +113,24 @@ $conn->close();
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
                         <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
+                            <i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["profilepage"]; ?>
+                        <a class="sidebar-link" href="stats/">
+                            <i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?>
                         </a>
                     </li>
-                    <li class="sidebar-header">
-                        Információk
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="profile/">
+                            <i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?>
+                        </a>
                     </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="invoices/">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                 </ul><br>
             </div>
             <br>
@@ -140,7 +145,7 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"];?></h4>
+                                <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"]; ?></h4>
                                 <h1><strong></strong></h1>
                             </div>
                         </div>
@@ -148,7 +153,7 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"];?></h4>
+                                <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"]; ?></h4>
                                 <h1><strong></strong></h1>
                             </div>
                         </div>
@@ -156,7 +161,7 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"];?></h4>
+                                <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"]; ?></h4>
                                 <h1><strong></strong></h1>
                             </div>
                         </div>
@@ -164,8 +169,8 @@ $conn->close();
                     <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title fw-semibold"><?php echo $translations["profilebalance"];?></h4>
-                                <h1><strong></strong><?php echo $currency;?></h1>
+                                <h4 class="card-title fw-semibold"><?php echo $translations["profilebalance"]; ?></h4>
+                                <h1><strong></strong><?php echo $currency; ?></h1>
                             </div>
                         </div>
                     </div>
@@ -193,7 +198,7 @@ $conn->close();
                     <div class="modal-footer">
                         <a type="button" class="btn btn-secondary"
                             data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                        <a href="../logout.php" type="button"
+                        <a href="logout.php" type="button"
                             class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                     </div>
                 </div>

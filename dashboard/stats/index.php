@@ -91,14 +91,14 @@ $conn->close();
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href=""><img src="../../assets/img/logo.png" width="70px" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#"><?php echo $translations["statspage"]; ?></a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
+                    <li><a href="../"><i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?></a></li>
+                    <li class="active"><a href=""><i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?></a></li>
+                    <li><a href="../profile/"><i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?></a></li>
+                    <li><a href="../invoices/"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
                 </ul>
             </div>
         </div>
@@ -110,16 +110,26 @@ $conn->close();
                 <h2><img src="../../assets/img/brand/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
-                            <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../">
+                            <i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
-                    <li class="sidebar-header">
-                        <?php echo $translations["statspage"]; ?>
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="">
+                            <i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
                     </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../profile/">
+                            <i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../invoices/">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                 </ul><br>
             </div>
             <br>
@@ -141,7 +151,7 @@ $conn->close();
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-heart-pulse"></i>
+                                            <i class="bi bi-stopwatch"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -163,13 +173,13 @@ $conn->close();
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-heart-pulse"></i>
+                                            <i class="bi bi-hourglass-split"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row text-center">
                                     <div class="col">
-                                        <h2><b>88</b> <?php echo $translations["minutes"];?></h2>
+                                        <h2><b>88</b> <?php echo $translations["minutes"]; ?></h2>
                                     </div>
                                 </div>
                             </div>
@@ -185,7 +195,7 @@ $conn->close();
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-heart-pulse"></i>
+                                            <i class="bi bi-calendar-check"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -203,8 +213,8 @@ $conn->close();
                         <div class="card shadow">
                             <div class="card-body text-start">
                                 <h4 class="card-title fw-semibold">
-                                    <?php echo $translations["thirtydaychart"];?>
-                                    
+                                    <?php echo $translations["thirtydaychart"]; ?>
+
                                 </h4>
                             </div>
                         </div>
