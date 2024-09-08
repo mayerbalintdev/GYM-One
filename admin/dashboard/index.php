@@ -379,7 +379,7 @@ foreach ($data as $item) {
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
-                            <span><?php echo $translations["updatepage"]; ?></span>
+                            <span><?php echo $translations["gatewaypage"]; ?></span>
                             <?php if ($is_new_version_available) : ?>
                                 <span class="sidebar-badge badge">
                                     <i class="bi bi-exclamation-circle"></i>

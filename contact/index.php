@@ -32,6 +32,11 @@ $metakey = $env_data['META_KEY'] ?? '';
 $gkey = $env_data['GOOGLE_KEY'] ?? '';
 $mailadress = $env_data['MAIL_USERNAME'] ?? '';
 $phoneno = $env_data['PHONE_NO'] ?? '';
+$smtp_host = $env_data['MAIL_HOST'] ?? '';
+$smtp_port = $env_data['MAIL_PORT'] ?? '';
+$smtp_encryption = $env_data['MAIL_ENCRYPTION'] ?? '';
+$smtp_username = $env_data['MAIL_USERNAME'] ?? '';
+$smtp_password = $env_data['MAIL_PASSWORD'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -54,6 +59,49 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+require_once '../vendor/autoload.php';
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'];
+    $userEmail = $_POST['email'];
+    $userMessage = $_POST['message'];
+
+    $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
+        ->setUsername($smtp_username)
+        ->setPassword($smtp_password);
+
+    $mailer = new Swift_Mailer($transport);
+
+    $adminMessage = (new Swift_Message($translations["newmessagefromwebsite"]))
+        ->setFrom([$userEmail => $name])
+        ->setTo([$smtp_username])
+        ->setBody(
+            $translations["fullname"] . ": " . $name . "\n" .
+            $translations["email"] . ": " . $userEmail . "\n" .
+            $translations["message"] . ": " . $userMessage . "\n"
+        );
+
+    $result = $mailer->send($adminMessage);
+
+    $userConfirmationMessage = (new Swift_Message($translations["thankyouforyouremail"]))
+        ->setFrom([$smtp_username => $business_name])
+        ->setTo([$userEmail])
+        ->setBody(
+            "{$translations["dear"]} " . $name . ",\n\n" .
+            "{$translations["smtpcontactcontent"]}\n\n" .
+            "{$translations["message"]}: " . $userMessage . "\n\n" .
+            "{$business_name}"
+        );
+
+    $resultUser = $mailer->send($userConfirmationMessage);
+
+    if ($result && $resultUser) {
+        echo "Az üzenetet sikeresen elküldtük!";
+    } else {
+        echo "Hiba történt az üzenet elküldésekor.";
+    }
+}
 ?>
 
 

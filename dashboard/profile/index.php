@@ -531,7 +531,8 @@ $conn->close();
             </div>
             <div class="card">
               <div class="card-body">
-                <div class="btn btn-danger"><i class="bi bi-x-lg"></i>Fiók végleges törlése</div>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal">
+                  <i class="bi bi-x-lg"></i> Fiók végleges törlése</button>
               </div>
             </div>
           </div>
@@ -552,6 +553,33 @@ $conn->close();
               data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
             <a href="../logout.php" type="button"
               class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- DELETE MODAL -->
+    <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title lead" id="deleteAccountModalLabel"><?php echo $translations["deleteuser"]; ?></h5>
+          </div>
+          <div class="modal-body">
+            <p>
+              <?php echo $translations["areyousuredelete"]; ?>
+            </p>
+            <pre tabindex="0"><li><?php echo $translations["deletemodalfirst"]; ?></li>
+<li><?php echo $translations["deletemodalsecond"]; ?></li>
+<li><?php echo $translations["deletemodalthree"]; ?></li>
+<li><?php echo $translations["deletemodalfour"]; ?></li>
+<li><?php echo $translations["deletemodalfive"]; ?></li>
+</pre>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></button>
+            <button type="button" class="btn btn-danger"><?php echo $translations["delete"]; ?></button>
           </div>
         </div>
       </div>

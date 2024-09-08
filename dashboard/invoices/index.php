@@ -144,10 +144,37 @@ $conn->close();
 
                 </div>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="card">
                             <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col"><?php echo $translations["fullname"]; ?></th>
+                                            <th scope="col"><?php echo $translations["invoiceprice"]; ?></th>
+                                            <th scope="col"><?php echo $translations["date-log"]; ?></th>
+                                            <th scope="col"><?php echo $translations["status"]; ?></th>
+                                            <th scope="col"><?php echo $translations["interact"]; ?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td scope="row">Mark</td>
+                                            <td scope="row">Otto</td>
+                                            <td scope="row">@mdo</td>
+                                            <td scope="row"><span class="badge bg-label-success" text-capitalized=""> Paid </span></td>
+                                            <td scope="row">
+                                                <div class="d-flex align-items-center">
+                                                    <a href="btn btn-primary"><i class="bi bi-eye"></i></a>
+                                                    <a href="btn btn-primary"><i class="bi bi-download"></i></a>
 
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

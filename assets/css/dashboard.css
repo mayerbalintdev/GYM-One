@@ -91,6 +91,29 @@ p.lead.mb-4.fs-4 {
     vertical-align: top;
 }
 
+.badge {
+    --bs-badge-padding-x: .77em;
+    --bs-badge-padding-y: .4235em;
+    --bs-badge-font-size: .8667em;
+    --bs-badge-font-weight: 500;
+    --bs-badge-color: #fff;
+    --bs-badge-border-radius: .25rem;
+    display: inline-block;
+    padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
+    font-size: var(--bs-badge-font-size);
+    font-weight: var(--bs-badge-font-weight);
+    line-height: 1;
+    color: var(--bs-badge-color);
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--bs-badge-border-radius);
+}
+
+.bg-label-success {
+    background-color: #e8fadf !important;
+    color: #71dd37 !important;
+}
 
 .roundbg {
     background-color: #0C9AB9;
