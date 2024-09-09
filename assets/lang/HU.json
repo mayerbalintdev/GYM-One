@@ -221,6 +221,7 @@
     "mailtest": "Teszt e-mail küldése",
     "thankyouforyouremail": "Köszönjük az üzenetedet!",
     "smtpcontactcontent": "Köszönjük, hogy kapcsolatba léptél velünk. Az elküldött üzeneted:",
+    "successsndedemail": "Az üzeneted megérkezett hozzánk! Hamarosan kapcsolatba lépünk veled!",
     "login": "Bejelentkezés",
     "adminaccountlogin": "Az itt dolgozók számára:",
     "userlogginer": "Felhasználó beléptetése:",

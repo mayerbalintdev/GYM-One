@@ -16,6 +16,8 @@
     return $env_data;
 }
 $copyright_year = date("Y");
+$alerts_html = '';
+
 
 $env_data = read_env_file('../.env');
 
@@ -46,6 +48,10 @@ $lang = $lang_code;
 $langDir = __DIR__ . "/../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
+
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$host = $_SERVER['HTTP_HOST'];
+$domain_url = $protocol . $host;
 
 if (!file_exists($langFile)) {
     die("A nyelvi fájl nem található: $langFile");
@@ -78,28 +84,250 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ->setTo([$smtp_username])
         ->setBody(
             $translations["fullname"] . ": " . $name . "\n" .
-            $translations["email"] . ": " . $userEmail . "\n" .
-            $translations["message"] . ": " . $userMessage . "\n"
+                $translations["email"] . ": " . $userEmail . "\n" .
+                $translations["message"] . ": " . $userMessage . "\n"
         );
 
     $result = $mailer->send($adminMessage);
+    $editedcontent = <<<EOD
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+  <!--[if !mso]><!-->
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <!--<![endif]-->
+  <!--[if (gte mso 9)|(IE)]>
+  <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+  </xml>
+  <![endif]-->
+  <!--[if (gte mso 9)|(IE)]>
+<style type="text/css">
+body {width: 600px;margin: 0 auto;}
+table {border-collapse: collapse;}
+table, td {mso-table-lspace: 0pt;mso-table-rspace: 0pt;}
+img {-ms-interpolation-mode: bicubic;}
+</style>
+<![endif]-->
+  <style type="text/css">
+body, p, div {
+  font-family: arial,helvetica,sans-serif;
+  font-size: 14px;
+}
+body {
+  color: #000000;
+}
+body a {
+  color: #1188E6;
+  text-decoration: none;
+}
+p { margin: 0; padding: 0; }
+table.wrapper {
+  width:100% !important;
+  table-layout: fixed;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+img.max-width {
+  max-width: 100% !important;
+}
+.column.of-2 {
+  width: 50%;
+}
+.column.of-3 {
+  width: 33.333%;
+}
+.column.of-4 {
+  width: 25%;
+}
+ul ul ul ul  {
+  list-style-type: disc !important;
+}
+ol ol {
+  list-style-type: lower-roman !important;
+}
+ol ol ol {
+  list-style-type: lower-latin !important;
+}
+ol ol ol ol {
+  list-style-type: decimal !important;
+}
+@media screen and (max-width:480px) {
+  .preheader .rightColumnContent,
+  .footer .rightColumnContent {
+    text-align: left !important;
+  }
+  .preheader .rightColumnContent div,
+  .preheader .rightColumnContent span,
+  .footer .rightColumnContent div,
+  .footer .rightColumnContent span {
+    text-align: left !important;
+  }
+  .preheader .rightColumnContent,
+  .preheader .leftColumnContent {
+    font-size: 80% !important;
+    padding: 5px 0;
+  }
+  table.wrapper-mobile {
+    width: 100% !important;
+    table-layout: fixed;
+  }
+  img.max-width {
+    height: auto !important;
+    max-width: 100% !important;
+  }
+  a.bulletproof-button {
+    display: block !important;
+    width: auto !important;
+    font-size: 80%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .columns {
+    width: 100% !important;
+  }
+  .column {
+    display: block !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .social-icon-column {
+    display: inline-block !important;
+  }
+}
+</style>
+  <!--user entered Head Start--><!--End Head user entered-->
+</head>
+<body>
+  <center class="wrapper" data-link-color="#1188E6" data-body-style="font-size:14px; font-family:arial,helvetica,sans-serif; color:#000000; background-color:#FFFFFF;">
+    <div class="webkit">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" class="wrapper" bgcolor="#FFFFFF">
+        <tr>
+          <td valign="top" bgcolor="#FFFFFF" width="100%">
+            <table width="100%" role="content-container" class="outer" align="center" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="100%">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td>
+                        <!--[if mso]>
+<center>
+<table><tr><td width="600">
+<![endif]-->
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px;" align="center">
+                                  <tr>
+                                    <td role="modules-container" style="padding:0px 0px 0px 0px; color:#000000; text-align:left;" bgcolor="#FFFFFF" width="100%" align="left"><table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%" style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
+<tr>
+  <td role="module-content">
+    <p></p>
+  </td>
+</tr>
+</table><table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="padding:0px 0px 0px 0px;" bgcolor="#FFFFFF" data-distribution="1">
+<tbody>
+  <tr role="module-content">
+    <td height="100%" valign="top"><table width="580" style="width:580px; border-spacing:0; border-collapse:collapse; margin:0px 10px 0px 10px;" cellpadding="0" cellspacing="0" align="left" border="0" bgcolor="" class="column column-0">
+  <tbody>
+    <tr>
+      <td style="padding:0px;margin:0px;border-spacing:0;"><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="dae5891b-ceee-40f7-9315-02ea0b72592e">
+<tbody>
+  <tr>
+    <td style="font-size:6px; line-height:10px; padding:0px 0px 0px 0px;" valign="top" align="center">
+      <img class="max-width" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px; max-width:20% !important; width:20%; height:auto !important;" width="116" alt="" data-proportionally-constrained="true" data-responsive="true" src="{$domain_url}/assets/img/brand/logo.png">
+    </td>
+  </tr>
+</tbody>
+</table></td>
+    </tr>
+  </tbody>
+</table></td>
+  </tr>
+</tbody>
+</table><table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="padding:10px 0px 10px 0px;" bgcolor="#FFFFFF" data-distribution="1">
+<tbody>
+  <tr role="module-content">
+    <td height="100%" valign="top"><table width="580" style="width:580px; border-spacing:0; border-collapse:collapse; margin:0px 10px 0px 10px;" cellpadding="0" cellspacing="0" align="left" border="0" bgcolor="" class="column column-0">
+  <tbody>
+    <tr>
+      <td style="padding:0px;margin:0px;border-spacing:0;"><table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="c09ad11e-b6f0-426b-bfb5-e854fb1d6b4e">
+<tbody>
+  <tr>
+    <td style="padding:18px 0px 18px 0px; line-height:30px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><h2 style="text-align: center">{$business_name}</h2>
+<div style="font-family: inherit; text-align: center">{$translations["dear"]} {$name}</div>
+<div style="font-family: inherit; text-align: center">{$translations["smtpcontactcontent"]}</div>
+<div style="font-family: inherit; text-align: center">{$userMessage}</div>
+<div></div></div>
+</td>
+  </tr>
+</tbody>
+</table><table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="padding:0px 0px 0px 0px;" bgcolor="#252525" data-distribution="1">
+<tbody>
+  <tr role="module-content">
+    <td height="100%" valign="top"><table width="580" style="width:580px; border-spacing:0; border-collapse:collapse; margin:0px 10px 0px 10px;" cellpadding="0" cellspacing="0" align="left" border="0" bgcolor="" class="column column-0">
+  <tbody>
+    <tr>
+      <td style="padding:0px;margin:0px;border-spacing:0;"><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="70667641-28f8-4e30-850f-c1783cac6e0b">
+<tbody>
+  <tr>
+    <td style="font-size:6px; line-height:10px; padding:0px 0px 0px 0px;" valign="top" align="center">
+      <img class="max-width" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px; max-width:10% !important; width:10%; height:auto !important;" width="58" alt="" data-proportionally-constrained="true" data-responsive="true" src="https://gymoneglobal.com/assets/img/text-color-logo.png">
+    </td>
+  </tr>
+</tbody>
+</table></td>
+    </tr>
+  </tbody>
+</table></td>
+  </tr>
+</tbody>
+</table><div data-role="module-unsubscribe" class="module" role="module" data-type="unsubscribe" style="background-color:#252525; color:#444444; font-size:12px; line-height:20px; padding:0px 0px 0px 0px; text-align:Center;" data-muid="4e838cf3-9892-4a6d-94d6-170e474d21e5"><div class="Unsubscribe--addressLine"></div><p style="font-size:12px; line-height:20px;"><a class="Unsubscribe--unsubscribeLink" href="https://gymoneglobal.com/" target="_blank" style="">Gymoneglobal.com</a></p></div></td>
+                                  </tr>
+                                </table>
+                                <!--[if mso]>
+                              </td>
+                            </tr>
+                          </table>
+                        </center>
+                        <![endif]-->
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </center>
+</body>
+</html>
+EOD;
 
     $userConfirmationMessage = (new Swift_Message($translations["thankyouforyouremail"]))
         ->setFrom([$smtp_username => $business_name])
         ->setTo([$userEmail])
-        ->setBody(
-            "{$translations["dear"]} " . $name . ",\n\n" .
-            "{$translations["smtpcontactcontent"]}\n\n" .
-            "{$translations["message"]}: " . $userMessage . "\n\n" .
-            "{$business_name}"
-        );
+        ->setBody($editedcontent, 'text/html');
 
     $resultUser = $mailer->send($userConfirmationMessage);
 
     if ($result && $resultUser) {
-        echo "Az üzenetet sikeresen elküldtük!";
+        $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["successsndedemail"] . '
+                        </div>';
     } else {
-        echo "Hiba történt az üzenet elküldésekor.";
+        $alerts_html .= '<div class="alert alert-danger" role="alert">
+                            ' . $translations["unexpected-error"] . '
+                        </div>';
     }
 }
 ?>
@@ -217,6 +445,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div id="contact" class="row text-center justify-content-center">
             <div class="col-sm-4 py-3">
                 <h1><?php echo $translations["contactform"]; ?></h1>
+                <?php echo $alerts_html; ?>
                 <form method="post">
                     <div class="mb-3">
                         <label for="name" class="form-label"><?php echo $translations["fullname"]; ?>:</label>
