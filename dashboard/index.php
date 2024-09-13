@@ -65,6 +65,44 @@ $stmt->fetch();
 
 $stmt->close();
 $conn->close();
+
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\Label\Font\NotoSans;
+
+$filename = __DIR__ . "/../assets/img/logincard/{$userid}.png";
+$logoPath = 'https://gymoneglobal.com/assets/img/logo.png';
+
+if (!file_exists($filename)) {
+    try {
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data($userid)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(300)
+            ->margin(5)
+            ->logoPath($logoPath)
+            ->logoResizeToWidth(100)
+            ->labelText($firstname . ' ' . $lastname)
+            ->labelFont(new NotoSans(20))
+            ->labelAlignment(new LabelAlignmentCenter())
+            ->validateResult(false)
+            ->build();
+
+        $result->saveToFile($filename);
+        header("Refresh:2");
+    } catch (Exception $e) {
+        echo ' . $translations["unexpected-error"] . ' . $e->getMessage();
+    }
+}
 ?>
 
 
@@ -99,7 +137,7 @@ $conn->close();
                     <li class="active"><a href=""><i class="bi bi-house"></i> <?php echo $translations["mainpage"]; ?></a></li>
                     <li><a href="stats/"><i class="bi bi-graph-up"></i> <?php echo $translations["statspage"]; ?></a></li>
                     <li><a href="profile/"><i class="bi bi-person-badge"></i> <?php echo $translations["profilepage"]; ?></a></li>
-                    <li><a href="invoices/"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"];?></a></li>
+                    <li><a href="invoices/"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
                 </ul>
             </div>
         </div>
@@ -146,7 +184,7 @@ $conn->close();
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"]; ?></h4>
-                                <h1><strong></strong></h1>
+                                <h1><strong>$TICKETNAME</strong></h1>
                             </div>
                         </div>
                     </div>
@@ -154,7 +192,7 @@ $conn->close();
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"]; ?></h4>
-                                <h1><strong></strong></h1>
+                                <h1><strong>2024.09.11</strong></h1>
                             </div>
                         </div>
                     </div>
@@ -162,7 +200,7 @@ $conn->close();
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"]; ?></h4>
-                                <h1><strong></strong></h1>
+                                <h1><strong></strong><?php echo $translations["day"]; ?></h1>
                             </div>
                         </div>
                     </div>
@@ -176,9 +214,16 @@ $conn->close();
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <div class="card">
-                            <div class="card-body">
+                            <div class="card-body text-center">
+                                <?php
+                                if (file_exists($filename)) {
+                                    echo "<img class='img img-fluid' src='../assets/img/logincard/{$userid}.png' alt='{$firstname}-{$lastname}-{$userid}'>";
+                                } else {
+                                    echo "<h2 class='lead'>{$translations["qrgenerateing"]}</h2>";
+                                }
+                                ?>
 
                             </div>
                         </div>
@@ -188,7 +233,7 @@ $conn->close();
         </div>
 
         <!-- EXIT MODAL -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel">
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

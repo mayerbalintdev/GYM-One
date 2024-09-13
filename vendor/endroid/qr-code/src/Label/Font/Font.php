@@ -6,14 +6,21 @@ namespace Endroid\QrCode\Label\Font;
 
 final class Font implements FontInterface
 {
-    public function __construct(
-        private string $path,
-        private int $size = 16
-    ) {
-        $this->assertValidPath($path);
+    /** @var string */
+    private $path;
+
+    /** @var int */
+    private $size;
+
+    public function __construct(string $path, int $size = 16)
+    {
+        $this->validatePath($path);
+
+        $this->path = $path;
+        $this->size = $size;
     }
 
-    private function assertValidPath(string $path): void
+    private function validatePath(string $path): void
     {
         if (!file_exists($path)) {
             throw new \Exception(sprintf('Invalid font path "%s"', $path));

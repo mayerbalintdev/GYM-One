@@ -367,6 +367,23 @@ EOD;
   }
 }
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_user'])) {
+
+  $sql = "DELETE FROM users WHERE userid = ?";
+
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $userid);
+
+  if ($stmt->execute()) {
+    session_unset();
+    session_destroy();
+    header("Location: ../../");
+    exit();
+  } else {
+    echo "Hiba történt a törlés során: " . $stmt->error;
+  }
+}
+
 
 $conn->close();
 ?>
@@ -562,25 +579,33 @@ $conn->close();
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title lead" id="deleteAccountModalLabel"><?php echo $translations["deleteuser"]; ?></h5>
-          </div>
-          <div class="modal-body">
-            <p>
-              <?php echo $translations["areyousuredelete"]; ?>
-            </p>
-            <pre tabindex="0"><li><?php echo $translations["deletemodalfirst"]; ?></li>
+          <form method="POST">
+            <div class="modal-header">
+              <h5 class="modal-title lead" id="deleteAccountModalLabel">
+                <?php echo $translations["deleteuser"]; ?>
+              </h5>
+            </div>
+            <div class="modal-body">
+              <p>
+                <?php echo $translations["areyousuredelete"]; ?>
+              </p>
+              <pre tabindex="0">
+<li><?php echo $translations["deletemodalfirst"]; ?></li>
 <li><?php echo $translations["deletemodalsecond"]; ?></li>
 <li><?php echo $translations["deletemodalthree"]; ?></li>
 <li><?php echo $translations["deletemodalfour"]; ?></li>
 <li><?php echo $translations["deletemodalfive"]; ?></li>
 </pre>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></button>
-            <button type="button" class="btn btn-danger"><?php echo $translations["delete"]; ?></button>
-          </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <?php echo $translations["not-yet"]; ?>
+              </button>
+              <button type="submit" name="delete_user" class="btn btn-danger">
+                <?php echo $translations["delete"]; ?>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

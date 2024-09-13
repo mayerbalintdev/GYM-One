@@ -6,12 +6,24 @@ namespace Endroid\QrCode\Color;
 
 final class Color implements ColorInterface
 {
-    public function __construct(
-        private int $red,
-        private int $green,
-        private int $blue,
-        private int $alpha = 0
-    ) {
+    /** @var int */
+    private $red;
+
+    /** @var int */
+    private $green;
+
+    /** @var int */
+    private $blue;
+
+    /** @var int */
+    private $alpha;
+
+    public function __construct(int $red, int $green, int $blue, int $alpha = 0)
+    {
+        $this->red = $red;
+        $this->green = $green;
+        $this->blue = $blue;
+        $this->alpha = $alpha;
     }
 
     public function getRed(): int
@@ -37,11 +49,6 @@ final class Color implements ColorInterface
     public function getOpacity(): float
     {
         return 1 - $this->alpha / 127;
-    }
-
-    public function getHex(): string
-    {
-        return sprintf('#%02x%02x%02x', $this->red, $this->green, $this->blue);
     }
 
     public function toArray(): array

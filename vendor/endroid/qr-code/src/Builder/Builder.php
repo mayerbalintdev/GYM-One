@@ -7,7 +7,6 @@ namespace Endroid\QrCode\Builder;
 use Endroid\QrCode\Color\ColorInterface;
 use Endroid\QrCode\Encoding\EncodingInterface;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelInterface;
-use Endroid\QrCode\Exception\ValidationException;
 use Endroid\QrCode\Label\Alignment\LabelAlignmentInterface;
 use Endroid\QrCode\Label\Font\FontInterface;
 use Endroid\QrCode\Label\Label;
@@ -22,41 +21,14 @@ use Endroid\QrCode\Writer\Result\ResultInterface;
 use Endroid\QrCode\Writer\ValidatingWriterInterface;
 use Endroid\QrCode\Writer\WriterInterface;
 
-class Builder implements BuilderInterface
+final class Builder implements BuilderInterface
 {
-    /**
-     * @var array<string, mixed>{
-     *     data: string,
-     *     writer: WriterInterface,
-     *     writerOptions: array,
-     *     qrCodeClass: class-string,
-     *     logoClass: class-string,
-     *     labelClass: class-string,
-     *     validateResult: bool,
-     *     size?: int,
-     *     encoding?: EncodingInterface,
-     *     errorCorrectionLevel?: ErrorCorrectionLevelInterface,
-     *     roundBlockSizeMode?: RoundBlockSizeModeInterface,
-     *     margin?: int,
-     *     backgroundColor?: ColorInterface,
-     *     foregroundColor?: ColorInterface,
-     *     labelText?: string,
-     *     labelFont?: FontInterface,
-     *     labelAlignment?: LabelAlignmentInterface,
-     *     labelMargin?: MarginInterface,
-     *     labelTextColor?: ColorInterface,
-     *     logoPath?: string,
-     *     logoResizeToWidth?: int,
-     *     logoResizeToHeight?: int,
-     *     logoPunchoutBackground?: bool
-     * }
-     */
-    private array $options;
+    /** @var array<mixed> */
+    private $options;
 
     public function __construct()
     {
         $this->options = [
-            'data' => '',
             'writer' => new PngWriter(),
             'writerOptions' => [],
             'qrCodeClass' => QrCode::class,
@@ -66,146 +38,146 @@ class Builder implements BuilderInterface
         ];
     }
 
-    public static function create(): BuilderInterface
+    public static function create(): self
     {
         return new self();
     }
 
-    public function writer(WriterInterface $writer): BuilderInterface
+    public function writer(WriterInterface $writer): self
     {
         $this->options['writer'] = $writer;
 
         return $this;
     }
 
-    /** @param array<string, mixed> $writerOptions */
-    public function writerOptions(array $writerOptions): BuilderInterface
+    /** @param array<mixed> $writerOptions */
+    public function writerOptions(array $writerOptions): self
     {
         $this->options['writerOptions'] = $writerOptions;
 
         return $this;
     }
 
-    public function data(string $data): BuilderInterface
+    public function data(string $data): self
     {
         $this->options['data'] = $data;
 
         return $this;
     }
 
-    public function encoding(EncodingInterface $encoding): BuilderInterface
+    public function encoding(EncodingInterface $encoding): self
     {
         $this->options['encoding'] = $encoding;
 
         return $this;
     }
 
-    public function errorCorrectionLevel(ErrorCorrectionLevelInterface $errorCorrectionLevel): BuilderInterface
+    public function errorCorrectionLevel(ErrorCorrectionLevelInterface $errorCorrectionLevel): self
     {
         $this->options['errorCorrectionLevel'] = $errorCorrectionLevel;
 
         return $this;
     }
 
-    public function size(int $size): BuilderInterface
+    public function size(int $size): self
     {
         $this->options['size'] = $size;
 
         return $this;
     }
 
-    public function margin(int $margin): BuilderInterface
+    public function margin(int $margin): self
     {
         $this->options['margin'] = $margin;
 
         return $this;
     }
 
-    public function roundBlockSizeMode(RoundBlockSizeModeInterface $roundBlockSizeMode): BuilderInterface
+    public function roundBlockSizeMode(RoundBlockSizeModeInterface $roundBlockSizeMode): self
     {
         $this->options['roundBlockSizeMode'] = $roundBlockSizeMode;
 
         return $this;
     }
 
-    public function foregroundColor(ColorInterface $foregroundColor): BuilderInterface
+    public function foregroundColor(ColorInterface $foregroundColor): self
     {
         $this->options['foregroundColor'] = $foregroundColor;
 
         return $this;
     }
 
-    public function backgroundColor(ColorInterface $backgroundColor): BuilderInterface
+    public function backgroundColor(ColorInterface $backgroundColor): self
     {
         $this->options['backgroundColor'] = $backgroundColor;
 
         return $this;
     }
 
-    public function logoPath(string $logoPath): BuilderInterface
+    public function logoPath(string $logoPath): self
     {
         $this->options['logoPath'] = $logoPath;
 
         return $this;
     }
 
-    public function logoResizeToWidth(int $logoResizeToWidth): BuilderInterface
+    public function logoResizeToWidth(string $logoResizeToWidth): self
     {
         $this->options['logoResizeToWidth'] = $logoResizeToWidth;
 
         return $this;
     }
 
-    public function logoResizeToHeight(int $logoResizeToHeight): BuilderInterface
+    public function logoResizeToHeight(string $logoResizeToHeight): self
     {
         $this->options['logoResizeToHeight'] = $logoResizeToHeight;
 
         return $this;
     }
 
-    public function logoPunchoutBackground(bool $logoPunchoutBackground): BuilderInterface
-    {
-        $this->options['logoPunchoutBackground'] = $logoPunchoutBackground;
-
-        return $this;
-    }
-
-    public function labelText(string $labelText): BuilderInterface
+    public function labelText(string $labelText): self
     {
         $this->options['labelText'] = $labelText;
 
         return $this;
     }
 
-    public function labelFont(FontInterface $labelFont): BuilderInterface
+    public function labelFont(FontInterface $labelFont): self
     {
         $this->options['labelFont'] = $labelFont;
 
         return $this;
     }
 
-    public function labelAlignment(LabelAlignmentInterface $labelAlignment): BuilderInterface
+    public function labelAlignment(LabelAlignmentInterface $labelAlignment): self
     {
         $this->options['labelAlignment'] = $labelAlignment;
 
         return $this;
     }
 
-    public function labelMargin(MarginInterface $labelMargin): BuilderInterface
+    public function labelMargin(MarginInterface $labelMargin): self
     {
         $this->options['labelMargin'] = $labelMargin;
 
         return $this;
     }
 
-    public function labelTextColor(ColorInterface $labelTextColor): BuilderInterface
+    public function labelTextColor(ColorInterface $labelTextColor): self
     {
         $this->options['labelTextColor'] = $labelTextColor;
 
         return $this;
     }
 
-    public function validateResult(bool $validateResult): BuilderInterface
+    public function labelBackgroundColor(ColorInterface $labelBackgroundColor): self
+    {
+        $this->options['labelBackgroundColor'] = $labelBackgroundColor;
+
+        return $this;
+    }
+
+    public function validateResult(bool $validateResult): self
     {
         $this->options['validateResult'] = $validateResult;
 
@@ -214,10 +186,14 @@ class Builder implements BuilderInterface
 
     public function build(): ResultInterface
     {
+        if (!isset($this->options['writer']) || !$this->options['writer'] instanceof WriterInterface) {
+            throw new \Exception('Pass a valid writer via $builder->writer()');
+        }
+
         $writer = $this->options['writer'];
 
         if ($this->options['validateResult'] && !$writer instanceof ValidatingWriterInterface) {
-            throw ValidationException::createForUnsupportedWriter(strval(get_class($writer)));
+            throw new \Exception('Unable to validate result with '.get_class($writer));
         }
 
         /** @var QrCode $qrCode */
@@ -243,7 +219,7 @@ class Builder implements BuilderInterface
      *
      * @return mixed
      */
-    private function buildObject(string $class, string|null $optionsPrefix = null)
+    private function buildObject(string $class, string $optionsPrefix = null)
     {
         /** @var \ReflectionClass<object> $reflectionClass */
         $reflectionClass = new \ReflectionClass($class);

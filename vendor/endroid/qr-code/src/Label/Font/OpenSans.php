@@ -6,9 +6,12 @@ namespace Endroid\QrCode\Label\Font;
 
 final class OpenSans implements FontInterface
 {
-    public function __construct(
-        private int $size = 16
-    ) {
+    /** @var int */
+    private $size;
+
+    public function __construct(int $size = 16)
+    {
+        $this->size = $size;
     }
 
     public function getPath(): string

@@ -364,12 +364,6 @@ foreach ($data as $item) {
                                 <span><?php echo $translations["rulepage"]; ?></span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/tickets">
-                                <i class="bi bi-ticket"></i>
-                                <span><?php echo $translations["ticketspage"]; ?></span>
-                            </a>
-                        </li>
                     <?php
                     }
                     ?>
@@ -380,11 +374,10 @@ foreach ($data as $item) {
                         <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["gatewaypage"]; ?></span>
-                            <?php if ($is_new_version_available) : ?>
-                                <span class="sidebar-badge badge">
-                                    <i class="bi bi-exclamation-circle"></i>
-                                </span>
-                            <?php endif; ?>
+                        </a>
+                        <a class="sidebar-ling" href="../shop/tickets">
+                            <i class="bi bi-ticket"></i>
+                            <span><?php echo $translations["ticketspage"]; ?></span>
                         </a>
                     </li>
                     <li class="sidebar-header">
