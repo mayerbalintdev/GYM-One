@@ -1,7 +1,7 @@
 {
     "require": {
         "swiftmailer/swiftmailer": "^6.3",
-        "tecnickcom/tcpdf": "^6.7",
-        "endroid/qr-code": "4.0"
+        "endroid/qr-code": "4.0",
+        "mpdf/mpdf": "^8.2"
     }
 }

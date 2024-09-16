@@ -84,7 +84,7 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
-// Új bérlet/jegy hozzáadása
+// Új bérlet hozzáadása
 if (isset($_POST['add_ticket'])) {
     $name = $_POST['name'];
     $expire_days = $_POST['expire_days'] === 'unlimited' ? 'NULL' : $_POST['expire_days'];
@@ -96,14 +96,14 @@ if (isset($_POST['add_ticket'])) {
     mysqli_query($conn, $sql);
 }
 
-// Bérlet/jegy törlése
+// Bérlet törlése
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     $sql = "DELETE FROM tickets WHERE id = $id";
     mysqli_query($conn, $sql);
 }
 
-// Bérletek/jegyek lekérdezése
+// Bérletek getter
 $sql = "SELECT * FROM tickets";
 $result = mysqli_query($conn, $sql);
 

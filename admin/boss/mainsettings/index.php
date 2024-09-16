@@ -354,7 +354,7 @@ $conn->close();
                                                         value="<?= htmlspecialchars($env_data['CURRENCY'] ?? '') ?>">
                                                 </div>
                                                 <div class="form-group col-md-4">
-                                                    <label for="phone_no"><?php echo $translations["phoneno"]; ?>:</label>
+                                                    <label for="phone_no"><?php echo $translations["fno"]; ?>:</label>
                                                     <input type="tel" class="form-control" id="phone_no" name="phone_no"
                                                         value="<?= htmlspecialchars($env_data['PHONE_NO'] ?? '') ?>">
                                                 </div>

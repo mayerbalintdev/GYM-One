@@ -316,6 +316,11 @@ foreach ($data as $item) {
                             <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../boss/sell">
+                            <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
+                        </a>
+                    </li>
                     <?php
                     if ($is_boss === 1) {
                     ?>

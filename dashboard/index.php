@@ -56,6 +56,38 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$sql = "SELECT * FROM current_tickets WHERE userid = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $userid);
+$stmt->execute();
+$result = $stmt->get_result();
+$id = $ticketname = $buydate = $expiredate = $opportunities = null;
+
+if ($row = $result->fetch_assoc()) {
+    $id = $row['id'];
+    $ticketname = $row['ticketname'];
+    $buydate = $row['buydate'];
+    $expiredate = $row['expiredate'];
+    $opportunities = $row['opportunities'];
+}
+
+$stmt->close();
+
+$currentDate = new DateTime();
+$expireDate = new DateTime($expiredate);
+$interval = $currentDate->diff($expireDate);
+$daysRemaining = $interval->days;
+if ($expireDate < $currentDate) {
+    $daysRemaining = "-";
+} else {
+    $interval = $currentDate->diff($expireDate);
+    $daysRemaining = $interval->days;
+
+    if ($expireDate >= $currentDate) {
+        $daysRemaining++;
+    }
+}
+
 $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -63,7 +95,9 @@ $stmt->execute();
 $stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
+
 $stmt->close();
+
 $conn->close();
 
 
@@ -184,7 +218,12 @@ if (!file_exists($filename)) {
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["currentticket"]; ?></h4>
-                                <h1><strong>$TICKETNAME</strong></h1>
+                                <h1><strong><?php if (!empty($ticketname)): ?>
+                                            <?php echo $ticketname; ?>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </strong></h1>
                             </div>
                         </div>
                     </div>
@@ -200,7 +239,7 @@ if (!file_exists($filename)) {
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["remainingdays"]; ?></h4>
-                                <h1><strong></strong><?php echo $translations["day"]; ?></h1>
+                                <h1><strong><?php echo $daysRemaining; ?> </strong><?php echo $translations["day"]; ?></h1>
                             </div>
                         </div>
                     </div>
