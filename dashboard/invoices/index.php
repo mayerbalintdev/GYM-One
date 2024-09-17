@@ -63,6 +63,10 @@ $stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
 
 $stmt->close();
+
+$sql = "SELECT id, name, price, created_at, status, route FROM invoices WHERE userid = $userid";
+$result = $conn->query($sql);
+
 $conn->close();
 ?>
 
@@ -159,20 +163,27 @@ $conn->close();
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td scope="row">Mark</td>
-                                            <td scope="row">Otto</td>
-                                            <td scope="row">@mdo</td>
-                                            <td scope="row"><span class="badge bg-label-success" text-capitalized=""> Paid </span></td>
-                                            <td scope="row">
-                                                <div class="d-flex align-items-center">
-                                                    <a href="btn btn-primary"><i class="bi bi-eye"></i></a>
-                                                    <a href="btn btn-primary"><i class="bi bi-download"></i></a>
+                                        <?php if ($result->num_rows > 0) {
+                                            while ($row = $result->fetch_assoc()) {
+                                                $statusClass = $row["status"] == 'paid' ? 'bg-label-success' : 'bg-label-danger';
 
-                                                </div>
-                                            </td>
-                                        </tr>
+                                                echo "<tr>
+                <th scope='row'>" . $row["id"] . "</th>
+                <td scope='row'>" . $row["name"] . "</td>
+                <td scope='row'>" . $row["price"] . " Ft</td>
+                <td scope='row'>" . $row["created_at"] . "</td>
+                <td scope='row'><span class='badge $statusClass' text-capitalized=''>" . ucfirst($row["status"]) . "</span></td>
+                <td scope='row'>
+                    <div class='d-flex align-items-center'>
+                        <a target='_blank' href='../../assets/docs/invoices/" . $row["route"] . "' class='btn btn-primary'><i class='bi bi-eye'></i></a>
+                        <a href='../../assets/docs/invoices/" . $row["route"] . "' class='btn btn-primary' download><i class='bi bi-download'></i></a>
+                    </div>
+                </td>
+            </tr>";
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='6'>" . $translations["youdonthaveinvoices"] . "</td></tr>";
+                                        }; ?>
                                     </tbody>
                                 </table>
                             </div>

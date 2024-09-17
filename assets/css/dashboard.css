@@ -115,6 +115,12 @@ p.lead.mb-4.fs-4 {
     color: #71dd37 !important;
 }
 
+.bg-label-danger {
+    background-color: #f9e7e7 !important; /* Halvány piros háttér */
+    color: #ff3e1d !important; /* Élénk piros szöveg */
+}
+
+
 .roundbg {
     background-color: #0C9AB9;
     color: whitesmoke;

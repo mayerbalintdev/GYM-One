@@ -61,6 +61,8 @@ $lang_code = $env_data['LANG_CODE'] ?? '';
 
 $lang = $lang_code;
 
+$alerts_html = "";
+
 $langDir = __DIR__ . "/../../../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
@@ -299,22 +301,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $invoicePath = __DIR__ . "/../../../../assets/docs/invoices/{$userid}-{$invoiceNumber}.pdf";
     $mpdf->Output($invoicePath, \Mpdf\Output\Destination::FILE);
 
-    echo "A számla sikeresen létrehozva: $invoicePath";
+    $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["invoicecreated"] . '
+                        </div>';
     $fullname = "{$firstname} {$lastname}";
 
     $stmt = $conn->prepare("INSERT INTO invoices (userid, name, price, status, route, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
 
     $status = "paid";
     $pathinvoicesql = "{$userid}-{$invoiceNumber}.pdf";
-    // Paraméterek kötése
     $stmt->bind_param("isdss", $userid, $fullname, $ticketprice, $status, $pathinvoicesql);
 
-    // Lekérdezés végrehajtása
     if ($stmt->execute()) {
-        echo "Új sor sikeresen hozzáadva.";
+        $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["invoiceadded"] . '
+                        </div>';
     } else {
         echo "Hiba történt: " . $stmt->error;
     }
+    $stmt->close();
+
+
+    $sql = "INSERT INTO current_tickets (userid, ticketname, buydate, expiredate, opportunities) 
+        VALUES (?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bind_param("isssi", $userid, $ticketname, $date, $expire_date, $occasions);
+
+    if ($stmt->execute()) {
+        $alerts_html .= '<div class="alert alert-success" role="alert">
+                            ' . $translations["ticketadded"] . '
+                        </div>';
+        header("Location: ../../../dashboard");
+    } else {
+        echo "Hiba történt: " . $stmt->error;
+    }
+
+    $stmt->close();
 }
 
 $message = "";
@@ -448,6 +472,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     </button>
                 </div>
                 <div class="row">
+                    <?= $alerts_html; ?>
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-body">
