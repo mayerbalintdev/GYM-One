@@ -39,6 +39,10 @@ i:hover,i:active{
     font-weight: bold;
 }
 
+.text-first{
+    color: var(--main-color) !important;
+}
+
 .nav-link:hover{
     color: white;
 }

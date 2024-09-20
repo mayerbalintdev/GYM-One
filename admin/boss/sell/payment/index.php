@@ -253,7 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <tbody>
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
-                        <td>$paymentMethod</td>
+                        <td>" .
+        ($paymentMethod == 'cash' ? $translations["cash"] : $translations["card"]) .
+        "</td>
                         <td>$date</td>
                     </tr>
                 </tbody>
@@ -531,8 +533,8 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     <form method="post">
                         <div class="form">
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
-                                <option selected value="cash">Készpénz</option>
-                                <option value="card">Kártya</option>
+                                <option selected value="cash"><?= $translations["cash"];?></option>
+                                <option value="card"><?= $translations["card"];?></option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-success"><?= $translations["next"]; ?></button>
