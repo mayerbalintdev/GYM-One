@@ -10,7 +10,12 @@ body {
     background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
-    height: 100vh;
+}
+
+@media (min-width:1400px) {
+    .sidenav {
+        height: 100%;
+    }
 }
 
 .navbar-header {
@@ -116,8 +121,16 @@ p.lead.mb-4.fs-4 {
 }
 
 .bg-label-danger {
-    background-color: #f9e7e7 !important; /* Halvány piros háttér */
-    color: #ff3e1d !important; /* Élénk piros szöveg */
+    background-color: #f9e7e7 !important;
+    color: #ff3e1d !important;
+}
+
+.list-group-itemcustom {
+    position: relative;
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+
 }
 
 
@@ -158,6 +171,26 @@ p.lead.mb-4.fs-4 {
 
 a {
     color: #f5f7fb;
+}
+
+.linkhref {
+    color: #0950dc !important;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: none;
 }
 
 .blacka {

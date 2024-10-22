@@ -56,7 +56,7 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-// Előre definiált hónapok tömbje
+
 $months = [
     "01" => $translations["Jan"],
     "02" => $translations["Feb"],
@@ -321,6 +321,11 @@ foreach ($data as $item) {
                             <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a href="../invoices/" class="sidebar-link">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                     <?php
                     if ($is_boss === 1) {
                     ?>
@@ -528,7 +533,14 @@ foreach ($data as $item) {
                             <div class="card-body">
                                 <p><?php echo $translations["dayopendayclose"]; ?></p>
                                 <div class="d-flex justify-content-between text-center">
-                                    <a href="" class="btn btn-success"><?php echo $translations["dayopen"]; ?></a>
+                                    <?php if ($message): ?>
+                                        <div class="alert alert-info" role="alert">
+                                            <?php echo $message; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#openModal">
+                                        <?php echo $translations["dayopen"]; ?>
+                                    </button>
                                     <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a>
                                 </div>
                             </div>
@@ -678,8 +690,8 @@ foreach ($data as $item) {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userDetailsLabel">Felhasználó Adatok</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Bezárás">
+                    <h5 class="modal-title" id="userDetailsLabel"><?= $translations["userinfo"];?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $translations["close"];?>">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -687,8 +699,54 @@ foreach ($data as $item) {
                     <div id="userDetails"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Bezárás</button>
+                    <button id="nextButton" class="btn btn-primary" disabled><?php echo $translations["next"];?></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Details Modal -->
+    <div class="modal fade" id="TicketDetails_MODAL" tabindex="-1" role="dialog" aria-labelledby="TicketDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TicketDetailsModalLabel"><?php echo $translations["ticketinfomodal"];?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="ticketDetails"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAYOPEN MODAL -->
+
+    <div class="modal fade" id="openModal" tabindex="-1" role="dialog" aria-labelledby="openModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="openModalLabel">Kassza Megnyitása</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="opening_amount">Kezdő összeg (Ft)</label>
+                            <input type="number" name="opening_amount" step="0.01" class="form-control" required placeholder="Kezdő összeg (Ft)">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégse</button>
+                        <button type="submit" name="open" class="btn btn-primary">Megnyitás</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -713,104 +771,156 @@ foreach ($data as $item) {
                     $("#results").html('');
                 }
             });
-        });
 
-        const codeReader = new ZXing.BrowserQRCodeReader();
-        const video = document.getElementById('video');
-        const resultElement = document.getElementById('result');
-        const checkmark = document.getElementById('checkmark');
-        const error = document.getElementById('error');
-        const qrCodeContent = document.getElementById('qrcodeContent');
-        const continueButton = document.getElementById('continueButton');
-        const userDetails = document.getElementById('userDetails');
+            const codeReader = new ZXing.BrowserQRCodeReader();
+            const video = document.getElementById('video');
+            const resultElement = document.getElementById('result');
+            const checkmark = document.getElementById('checkmark');
+            const error = document.getElementById('error');
+            const qrCodeContent = document.getElementById('qrcodeContent');
+            const continueButton = document.getElementById('continueButton');
+            const userDetails = document.getElementById('userDetails');
+            const nextButton = document.getElementById('nextButton');
 
-        let scanCompleted = false;
-        let scanning = false;
+            let scanCompleted = false;
+            let scanning = false;
 
-        let userData = {}; // Új változó a felhasználói adatok tárolására
+            let userData = {};
 
-        var translations = <?php echo json_encode($translations); ?>;
+            var translations = <?php echo json_encode($translations); ?>;
 
-        function startScanning() {
-            if (scanCompleted || scanning) return;
+            function startScanning() {
+                if (scanCompleted || scanning) return;
 
-            scanning = true;
-            codeReader.decodeFromVideoDevice(null, video, (result, error) => {
-                if (result && !scanCompleted) {
-                    scanCompleted = true;
-                    const qrCodeText = result.text;
-                    resultElement.textContent = `QR Code Result: ${qrCodeText}`;
-                    qrCodeContent.value = qrCodeText;
-                    continueButton.style.display = 'inline';
+                scanning = true;
+                codeReader.decodeFromVideoDevice(null, video, (result, error) => {
+                    if (result && !scanCompleted) {
+                        scanCompleted = true;
+                        const qrCodeText = result.text;
+                        resultElement.textContent = `QR Code Result: ${qrCodeText}`;
+                        qrCodeContent.value = qrCodeText;
+                        continueButton.style.display = 'inline';
 
-                    fetch('process.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: `qrcode=${encodeURIComponent(qrCodeText)}`
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                userData = {
-                                    firstname: data.firstname,
-                                    lastname: data.lastname,
-                                    birthdate: data.birthdate
-                                };
-                                resultElement.innerHTML = `${translations.firstname}: ${data.firstname}<br>${translations.lastname}: ${data.lastname}`;
-                                video.classList.add('scanned');
-                                checkmark.style.display = 'block';
-                            } else {
-                                resultElement.textContent = `${translations['qr-error']}`;
+                        fetch('process.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: `qrcode=${encodeURIComponent(qrCodeText)}`
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    userData = {
+                                        firstname: data.firstname,
+                                        lastname: data.lastname,
+                                        birthdate: data.birthdate,
+                                        ticket_status: data.ticket_status,
+                                        remaining_opportunities: data.remaining_opportunities,
+                                        expiredate: data.expiredate,
+                                        assigned_locker: data.assigned_locker
+                                    };
+                                    resultElement.innerHTML = `${translations.firstname}: ${data.firstname}<br>${translations.lastname}: ${data.lastname}`;
+
+                                    userDetails.innerHTML =
+                                        `${translations.firstname}: ${userData.firstname}<br>
+                            ${translations.lastname}: ${userData.lastname}<br>
+                            ${translations.birthday}: ${userData.birthdate}<br>
+                            ${translations.ticketinfo} ${userData.ticket_status}`;
+
+                                    if (userData.ticket_status === 'Érvényes') {
+                                        nextButton.disabled = false;
+                                    } else {
+                                        nextButton.disabled = true;
+                                    }
+
+                                    video.classList.add('scanned');
+                                    checkmark.style.display = 'block';
+                                } else {
+                                    resultElement.textContent = translations['qr-error'];
+                                    video.classList.add('error');
+                                    error.style.display = 'block';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                resultElement.textContent = translations['qr-error'];
                                 video.classList.add('error');
                                 error.style.display = 'block';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            resultElement.textContent = `${translations['qr-error']}`;
-                            video.classList.add('error');
-                            error.style.display = 'block';
-                        });
-                }
-                if (error && !scanCompleted) {
-                    console.error(error);
-                }
-            }).catch(error => console.error(error));
-        }
-
-        function stopScanning() {
-            if (scanning) {
-                codeReader.reset(); // Stop the scanner
-                video.srcObject = null; // Stop the video stream
-                scanning = false;
-                scanCompleted = false;
-                resultElement.textContent = '';
-                checkmark.style.display = 'none';
-                error.style.display = 'none';
-                video.classList.remove('scanned', 'error'); // Remove the scanned and error classes
-                continueButton.style.display = 'none'; // Hide the continue button
+                            });
+                    }
+                    if (error && !scanCompleted) {
+                        console.error(error);
+                    }
+                }).catch(error => console.error(error));
             }
-        }
 
-        $('#continueButton').on('click', function() {
-            $('#Logginer_MODAL').modal('hide'); // Hide the current modal
-            stopScanning(); // Reset the scanner
+            function stopScanning() {
+                if (scanning) {
+                    codeReader.reset();
+                    video.srcObject = null;
+                    scanning = false;
+                    scanCompleted = false;
+                    resultElement.textContent = '';
+                    checkmark.style.display = 'none';
+                    error.style.display = 'none';
+                    video.classList.remove('scanned', 'error');
+                    continueButton.style.display = 'none';
+                }
+            }
 
-            // Frissítsd a userDetails modal tartalmát az userData változó alapján
-            userDetails.innerHTML = `
-            First Name: ${userData.firstname}<br>
-            Last Name: ${userData.lastname}<br>
-            Birthday: ${userData.birthdate}
-        `;
+            $('#continueButton').on('click', function() {
+                $('#Logginer_MODAL').modal('hide');
+                stopScanning();
 
-            $('#UserDetails_MODAL').modal('show'); // Show the next modal
+                userDetails.innerHTML =
+                    `${translations.firstname}: ${userData.firstname}<br>
+                            ${translations.lastname}: ${userData.lastname}<br>
+                            ${translations.birthday}: ${userData.birthdate}<br>
+                            ${translations.ticketinfo} ${userData.ticket_status}`;
+
+                $('#UserDetails_MODAL').modal('show');
+            });
+
+            $('#nextButton').on('click', function() {
+                if (userData.ticket_status === "Érvényes") {
+                    $('#UserDetails_MODAL').modal('hide');
+                    $('#TicketDetails_MODAL').modal('show');
+
+                    $('#ticketDetails').html(
+                        `${translations.tickettableoccassion}: <span>${userData.remaining_opportunities}</span><br>
+                    ${translations.expiredate} ${userData.expiredate}<br>
+                    ${translations.randomlockerselected} <span class="flash">${userData.assigned_locker}</span>`
+                    );
+                } else {
+                    alert('A bérlet nem érvényes.');
+                }
+            });
+
+            $('#Logginer_MODAL').on('shown.bs.modal', startScanning);
+            $('#Logginer_MODAL').on('hidden.bs.modal', stopScanning);
         });
 
-        $('#Logginer_MODAL').on('shown.bs.modal', startScanning);
-        $('#Logginer_MODAL').on('hidden.bs.modal', stopScanning);
+        $('<style>')
+            .prop('type', 'text/css')
+            .html(`
+        .flash {
+            color: red;
+            animation: flash-animation 1s infinite;
+        }
+        @keyframes flash-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    `)
+            .appendTo('head');
     </script>
+
+
+
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);

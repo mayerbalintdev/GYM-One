@@ -1,42 +1,125 @@
-### **Code Usage License** ###
+# GYM One License Agreement
 
-1. Definitions
+**Version Beta 1.0 - December 15, 2024**
 
-1.1. "Author" refers to the creator or authorized representative of the code.
-1.2. "User" refers to the individual or organization who accesses and uses the code.
-1.3. "Code" refers to the software code provided by the Author, including its source code and binary files.
+This License Agreement (hereafter referred to as "Agreement") governs the use, distribution, and modification of the GYM One software (hereafter referred to as "Software"). By using, distributing, or modifying the Software, you agree to be bound by the terms of this Agreement.
 
-2. Permitted Use
+---
 
-2.1. The User is permitted to modify the Code for their own use. However, the modified Code may not be distributed to third parties.
+## 1. **Definitions**
 
-2.2. The User may generate revenue through the use of the Code and its modified versions, provided that such use aligns with the purpose and functionality of the Code.
+- **Software**: Refers to the GYM One open-source gym management software, including all associated files, databases, executable programs, and documentation.
+- **Licensee**: Any individual or entity that downloads, installs, uses, or distributes the Software.
+- **Licensor**: GYM One contributors, including any individual or entity who has contributed to the development of the Software.
+- **Derivative Works**: Any work based upon or incorporating the Software, including modifications, translations, and adaptations.
 
-3. Prohibition of Commercial Use
+---
 
-3.1. The Code and its modified versions may not be sold to third parties. Commercial distribution or sale is prohibited.
+## 2. **Grant of License**
 
-4. Trademarks and Logos
+Subject to the terms of this Agreement, the Licensor hereby grants the Licensee the following rights:
 
-4.1. The Code may contain trademarks, logos, or other protected elements. The User is not authorized to modify or remove these trademarks, logos, or other protected elements.
+- **Usage**: The Licensee is free to use the Software for personal, commercial, and educational purposes.
+- **Modification**: The Licensee may modify the Software to fit their needs, provided that such modifications comply with the restrictions set forth in this Agreement.
+- **Distribution**: The Licensee is allowed to distribute the Software or its modified versions under the conditions stated below.
 
-4.2. Modifying trademarks or logos is considered a violation of this License and may result in the User being excluded from the GYM One program.
+---
 
-5. Legal Responsibility
+## 3. **Conditions of Distribution**
 
-5.1. GYM One assumes no responsibility for any legal disputes arising from the use of the Code.
+The Licensee may distribute the Software or Derivative Works under the following conditions:
 
-5.2. GYM One does not guarantee the accessibility of the Code and assumes no responsibility for any errors or deficiencies in the Code.
+- **Attribution**: Any distribution of the Software, whether modified or unmodified, must include clear attribution to the original Software and its authors. This can be done by including a prominent statement such as:  
+  “This software is based on GYM One, developed by the GYM One contributors.”
 
-6. License Modifications
+- **License Inclusion**: Any distributed version of the Software, including Derivative Works, must include this License Agreement.
+  
+- **No Warranty**: The GYM One developers provide the Software "as-is" and make no guarantees or warranties regarding its performance, reliability, or suitability for any purpose. The developers shall not be held responsible for any damages, losses, or issues caused by the use of the Software, whether direct, indirect, or consequential. Furthermore, the Licensee is prohibited from offering any guarantees or warranties on behalf of the GYM One developers unless explicitly agreed upon in writing.
 
-6.1. The Author reserves the right to modify the License at any time. The modified License will be effective from the date of modification.
+---
 
-7. Validity
+## 4. **Rights and Restrictions**
 
-7.1. If any provision of the License is found to be invalid, it shall not affect the validity of the remaining provisions of the License.
+- **Modification Rights**: The Licensee has the right to modify the Software but must clearly indicate any changes from the original version. Modified versions must retain a mention of the original Software and the fact that changes were made.
+  
+- **Non-Exclusive License**: This license is non-exclusive, meaning the Licensee is not permitted to distribute the Software as part of or integrated into any other software. The Software must remain distinct and separate from other software products and cannot be sublicensed or rebranded.
 
-8. Contact
+- **Non-Transferable**: The Licensee cannot transfer rights granted by this Agreement to another individual or entity unless they agree to be bound by the terms of this Agreement.
 
-8.1. Any questions, requests, or comments should be directed to the Author at Mayer Bálint info@gymoneglobal.com
+---
 
+## 5. **Warranty Disclaimer**
+
+THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE LICENSOR OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+## 6. **Limitation of Liability**
+
+Under no circumstances shall the Licensor be liable for any indirect, incidental, consequential, or special damages, including any loss of revenue, data, or profit, arising out of the use or inability to use the Software. The Licensee assumes all responsibility for determining whether the Software is appropriate for their purposes and for ensuring proper usage.
+
+---
+
+## 7. **Termination**
+
+This Agreement shall remain in force indefinitely. However, the Licensor may terminate this Agreement if the Licensee breaches any of its terms. Upon termination, the Licensee has 14 days to cease all use and distribution of the Software. Failure to comply within this period may result in legal action.
+
+---
+
+## 8. **Governing Law**
+
+This Agreement shall be governed by and interpreted in accordance with the laws of Hungary. Any legal action or proceeding arising under this Agreement will be brought exclusively in the courts located in Budapest, Hungary.
+
+---
+
+## 9. **Contributions**
+
+If the Licensee contributes to the development of the Software (e.g., by submitting code or translations), such contributions shall become the property of GYM One. These contributions are licensed under the same terms as this Agreement unless otherwise agreed in writing. By contributing, the Licensee acknowledges that all rights, title, and interest in and to the contributions are transferred to GYM One, granting the Licensor a perpetual, irrevocable, worldwide license to incorporate these contributions into the Software.
+
+---
+
+## 10. **Third-Party Libraries**
+
+The Software may depend on various third-party libraries and software packages that are essential for its functionality and performance. These libraries and packages are often licensed under different terms than this Agreement. 
+
+Specifically, the Software incorporates well-known libraries and frameworks, including but not limited to:
+- **Bootstrap**: A popular front-end framework that facilitates responsive web design and development.
+- **Composer**: A dependency manager for PHP, which allows the integration of various packages, including:
+  - **mpdf/mpdf**: A library for generating PDF files from HTML.
+  - **endroid/qr-code**: A library for creating QR codes in PHP.
+  - **swiftmailer/swiftmailer**: A powerful library for sending emails from PHP applications.
+
+Additionally, the Software utilizes resources from GitHub, such as:
+- **lipis/flag-icons**: A collection of SVG flags used for internationalization and localization in web applications.
+
+The Licensee must ensure compliance with the respective licenses governing these third-party components in addition to the terms outlined in this Agreement. This means that any use, modification, or distribution of the Software must adhere to the licensing requirements of the included libraries and frameworks. Failure to comply with these licenses may result in legal consequences and could jeopardize the Licensee's rights to use the Software.
+
+---
+
+## 11. **Amendments**
+
+The Licensor reserves the right to update or modify this Agreement at any time. Any changes will be communicated via the official distribution channels of the Software. Continued use of the Software after any changes to the Agreement constitutes acceptance of the revised terms.
+
+---
+
+## 12. **Severability**
+
+If any provision of this Agreement is found to be invalid or unenforceable, the remainder of this Agreement shall remain in full force and effect.
+
+---
+
+## 13. **Contact Information**
+
+For any questions or inquiries about this Agreement or the Software, please contact:
+
+**GYM One Center**  
+[center@gymoneglobal.com]  
+[https://www.gymoneglobal.com]
+
+---
+
+## 14. **Conclusion**
+
+By downloading, installing, using, or distributing the Software, you agree to the terms and conditions outlined in this Agreement. Failure to comply with these terms may result in legal consequences, including termination of rights granted under this Agreement.
+
+**Last Updated**: October 22, 2024

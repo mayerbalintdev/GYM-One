@@ -74,33 +74,50 @@ $alerts_html = '';
 $sql = "SELECT userid, Firstname, Lastname, username, is_boss FROM workers";
 $result = $conn->query($sql);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
-    foreach ($days as $key => $day) {
-        $open_time = $_POST["open_time"][$key];
-        $close_time = $_POST["close_time"][$key];
+$dayNames = [
+    1 => $translations["Mon"],
+    2 => $translations["Tue"],
+    3 => $translations["Wed"],
+    4 => $translations["Thu"],
+    5 => $translations["Fri"],
+    6 => $translations["Sat"],
+    7 => $translations["Sun"]
+];
 
-        if ($open_time == "closed" || $close_time == "closed") {
-            $open_time = NULL;
-            $close_time = NULL;
+$sql = "SELECT * FROM opening_hours ORDER BY day ASC";
+$result = $conn->query($sql);
+
+$days = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $days[] = $row;
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    foreach ($dayNames as $dayNumber => $dayName) {
+        $isClosed = isset($_POST['closed'][$dayNumber]) ? 1 : 0;
+
+        if ($isClosed) {
+            $open_time = 'NULL';
+            $close_time = 'NULL';
+        } else {
+            $open_time = isset($_POST['open_time'][$dayNumber]) && !empty($_POST['open_time'][$dayNumber])
+                ? "'" . $conn->real_escape_string($_POST['open_time'][$dayNumber]) . "'"
+                : 'NULL';
+            $close_time = isset($_POST['close_time'][$dayNumber]) && !empty($_POST['close_time'][$dayNumber])
+                ? "'" . $conn->real_escape_string($_POST['close_time'][$dayNumber]) . "'"
+                : 'NULL';
         }
 
-        $update_sql = "UPDATE opening_hours SET open_time=?, close_time=? WHERE day_of_week=?";
-        $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bind_param("ssi", $open_time, $close_time, $key);
-        $update_stmt->execute();
+        $updateSql = "UPDATE opening_hours SET open_time = $open_time, close_time = $close_time WHERE day = $dayNumber";
+        if (!$conn->query($updateSql)) {
+            echo "Hiba a(z) $dayName frissítésekor: " . $conn->error;
+        }
     }
-    $alerts_html .= "<div class='alert alert-success'>{$translations["time-update-success"]}</div>";
-    $action = $translations['success-update-hours'];
-    $actioncolor = 'success';
-    $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
-            VALUES (?, ?, ?, NOW())";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iss", $userid, $action, $actioncolor);
-    $stmt->execute();
-    header("Refresh:2");
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
-$days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
@@ -168,30 +185,30 @@ $conn->close();
                     </li>
                     <?php
                     if ($is_boss == 1) {
-                            ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-link" href="#">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../smtp">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
-                            <?php
-                        }
+                    ?>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="#">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../smtp">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
+                    <?php
+                    }
                     ?>
                     <li class="sidebar-header">
                         Bolt
@@ -234,56 +251,41 @@ $conn->close();
 
                                 <?php
                                 if ($is_boss == 1) {
-                                        ?>
-                                        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-                                            <table class="table">
-                                                <thead>
+                                ?>
+                                    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th><?php echo $translations["day"]; ?></th>
+                                                    <th><?php echo $translations["opentime"]; ?></th>
+                                                    <th><?php echo $translations["closetime"]; ?></th>
+                                                    <th><?php echo $translations["checkbox-closed"];?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($days as $day): ?>
                                                     <tr>
-                                                        <th><?php echo $translations["day"]; ?></th>
-                                                        <th><?php echo $translations["opentime"]; ?></th>
-                                                        <th><?php echo $translations["closetime"]; ?></th>
+                                                        <td><?= htmlspecialchars($dayNames[$day['day']]) ?></td>
+                                                        <td>
+                                                            <input type="time" name="open_time[<?= $day['day'] ?>]" value="<?= htmlspecialchars($day['open_time']) ?>" class="form-control" <?= is_null($day['open_time']) ? 'disabled' : '' ?>>
+                                                        </td>
+                                                        <td>
+                                                            <input type="time" name="close_time[<?= $day['day'] ?>]" value="<?= htmlspecialchars($day['close_time']) ?>" class="form-control" <?= is_null($day['close_time']) ? 'disabled' : '' ?>>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <input type="checkbox" name="closed[<?= $day['day'] ?>]" value="1" <?= is_null($day['open_time']) && is_null($day['close_time']) ? 'checked' : '' ?> onclick="toggleTimeFields(this, <?= $day['day'] ?>)">
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($days as $key => $day): ?>
-                                                        <tr>
-                                                            <td><?php echo $day; ?></td>
-                                                            <td>
-                                                                <select name="open_time[<?php echo $key; ?>]" class="form-control">
-                                                                    <option value="closed" <?php if (!isset($opening_hours[$key]['open_time']))
-                                                                        echo 'selected'; ?>><?php echo $translations["closed"]; ?></option>
-                                                                    <?php for ($hour = 0; $hour < 24; $hour++): ?>
-                                                                        <option value="<?php echo sprintf("%02d:00", $hour); ?>" <?php if (isset($opening_hours[$key]['open_time']) && $opening_hours[$key]['open_time'] == sprintf("%02d:00", $hour))
-                                                                                echo 'selected'; ?>>
-                                                                            <?php echo sprintf("%02d:00", $hour); ?>
-                                                                        </option>
-                                                                    <?php endfor; ?>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <select name="close_time[<?php echo $key; ?>]" class="form-control">
-                                                                    <option value="closed" <?php if (!isset($opening_hours[$key]['close_time']))
-                                                                        echo 'selected'; ?>><?php echo $translations["closed"]; ?>
-                                                                    </option>
-                                                                    <?php for ($hour = 0; $hour < 24; $hour++): ?>
-                                                                        <option value="<?php echo sprintf("%02d:00", $hour); ?>" <?php if (isset($opening_hours[$key]['close_time']) && $opening_hours[$key]['close_time'] == sprintf("%02d:00", $hour))
-                                                                                echo 'selected'; ?>>
-                                                                            <?php echo sprintf("%02d:00", $hour); ?>
-                                                                        </option>
-                                                                    <?php endfor; ?>
-                                                                </select>
-                                                            </td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                            <button type="submit"
-                                                class="btn btn-primary"><?php echo $translations["save"]; ?></button>
-                                        </form>
-                                        <?php
-                                    } else {
-                                        echo $translations["dont-access"];
-                                    }
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                        <button type="submit" class="btn btn-primary"><?= $translations["save"];?></button>
+
+                                    </form>
+                                <?php
+                                } else {
+                                    echo $translations["dont-access"];
+                                }
                                 ?>
 
                             </div>
@@ -312,6 +314,29 @@ $conn->close();
     </div>
 
     <!-- SCRIPTS! -->
+    <script>
+        function toggleTimeFields(checkbox, dayNumber) {
+            const openTime = document.querySelector(`input[name="open_time[${dayNumber}]"]`);
+            const closeTime = document.querySelector(`input[name="close_time[${dayNumber}]"]`);
+            if (checkbox.checked) {
+                openTime.value = '';
+                closeTime.value = '';
+                openTime.disabled = true;
+                closeTime.disabled = true;
+            } else {
+                openTime.disabled = false;
+                closeTime.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="closed"]');
+            checkboxes.forEach(checkbox => {
+                const dayNumber = checkbox.name.match(/\d+/)[0];
+                toggleTimeFields(checkbox, dayNumber);
+            });
+        });
+    </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 

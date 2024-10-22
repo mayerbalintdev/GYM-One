@@ -550,4 +550,4 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
-</html>a
+</html>

@@ -55,6 +55,26 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$dayNames = [
+    1 => $translations["Mon"],
+    2 => $translations["Tue"],
+    3 => $translations["Wed"],
+    4 => $translations["Thu"],
+    5 => $translations["Fri"],
+    6 => $translations["Sat"],
+    7 => $translations["Sun"]
+];
+
+$sql = "SELECT * FROM opening_hours ORDER BY day ASC";
+$result = $conn->query($sql);
+
+$days = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $days[] = $row;
+    }
+}
+
 $sql = "SELECT * FROM trainers";
 $result = $conn->query($sql);
 
@@ -121,7 +141,7 @@ $result = $conn->query($sql);
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a href="login/" rel="noopener noreferrer" title="Login" class="nav-link ps-0 ps-lg-3 pe-3">
+                        <a href="../login/" rel="noopener noreferrer" title="Login" class="nav-link ps-0 ps-lg-3 pe-3">
                             <i class="bi bi-person-circle"></i>
                         </a>
                     </li>
@@ -164,7 +184,24 @@ $result = $conn->query($sql);
                         <p><?php echo $street; ?> <?php echo $hause_no; ?></p>
                     </div>
                     <div class="col-md-3 offset-md-1">
-                        <h2 class="text-light mb-4"></h2>
+                        <?php if (!empty($days)): ?>
+                            <div class="list-group">
+                                <?php foreach ($days as $day): ?>
+                                    <div class="list-group-itemcustom d-flex justify-content-between align-items-center">
+                                        <span><strong><?= htmlspecialchars($dayNames[$day['day']]) ?></strong></span>
+                                        <span class="text-center justify-content-center">
+                                            <?php if (is_null($day['open_time']) && is_null($day['close_time'])): ?>
+                                                <span class="badge bg-danger"><?= $translations["closed"]; ?></span>
+                                            <?php else: ?>
+                                                <span class="badge bg-success">
+                                                    <?= date('H:i', strtotime($day['open_time'])) ?> - <?= date('H:i', strtotime($day['close_time'])) ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <div class="col-md-2 offset-md-1">

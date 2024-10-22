@@ -1,10 +1,51 @@
 <?php
 header('Content-Type: application/json');
+function read_env_file($file_path)
+{
+    $env_file = file_get_contents($file_path);
+    $env_lines = explode("\n", $env_file);
+    $env_data = [];
 
-$host = 'localhost';
-$db = 'gymone';
-$user = 'root';
-$pass = '';
+    foreach ($env_lines as $line) {
+        $line_parts = explode('=', $line);
+        if (count($line_parts) == 2) {
+            $key = trim($line_parts[0]);
+            $value = trim($line_parts[1]);
+            $env_data[$key] = $value;
+        }
+    }
+
+    return $env_data;
+}
+
+$env_data = read_env_file('../../.env');
+
+$db_host = $env_data['DB_SERVER'] ?? '';
+$db_username = $env_data['DB_USERNAME'] ?? '';
+$db_password = $env_data['DB_PASSWORD'] ?? '';
+$db_name = $env_data['DB_NAME'] ?? '';
+
+$business_name = $env_data['BUSINESS_NAME'] ?? '';
+$lang_code = $env_data['LANG_CODE'] ?? '';
+$version = $env_data["APP_VERSION"] ?? '';
+$capacity = $env_data["CAPACITY"] ?? '';
+
+$lang = $lang_code;
+
+$langDir = __DIR__ . "/../../assets/lang/";
+
+$langFile = $langDir . "$lang.json";
+
+if (!file_exists($langFile)) {
+    die("A nyelvi fájl nem található: $langFile");
+}
+
+$translations = json_decode(file_get_contents($langFile), true);
+
+$host = $db_host;
+$db = $db_name;
+$user = $db_username;
+$pass = $db_password;
 
 $conn = new mysqli($host, $user, $pass, $db);
 
@@ -14,7 +55,7 @@ if ($conn->connect_error) {
 
 $qrCode = isset($_POST['qrcode']) ? $conn->real_escape_string($_POST['qrcode']) : '';
 
-$sql = "SELECT firstname, lastname,birthdate, gender FROM users WHERE userid = '$qrCode'";
+$sql = "SELECT firstname, lastname, birthdate, gender FROM users WHERE userid = '$qrCode'";
 $result = $conn->query($sql);
 
 $response = ['success' => false];
@@ -26,6 +67,48 @@ if ($result && $result->num_rows > 0) {
     $response['lastname'] = $row['lastname'];
     $response['birthdate'] = $row['birthdate'];
     $response['gender'] = $row["gender"];
+
+    
+    $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode'";
+    $ticketResult = $conn->query($ticketSql);
+    
+    if ($ticketResult && $ticketResult->num_rows > 0) {
+        $ticketRow = $ticketResult->fetch_assoc();
+        $opportunities = $ticketRow['opportunities'];
+        $expiredate = $ticketRow['expiredate'];
+        
+        
+        if ($opportunities > 0 && $expiredate >= date('Y-m-d')) {
+            $response['ticket_status'] = 'Érvényes';
+            $response['remaining_opportunities'] = $opportunities;
+            $response['expiredate'] = $expiredate;
+
+            
+            $gender = $row['gender'];
+            $lockerSql = "SELECT lockernum FROM lockers WHERE gender = '$gender' AND user_id IS NULL"; 
+            $lockerResult = $conn->query($lockerSql);
+
+            if ($lockerResult && $lockerResult->num_rows > 0) {
+                $lockers = [];
+                while ($lockerRow = $lockerResult->fetch_assoc()) {
+                    $lockers[] = $lockerRow['lockernum'];
+                }
+                
+                $randomLocker = $lockers[array_rand($lockers)];
+                $response['assigned_locker'] = $randomLocker;
+
+                
+                $assignLockerSql = "UPDATE lockers SET user_id = '$qrCode' WHERE lockernum = '$randomLocker'";
+                $conn->query($assignLockerSql);
+            } else {
+                $response['assigned_locker'] = $translations["locker_notavilable"]; 
+            }
+        } elseif ($opportunities == 0 || $expiredate < date('Y-m-d')) {
+            $response['ticket_status'] = $translations["expired"];
+        }
+    } else {
+        $response['ticket_status'] = $translations["youdonthaveticket"];
+    }
 } else {
     $response['error'] = 'User not found';
 }

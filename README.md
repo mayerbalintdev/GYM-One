@@ -1,36 +1,132 @@
-<h1 align="center" id="title">GYM One - Gym Management Software</h1>
 
+---
+
+# GYM One - Open Source Gym Management Software
 <p align="center"><img src="https://gymoneglobal.com/assets/img/text-color-logo.png" alt="project-image"></p>
 
-<p id="description">GYM One is a CMS and open source free gym management software designed to optimise the operations of fitness centres personal trainers and sports clubs. Our goal is to provide an efficient easy-to-use solution that helps manage memberships scheduling billing and other essential functions enabling gym owners and coaches to provide the best experience for their clients. Simple powerful open source and free</p>
 
-  
-<h2>🧐 Features</h2>
+Welcome to GYM One! This open-source gym management software is designed to help fitness centers, personal trainers, and sports clubs streamline their operations. With its user-friendly interface and powerful features, GYM One makes managing your gym simpler and more efficient.
 
-Here're some of the project's best features:
+## Table of Contents
 
-*   Membership Management: Track and manage member information including personal details membership status and attendance records.
-*   Scheduling: Create and manage class schedules personal training sessions and facility bookings.
-*   Billing and Payments: Automate billing processes handle payments and manage financial reports.
-*   Reporting: Generate detailed reports on memberships attendance finances and more to gain insights into your gym’s performance.
-*   User Roles and Permissions: Define different user roles and set permissions to ensure secure access to information and functionalities.
-*   Notifications and Reminders: Send automated notifications and reminders for class schedules payments and other important events.
-*   Customization: Customize the software to fit your specific needs with various themes and settings.
+1. [Features](#features)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Usage](#usage)
+6. [Admin Panel](#admin-panel)
+7. [Database Structure](#database-structure)
+8. [Contribution](#contribution)
+9. [License](#license)
+10. [Contact](#contact)
 
-<h2>⏰ Expected arrival:</h2>
-The very first version of GYM One is expected to be released in <strong>mid-October 2024</strong>.
+## Features
 
-*   For the first 2 weeks only the Hungarian Public-HunBeta version will be released, after that all other available languages will be released with PublicBeta 1.0 version number
+- **Member Management:** Easily add, edit, and remove members. Track their membership status, expiration dates, and attendance records.
+- **Ticketing System:** Manage different types of tickets (e.g., day passes, monthly memberships) with varying prices and benefits.
+- **Class Scheduling:** Create and manage class schedules. Allow members to sign up for classes online.
+- **Payment Tracking:** Keep track of payments made by members. Generate reports for financial analysis.
+- **Admin Panel:** A dedicated area for administrators to manage the entire system, including member and ticket management.
+- **Responsive Design:** Built with Bootstrap for a seamless experience on desktops, tablets, and mobile devices.
+- **Customizable:** Easily modify the code and design to fit your gym's branding and needs.
 
-<a href="https://buymeacoffee.com/mayerbalint" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
-  
-<h2>💻 Built with</h2>
+## Requirements
 
-Technologies used in the project:
+To run GYM One, ensure that you have the following:
 
-*   PHP
-*   Bootstrap
+- PHP version 7.4 or higher
+- MySQL version 5.7 or higher
+- A web server (Apache, Nginx, etc.)
+- Composer for dependency management
+- Bootstrap for styling (included)
 
-<h2>🛡️ License:</h2>
+## Installation
 
-This project is licensed under the Custom License (CL)
+Follow these steps to install GYM One on your server:
+
+1. **Download the Source Code:**
+   You can clone the repository using Git:
+   ```bash
+   git clone https://github.com/mayerbalintdev/GYM-One.git
+   cd gym-one
+   ```
+
+2. **Install Dependencies:**
+   Make sure you have Composer installed, then run:
+   ```bash
+   composer install
+   ```
+
+3. **Set Up the Database:**
+   Create a new MySQL database. You can use the following command in your MySQL shell:
+   ```sql
+   CREATE DATABASE gym_one;
+   ```
+
+4. **Import the Database Schema:**
+   Import the `schema.sql` file located in the `database` directory:
+   ```bash
+   mysql -u username -p gym_one < database/schema.sql
+   ```
+
+5. **Configure Database Connection:**
+   Open the `.env` file and configure your database connection:
+   ```bash
+   DB_SERVER= [Server IP]
+   DB_USERNAME= [Admin Username]
+   DB_PASSWORD= [Admin Password]
+   DB_NAME=gym_one
+   ```
+
+6. **Run the Application:**
+   You can now run the application on your web server.
+
+## Configuration
+
+After installation, you may want to configure additional settings:
+
+- **Email Notifications:** Configure SMTP settings for email notifications regarding membership renewals, class reminders, etc.
+- **Payment Gateway:** Set up payment integration for online transactions.
+
+## Usage
+
+### Dashboard
+
+Upon logging in, you will be greeted with the dashboard, which provides an overview of member activity, class schedules, and financial statistics.
+
+## Admin Panel
+
+The admin panel is a comprehensive management interface that allows you to oversee all operations of your gym. Key features include:
+
+- **User Management:** Manage users and Admin roles.
+- **Reports:** Generate reports on membership sales, attendance, and revenue.
+- **Settings:** Adjust various application settings such as operating hours, fees, and class schedules.
+
+## Database Structure
+
+The database consists of several tables to manage different aspects of the gym's operations:
+
+## Contribution
+
+We welcome contributions! If you would like to contribute to GYM One, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Submit a pull request.
+
+**Translations:** Use Crowdin for translations to help us reach a wider audience.
+
+## License
+
+GYM One is open source software and is licensed under the CUSTOM license. You are free to use, modify and distribute this software as long as the original license is included.
+
+## Contact
+
+For any inquiries, suggestions, or feedback, feel free to contact us:
+
+- **Email:** center@gymoneglobal.com
+- **GitHub:** [Mayer Bálint](https://github.com/mayerbalintdev)
+
+Thank you for choosing GYM One! We hope this software helps you manage your gym more efficiently.
+
+--- 

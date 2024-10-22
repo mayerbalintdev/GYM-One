@@ -53,15 +53,23 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM opening_hours";
+$dayNames = [
+    1 => $translations["Mon"],
+    2 => $translations["Tue"],
+    3 => $translations["Wed"],
+    4 => $translations["Thu"],
+    5 => $translations["Fri"],
+    6 => $translations["Sat"],
+    7 => $translations["Sun"]
+];
+
+$sql = "SELECT * FROM opening_hours ORDER BY day ASC";
 $result = $conn->query($sql);
-$opening_hours = [];
+
+$days = [];
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $opening_hours[$row["day_of_week"]] = [
-            "open_time" => $row["open_time"],
-            "close_time" => $row["close_time"]
-        ];
+        $days[] = $row;
     }
 }
 
@@ -91,8 +99,6 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
     $progresscolor = 'danger';
 }
 
-
-$days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 ?>
 
 
@@ -175,33 +181,16 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
                 <p>CMSTEXT</p>
             </div>
             <div class="status-bar" id="statusBar">
-                <h2><?php echo $translations["capacitytext"];?></h2>
+                <h2><?php echo $translations["capacitytext"]; ?></h2>
                 <div class="progress" style="height: 6px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-<?php echo $progresscolor;?>" style="width: <?php echo $capacityPercent;?>%" role="progressbar"></div>
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-<?php echo $progresscolor; ?>" style="width: <?php echo $capacityPercent; ?>%" role="progressbar"></div>
                 </div>
-                <p id="peopleCount"><?php echo $workoutpeoplenow; ?> <?php echo $translations["people"];?></p>
+                <p id="peopleCount"><?php echo $workoutpeoplenow; ?> <?php echo $translations["people"]; ?></p>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <table class="table table-striped table-bordered">
-                    <thead class="table-white">
-                        <tr>
-                            <th><?php echo $translations["day"]; ?></th>
-                            <th><?php echo $translations["opentime"]; ?></th>
-                            <th><?php echo $translations["closetime"]; ?></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($days as $key => $day) : ?>
-                            <tr>
-                                <td><?php echo $day; ?></td>
-                                <td><?php echo isset($opening_hours[$key]['open_time']) ? $opening_hours[$key]['open_time'] : $translations["closed"]; ?></td>
-                                <td><?php echo isset($opening_hours[$key]['close_time']) ? $opening_hours[$key]['close_time'] : $translations["closed"]; ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+
             </div>
         </div>
     </div>
@@ -219,7 +208,24 @@ $days = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $tran
                     <p><?php echo $street; ?> <?php echo $hause_no; ?></p>
                 </div>
                 <div class="col-md-3 offset-md-1">
-                    <h2 class="text-light mb-4"></h2>
+                    <?php if (!empty($days)): ?>
+                    <div class="list-group">
+                        <?php foreach ($days as $day): ?>
+                            <div class="list-group-itemcustom d-flex justify-content-between align-items-center">
+                                <span><strong><?= htmlspecialchars($dayNames[$day['day']]) ?></strong></span>
+                                <span class="text-center justify-content-center">
+                                    <?php if (is_null($day['open_time']) && is_null($day['close_time'])): ?>
+                                        <span class="badge bg-danger"><?= $translations["closed"];?></span>
+                                    <?php else: ?>
+                                        <span class="badge bg-success">
+                                            <?= date('H:i', strtotime($day['open_time'])) ?> - <?= date('H:i', strtotime($day['close_time'])) ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
                 </div>
 
                 <div class="col-md-2 offset-md-1">
