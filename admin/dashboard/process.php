@@ -68,22 +68,19 @@ if ($result && $result->num_rows > 0) {
     $response['birthdate'] = $row['birthdate'];
     $response['gender'] = $row["gender"];
 
-    
     $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode'";
     $ticketResult = $conn->query($ticketSql);
-    
+
     if ($ticketResult && $ticketResult->num_rows > 0) {
         $ticketRow = $ticketResult->fetch_assoc();
         $opportunities = $ticketRow['opportunities'];
         $expiredate = $ticketRow['expiredate'];
-        
-        
-        if ($opportunities > 0 && $expiredate >= date('Y-m-d')) {
+
+        if (($opportunities > 0 || is_null($opportunities)) && $expiredate >= date('Y-m-d')) {
             $response['ticket_status'] = 'Érvényes';
             $response['remaining_opportunities'] = $opportunities;
             $response['expiredate'] = $expiredate;
 
-            
             $gender = $row['gender'];
             $lockerSql = "SELECT lockernum FROM lockers WHERE gender = '$gender' AND user_id IS NULL"; 
             $lockerResult = $conn->query($lockerSql);
@@ -93,13 +90,22 @@ if ($result && $result->num_rows > 0) {
                 while ($lockerRow = $lockerResult->fetch_assoc()) {
                     $lockers[] = $lockerRow['lockernum'];
                 }
-                
+
                 $randomLocker = $lockers[array_rand($lockers)];
                 $response['assigned_locker'] = $randomLocker;
 
-                
                 $assignLockerSql = "UPDATE lockers SET user_id = '$qrCode' WHERE lockernum = '$randomLocker'";
                 $conn->query($assignLockerSql);
+
+                if (!is_null($opportunities) && $opportunities > 0) {
+                    $newOpportunities = $opportunities - 1;
+                    $updateTicketSql = "UPDATE current_tickets SET opportunities = '$newOpportunities' WHERE userid = '$qrCode'";
+                    $conn->query($updateTicketSql);
+                    $response['remaining_opportunities'] = $newOpportunities;
+                }
+
+                $logUserSql = "INSERT INTO temp_loggeduser (name, userid, login_date, lockerid) VALUES ('{$row['firstname']} {$row['lastname']}', '$qrCode', NOW(), '$randomLocker')";
+                $conn->query($logUserSql);
             } else {
                 $response['assigned_locker'] = $translations["locker_notavilable"]; 
             }

@@ -55,14 +55,59 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$sql_latest_session = "SELECT duration FROM workout_stats WHERE userid = $userid AND workout_date = CURDATE()";
+$result_latest_session = $conn->query($sql_latest_session);
+if (!$result_latest_session) {
+    die("Hiba a legutóbbi edzés lekérdezésekor: " . $conn->error);
+}
+$latest_session_time = ($result_latest_session->num_rows > 0) ? $result_latest_session->fetch_assoc()['duration'] : 0;
+
+$sql_avg_time = "SELECT AVG(duration) AS avg_duration FROM workout_stats WHERE userid = $userid";
+$result_avg_time = $conn->query($sql_avg_time);
+if (!$result_avg_time) {
+    die("Hiba az átlagos edzésidő lekérdezésekor: " . $conn->error);
+}
+$avg_duration = ($result_avg_time->num_rows > 0) ? round($result_avg_time->fetch_assoc()['avg_duration']) : 0;
+
+$sql_latest_training = "SELECT workout_date FROM workout_stats WHERE userid = $userid ORDER BY workout_date DESC LIMIT 1";
+$result_latest_training = $conn->query($sql_latest_training);
+if (!$result_latest_training) {
+    die("Hiba a legutóbbi edzés dátumának lekérdezésekor: " . $conn->error);
+}
+$latest_training = ($result_latest_training->num_rows > 0) ? $result_latest_training->fetch_assoc()['workout_date'] : $translations["n/a"];
+
+
+$dates = [];
+$durations = [];
+for ($i = 29; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $dates[$date] = 0;
+}
+
+$sql_workouts = "
+    SELECT workout_date, duration 
+    FROM workout_stats 
+    WHERE userid = $userid AND workout_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+";
+$result = $conn->query($sql_workouts);
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $dates[$row['workout_date']] = $row['duration'];
+    }
+}
+
+$chart_dates = array_keys($dates);
+$chart_durations = array_values($dates);
+
 $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $stmt->bind_result($lastname, $firstname);
 $stmt->fetch();
-
 $stmt->close();
+
 $conn->close();
 ?>
 
@@ -147,7 +192,6 @@ $conn->close();
                                 <div class="row">
                                     <div class="col-xs-10 text-start">
                                         <h4 class="card-title fw-semibold"><?php echo $translations["latestsessiontime"]; ?></h4>
-                                        <h1><strong></strong></h1>
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
@@ -157,7 +201,7 @@ $conn->close();
                                 </div>
                                 <div class="row text-center">
                                     <div class="col">
-                                        <h2><b>88</b> <?php echo $translations["minutes"]; ?></h2>
+                                        <h2><b><?php echo $latest_session_time; ?></b> <?php echo $translations["minutes"]; ?></h2>
                                     </div>
                                 </div>
                             </div>
@@ -169,7 +213,6 @@ $conn->close();
                                 <div class="row">
                                     <div class="col-xs-10 text-start">
                                         <h4 class="card-title fw-semibold"><?php echo $translations["averagetraintime"]; ?></h4>
-                                        <h1><strong></strong></h1>
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
@@ -179,7 +222,7 @@ $conn->close();
                                 </div>
                                 <div class="row text-center">
                                     <div class="col">
-                                        <h2><b>88</b> <?php echo $translations["minutes"]; ?></h2>
+                                        <h2><b><?php echo $avg_duration; ?></b> <?php echo $translations["minutes"]; ?></h2>
                                     </div>
                                 </div>
                             </div>
@@ -191,7 +234,6 @@ $conn->close();
                                 <div class="row">
                                     <div class="col-xs-10 text-start">
                                         <h4 class="card-title fw-semibold"><?php echo $translations["latesttraining"]; ?></h4>
-                                        <h1><strong></strong></h1>
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
@@ -201,7 +243,7 @@ $conn->close();
                                 </div>
                                 <div class="row text-center">
                                     <div class="col">
-                                        <h2><b>8888.88.88</b></h2>
+                                        <h2><b><?php echo $latest_training; ?></b></h2>
                                     </div>
                                 </div>
                             </div>
@@ -214,8 +256,8 @@ $conn->close();
                             <div class="card-body text-start">
                                 <h4 class="card-title fw-semibold">
                                     <?php echo $translations["thirtydaychart"]; ?>
-
                                 </h4>
+                                <div id="chart"></div>
                             </div>
                         </div>
                     </div>
@@ -237,7 +279,43 @@ $conn->close();
                 </div>
             </div>
         </div>
+        <script>
+            var dates = <?php echo json_encode($chart_dates); ?>;
+            var durations = <?php echo json_encode($chart_durations); ?>;
 
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 350,
+                    zoom: {
+                        enabled: false
+                    },
+                    toolbar: {
+                        show: false
+                    }
+                },
+                stroke: {
+                    curve: 'smooth'
+                },
+                colors: ['#59F8E4'],
+                series: [{
+                    name: '<?php echo $translations["chartminutestraintime"]; ?>',
+                    data: durations
+                }],
+                xaxis: {
+                    categories: dates,
+                    labels: {
+                        rotate: -45
+                    }
+                },
+                yaxis: {
+                    min: 0
+                },
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        </script>
         <!-- SCRIPTS! -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
