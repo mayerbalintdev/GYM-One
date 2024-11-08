@@ -42,44 +42,8 @@ To run GYM One, ensure that you have the following:
 
 ## Installation
 
-Follow these steps to install GYM One on your server:
+**The GYM One installer is not yet available. Please check back soon!**
 
-1. **Download the Source Code:**
-   You can clone the repository using Git:
-   ```bash
-   git clone https://github.com/mayerbalintdev/GYM-One.git
-   cd gym-one
-   ```
-
-2. **Install Dependencies:**
-   Make sure you have Composer installed, then run:
-   ```bash
-   composer install
-   ```
-
-3. **Set Up the Database:**
-   Create a new MySQL database. You can use the following command in your MySQL shell:
-   ```sql
-   CREATE DATABASE gym_one;
-   ```
-
-4. **Import the Database Schema:**
-   Import the `schema.sql` file located in the `database` directory:
-   ```bash
-   mysql -u username -p gym_one < database/schema.sql
-   ```
-
-5. **Configure Database Connection:**
-   Open the `.env` file and configure your database connection:
-   ```bash
-   DB_SERVER= [Server IP]
-   DB_USERNAME= [Admin Username]
-   DB_PASSWORD= [Admin Password]
-   DB_NAME=gym_one
-   ```
-
-6. **Run the Application:**
-   You can now run the application on your web server.
 
 ## Configuration
 
