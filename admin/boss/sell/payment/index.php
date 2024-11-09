@@ -78,6 +78,7 @@ $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
+$curryear = date("Y");
 
 
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
@@ -288,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <img src='$partnerLogoSrc' width='100' class='img-fluid' alt='GYM ONE Logo COPYRIGHT DO NOT REMOVE'>
                     </td>
                     <td class='col-6 align-center text-left'>
-                        <p class='mb-0'>Partner Program - © 2024 GYM One</p>
+                        <p class='mb-0'>Partner Program - © ' . $curryear . ' GYM One</p>
                     </td>
                 </tr>
             </table>

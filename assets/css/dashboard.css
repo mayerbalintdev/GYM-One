@@ -11,6 +11,9 @@ body {
     background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
 }
+.col-sm-2.sidenav.hidden-xs.text-center{
+    height: 100vh !important;
+}
 
 @media (min-width:1400px) {
     .sidenav {

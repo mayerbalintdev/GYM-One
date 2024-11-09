@@ -582,8 +582,7 @@ foreach ($data as $item) {
                                                 echo "<td>" . $counter . "</td>";
                                                 echo "<td>" . $row["name"] . "</td>";
                                                 echo "<td>" . $elapsed_time . "</td>";
-                                                // KILÉPTETÉST MEGCSINÁLNI!
-                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">Kiléptetés ERROR!</a></td>';
+                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">' . $translations["userlogout"] .'</a></td>';
                                                 echo '<td><a class= "btn btn-secondary" href="../users/edit/?user=' . $row["userid"] . '">' . $translations["editbtn"] . '</a></td>';
                                                 echo "</tr>";
 
@@ -752,6 +751,7 @@ foreach ($data as $item) {
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
         $(document).ready(function() {
             $("#search").on("input", function() {

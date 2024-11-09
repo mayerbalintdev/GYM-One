@@ -180,7 +180,7 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
                 <h1>Rólunk</h1>
                 <p>CMSTEXT</p>
             </div>
-            <div class="status-bar" id="statusBar">
+            <div class="status-bar mt-3" id="statusBar">
                 <h2><?php echo $translations["capacitytext"]; ?></h2>
                 <div class="progress" style="height: 6px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-<?php echo $progresscolor; ?>" style="width: <?php echo $capacityPercent; ?>%" role="progressbar"></div>
@@ -254,5 +254,6 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
         document.getElementById('statusBar').classList.add('visible');
     }, 500);
 </script>
+
 
 </html>

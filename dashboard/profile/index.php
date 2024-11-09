@@ -63,6 +63,54 @@ if ($conn->connect_error) {
   die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$alerts_html = '';
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profilePicture'])) {
+  $file = $_FILES['profilePicture'];
+
+  $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+  $image = null;
+  switch ($fileExtension) {
+    case 'png':
+      $image = imagecreatefrompng($file['tmp_name']);
+      break;
+    case 'jpg':
+    case 'jpeg':
+      $image = imagecreatefromjpeg($file['tmp_name']);
+      break;
+    case 'gif':
+      $image = imagecreatefromgif($file['tmp_name']);
+      break;
+    default:
+      echo "<div class='alert alert-danger'>" . $translations["onlypng"] . "</div>";
+      exit;
+  }
+
+  if ($image !== null) {
+    $targetDir = '../../assets/img/profiles/';
+    $targetFile = $targetDir . $userid . '.png';
+
+    if (file_exists($targetFile)) {
+      unlink($targetFile);
+    }
+
+    if (imagepng($image, $targetFile)) {
+      $alerts_html .= '<div class="alert alert-success" role="alert">
+                                    ' . $translations["success-update"] . '
+                                </div>';
+      header("Refresh:2");
+    } else {
+      $alerts_html .= '<div class="alert alert-danger" role="alert">
+                                    ' . $translations["unexpected-error"] . '
+                                </div>';
+      header("Refresh:2");
+    }
+    imagedestroy($image);
+  }
+}
+
 $sql = "SELECT firstname, lastname, email FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -71,14 +119,13 @@ $stmt->bind_result($lastname, $firstname, $mail);
 $stmt->fetch();
 
 $stmt->close();
-$alerts_html = '';
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'];
 $domain_url = $protocol . $host;
 
 
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['userid'])) {
   if (isset($_POST['currentPassword'], $_POST['newPassword'], $_POST['confirmPassword'])) {
     $userid = $_SESSION['userid'];
     $currentPassword = $_POST['currentPassword'];
@@ -380,7 +427,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_user'])) {
     header("Location: ../../");
     exit();
   } else {
-    echo "Hiba történt a törlés során: " . $stmt->error;
+    echo "" . $translations["unexpected-error"] . ": " . $stmt->error;
   }
 }
 
@@ -470,20 +517,26 @@ $conn->close();
           <div class="col-sm-4">
             <div class="card">
               <div class="card-body">
-                <form id="uploadForm">
+                <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
                   <div class="row">
                     <div class="col-md-9">
                       <div class="mb-3">
                         <div class="form-group">
                           <label for="profilePicture" class="form-label"><?php echo $translations["select-upload-profile"]; ?></label>
-                          <input type="file" class="form-control" id="profilePicture" accept=".png" required>
+                          <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept=".png,.jpg,.jpeg,.gif" required>
                           <div id="fileHelp" class="form-text"><small><?php echo $translations["onlypng"]; ?></small></div>
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-3 text-center">
-                      <img src="../../assets/img/profiles/<?php echo $userid; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
-                    </div>
+
+                    <?php
+                    $profilePicPath = '../../assets/img/profiles/' . $userid . '.png';
+                    if (file_exists($profilePicPath)): ?>
+                      <div class="col-md-3 text-center">
+                        <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid mb-3" width="100" height="100">
+                      </div>
+                    <?php endif; ?>
+
                   </div>
                   <button type="submit" class="btn btn-primary"><?php echo $translations["upload"]; ?></button>
                 </form>

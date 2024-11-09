@@ -88,6 +88,15 @@ if ($expireDate < $currentDate) {
     }
 }
 
+$sql_latest_training = "SELECT workout_date FROM workout_stats WHERE userid = $userid ORDER BY workout_date DESC LIMIT 1";
+$result_latest_training = $conn->query($sql_latest_training);
+if (!$result_latest_training) {
+    die("Hiba a legutóbbi edzés dátumának lekérdezésekor: " . $conn->error);
+}
+$latest_training = ($result_latest_training->num_rows > 0) ? $result_latest_training->fetch_assoc()['workout_date'] : $translations["n/a"];
+
+
+
 $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -146,6 +155,7 @@ if (!file_exists($filename)) {
 <head>
     <meta charset="UTF-8">
     <title><?php echo $business_name; ?> - <?php echo $translations["dashboard"]; ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -231,7 +241,7 @@ if (!file_exists($filename)) {
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["lastworkout"]; ?></h4>
-                                <h1><strong>2024.09.11</strong></h1>
+                                <h1><strong><?= $latest_training;?></strong></h1>
                             </div>
                         </div>
                     </div>
@@ -288,9 +298,10 @@ if (!file_exists($filename)) {
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- SCRIPTS! -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- SCRIPTS! -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

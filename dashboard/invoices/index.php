@@ -36,6 +36,8 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
+$currency = $env_data['CURRENCY'] ?? '';
+
 
 $lang = $lang_code;
 
@@ -170,7 +172,7 @@ $conn->close();
                                                 echo "<tr>
                 <th scope='row'>" . $row["id"] . "</th>
                 <td scope='row'>" . $row["name"] . "</td>
-                <td scope='row'>" . $row["price"] . " Ft</td>
+                <td scope='row'>" . $row["price"] . " " . $currency . "</td>
                 <td scope='row'>" . $row["created_at"] . "</td>
                 <td scope='row'><span class='badge $statusClass' text-capitalized=''>" . ucfirst($row["status"]) . "</span></td>
                 <td scope='row'>

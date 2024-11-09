@@ -283,6 +283,8 @@ $conn->close();
             var dates = <?php echo json_encode($chart_dates); ?>;
             var durations = <?php echo json_encode($chart_durations); ?>;
 
+            // console.log(dates);
+            // console.log(durations);
             var options = {
                 chart: {
                     type: 'line',
