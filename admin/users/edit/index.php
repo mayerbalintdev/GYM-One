@@ -356,7 +356,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                   </div>
 
                   <div class="col-md-3 text-center">
-                    <img src="../../../assets/img/profiles/<?php echo $useridgymuser; ?>.png" alt="User" class="img-rounded img-fluid mb-3" height="150">
+                    <img src="../../../assets/img/profiles/<?php echo $useridgymuser; ?>.png" alt="User" class="img img-rounded img-fluid mb-3" height="150">
                   </div>
                 </div>
                 <div class="mb-3">

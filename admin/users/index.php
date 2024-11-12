@@ -259,10 +259,10 @@ $result = $conn->query($sql);
                             <form method="GET" class="mb-4">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="Név keresése" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
+                                        <input type="text" class="form-control" placeholder="<?= $translations["name-search"];?>" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
                                     </div>
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="Email cím keresése" name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
+                                        <input type="text" class="form-control" placeholder="<?= $translations["email-search"];?>" name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
                                     </div>
                                     <div class="col-md-2">
                                         <button type="submit" class="btn btn-primary"><?php echo $translations["search"]; ?></button>

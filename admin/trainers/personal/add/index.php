@@ -245,7 +245,7 @@ $conn->close();
                     <div class="col-sm-12">
                         <?php echo $alerts_html; ?>
                         <div class="card shadow">
-                        <p class="lead">HOZZAD</p>
+                        <p class="lead"><?php echo $translations["newtraineradd"];?></p>
 
                             <div class="card-body">
 

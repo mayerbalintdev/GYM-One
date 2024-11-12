@@ -116,6 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     header("Location: " . $_SERVER['PHP_SELF']);
+    $action = $translations['success-update-hours'];
+    $actioncolor = 'success';
+    $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+            VALUES (?, ?, ?, NOW())";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iss", $userid, $action, $actioncolor);
+    $stmt->execute();
     exit();
 }
 
@@ -259,7 +266,7 @@ $conn->close();
                                                     <th><?php echo $translations["day"]; ?></th>
                                                     <th><?php echo $translations["opentime"]; ?></th>
                                                     <th><?php echo $translations["closetime"]; ?></th>
-                                                    <th><?php echo $translations["checkbox-closed"];?></th>
+                                                    <th><?php echo $translations["checkbox-closed"]; ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -279,7 +286,7 @@ $conn->close();
                                                 <?php endforeach; ?>
                                             </tbody>
                                         </table>
-                                        <button type="submit" class="btn btn-primary"><?= $translations["save"];?></button>
+                                        <button type="submit" class="btn btn-primary"><?= $translations["save"]; ?></button>
 
                                     </form>
                                 <?php

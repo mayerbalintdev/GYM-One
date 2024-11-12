@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <html lang='hu'>
     <head>
         <meta charset='utf-8'>
-        <title>Számla</title>
+        <title>". $translations["invoice"] . " - " . $invoiceNumber . "</title>
         <style>
             body { font-family: Arial, sans-serif; }
             .container { width: 100%; max-width: 800px; margin: auto; }
@@ -219,7 +219,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </tr>
             </table>
             <hr class='hr' />
-            <!-- Cég és számla adatok -->
             <table class='row text-left'>
                 <tr>
                     <td class='col-6 align-center'>
@@ -289,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <img src='$partnerLogoSrc' width='100' class='img-fluid' alt='GYM ONE Logo COPYRIGHT DO NOT REMOVE'>
                     </td>
                     <td class='col-6 align-center text-left'>
-                        <p class='mb-0'>Partner Program - © ' . $curryear . ' GYM One</p>
+                        <p class='mb-0'>Partner Program - © " . $curryear . " GYM One</p>
                     </td>
                 </tr>
             </table>
@@ -487,7 +486,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                         <div class="card">
                             <div class="card-body">
                                 <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#paymentModal">
-                                    Fizetés
+                                    <?php echo $translations["paybutton"];?>
                                 </button>
                             </div>
                         </div>
@@ -530,7 +529,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                 <div class="modal-body text-center">
                     <h1><?= $translations["payment"]; ?></h1>
                     <p><?= $modalpayertext; ?></p>
-                    <p><?= $translations["invoiceamount"]; ?>: <?php echo $ticketprice; ?></p>
+                    <p><?= $translations["invoiceamount"]; ?>: <?php echo $ticketprice; ?> <?php echo $currency;?></p>
                     <form method="post">
                         <div class="form">
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
@@ -538,7 +537,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                 <option value="card"><?= $translations["card"];?></option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-success"><?= $translations["next"]; ?></button>
+                        <button type="submit" class="btn btn-success mt-3"><?= $translations["next"]; ?></button>
                     </form>
                 </div>
             </div>

@@ -28,7 +28,6 @@ function read_env_file($file_path)
 
 if (isset($_GET['userid'])) {
     $ticketbuyerid = htmlspecialchars($_GET['userid']);
-    
 } else {
     $ticketbuyerid = 'N/A';
 }
@@ -212,23 +211,23 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     </button>
                 </div>
                 <div class="row text-center justify-content-center">
-                <?php if ($result->num_rows > 0): ?>
-                <?php while($row = $result->fetch_assoc()): ?>
-                    <div class="col-md-2 mb-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($row['name']); ?></h5>
-                                <p class="card-text">Lejárat: <?php echo $row['expire_days'] ? htmlspecialchars($row['expire_days']) . " nap" : "Nincs megadva"; ?></p>
-                                <p class="card-text">Alkalmak száma: <?php echo $row['occasions'] ? htmlspecialchars($row['occasions']) : "Nincs megadva"; ?></p>
-                                <p class="card-text">Ár: <?php echo htmlspecialchars($row['price']); ?> Ft</p>
-                                <a href="../payment/?userid=<?php echo $ticketbuyerid; ?>&ticketid=<?php echo $row['id']; ?>" class="btn btn-primary">Választás</a>
+                    <?php if ($result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <div class="col-md-2 mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><?php echo htmlspecialchars($row['name']); ?></h5>
+                                        <p class="card-text"><?php echo $translations["expiredate"]; ?> <?php echo $row['expire_days'] ? htmlspecialchars($row['expire_days']) . " " . $translations["day"] . "" : "" . $translations["unlimited"] . ""; ?></p>
+                                        <p class="card-text"><?php echo $translations["tickettableoccassion"]; ?>: <?php echo $row['occasions'] ? htmlspecialchars($row['occasions']) : "Nincs megadva"; ?></p>
+                                        <p class="card-text"><?php echo $translations["price"]; ?>: <?php echo htmlspecialchars($row['price']); ?> <?php echo $currency; ?></p>
+                                        <a href="../payment/?userid=<?php echo $ticketbuyerid; ?>&ticketid=<?php echo $row['id']; ?>" class="btn btn-primary"><?php echo $translations["choose"]; ?></a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p class="text-center">Nincsenek jegytípusok.</p>
-            <?php endif; ?>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p class="text-center"><?php echo $translations["notickets"]; ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -510,7 +510,7 @@ foreach ($data as $item) {
                                 <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["userlogginer"]; ?></h5>
                                 <div class="text-center">
                                     <a data-toggle="modal" data-target="#Logginer_MODAL" class="btn btn-success">
-                                        <h4>BELEPTETÉS</h4>
+                                        <h4><?= $translations["logginer"];?></h4>
                                     </a>
                                 </div>
                             </div>
@@ -601,7 +601,7 @@ foreach ($data as $item) {
                 <div class="row justify-content-between text-center">
                     <div class="col-sm-2">
                         <div class="card">
-                            <p>Az edzőterem telitettsége:</p>
+                            <p><?= $translations["capacitytext"];?></p>
                             <div class="card-body">
                                 <div class="progress">
                                     <div class="progress-bar-<?php echo $progresscolor; ?>" role="progressbar" style="width: <?php echo number_format($capacityPercent, 2); ?>%;" aria-valuenow="<?php echo number_format($capacityPercent, 2); ?>" aria-valuemin="0" aria-valuemax="100"><?php echo number_format($capacityPercent, 0); ?>%</div>
