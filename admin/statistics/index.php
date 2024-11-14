@@ -36,6 +36,8 @@ $db_name = $env_data['DB_NAME'] ?? '';
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
 $version = $env_data["APP_VERSION"] ?? '';
+$currency = $env_data["CURRENCY"] ?? '';
+
 
 $lang = $lang_code;
 
@@ -153,38 +155,46 @@ if ($result->num_rows > 0) {
     }
 }
 
+$sql = "
+    SELECT 
+        `date`,
+        COALESCE(SUM(bank_card), 0) AS bank_card,
+        COALESCE(SUM(cash), 0) AS cash
+    FROM 
+        `revenu_stats`
+    WHERE 
+        `date` >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+    GROUP BY 
+        `date`
+    ORDER BY 
+        `date` ASC;
+";
+$result = $conn->query($sql);
+
+$dates = [];
+$bankCardData = [];
+$cashData = [];
+
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $dates[$date] = ['bank_card' => 0, 'cash' => 0];
+}
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $dates[$row['date']]['bank_card'] = (float)$row['bank_card'];
+        $dates[$row['date']]['cash'] = (float)$row['cash'];
+    }
+}
+
+foreach ($dates as $date => $values) {
+    $formattedDates[] = $date;
+    $bankCardData[] = $values['bank_card'];
+    $cashData[] = $values['cash'];
+}
 
 $conn->close();
 
-$ipInfoUrl = 'https://ipinfo.io/json';
-
-$ipInfo = json_decode(file_get_contents($ipInfoUrl), true);
-$countryCode = $ipInfo['country'];
-
-$jsonFile = 'https://emergencynumberapi.com/api/data/all';
-
-$jsonData = @file_get_contents($jsonFile);
-if (!$jsonData) {
-    exit;
-}
-
-$data = json_decode($jsonData, true);
-if (!$data) {
-    exit;
-}
-
-$ambulanceNumbers = $translations["unknown"];
-$fireNumbers = $translations["unknown"];
-$policeNumbers = $translations["unknown"];
-
-foreach ($data as $item) {
-    if (isset($item['Country']['ISOCode']) && $item['Country']['ISOCode'] == $countryCode) {
-        $ambulanceNumbers = isset($item['Ambulance']['All']) ? implode(', ', $item['Ambulance']['All']) : "Ismeretlen";
-        $fireNumbers = isset($item['Fire']['All']) ? implode(', ', $item['Fire']['All']) : "Ismeretlen";
-        $policeNumbers = isset($item['Police']['All']) ? implode(', ', $item['Police']['All']) : "Ismeretlen";
-        break;
-    }
-}
 
 ?>
 
@@ -230,7 +240,7 @@ foreach ($data as $item) {
 
     <div class="container-fluid">
         <div class="row content">
-            <div class="col-sm-2 sidenav hidden-xs text-center">
+            <div class="col-sm-2 sidenav hidden-xs text-center ">
                 <h2><img src="../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
@@ -408,10 +418,24 @@ foreach ($data as $item) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-3">
                         <div class="card">
                             <div class="card-body">
                                 <div class="text-center" id="malefamalechart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col text-center">
+                        <h2 class="lead"><?php echo $translations["moneystats"];?></h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center" id="moneyincomechart"></div>
                             </div>
                         </div>
                     </div>
@@ -523,6 +547,47 @@ foreach ($data as $item) {
             var chart = new ApexCharts(document.querySelector("#malefamalechart"), options);
             chart.render();
         });
+    </script>
+    <script>
+        var options = {
+            chart: {
+                type: 'area',
+                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+
+                toolbar: {
+                    show: false // Eltávolítja az eszköztárat (nincs nyomtatás/exportálás)
+                },
+                zoom: {
+                    enabled: false // Letiltja a zoomolást
+                }
+            },
+            colors: ['#59F8E4', '#FB7B18'],
+
+            series: [{
+                name: '<?php echo $translations["card"]; ?>',
+                data: <?php echo json_encode($bankCardData); ?>
+            }, {
+                name: '<?php echo $translations["cash"]; ?>',
+                data: <?php echo json_encode($cashData); ?>
+            }],
+            xaxis: {
+                categories: <?php echo json_encode($formattedDates); ?>
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            yaxis: {
+                title: {
+                    text: '<?php echo $translations["incomemoney"]; ?> (<?php echo $currency; ?>)'
+                }
+            },
+            legend: {
+                position: 'bottom'
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#moneyincomechart"), options);
+        chart.render();
     </script>
     <script src="../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>

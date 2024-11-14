@@ -3,6 +3,11 @@ body {
     background-color: #F5F7FB;
 }
 
+.content {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row;
+}
 
 .sidenav {
     background: rgb(9, 80, 220);
@@ -10,15 +15,8 @@ body {
     background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#0950dc", endColorstr="#096ed2", GradientType=1);
-}
-.col-sm-2.sidenav.hidden-xs.text-center{
-    height: 100vh !important;
-}
-
-@media (min-width:1400px) {
-    .sidenav {
-        height: 100%;
-    }
+    height: auto;
+    overflow-y: auto;
 }
 
 .navbar-header {
