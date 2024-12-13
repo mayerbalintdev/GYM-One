@@ -130,12 +130,32 @@ $conn->close();
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="#">
+                        <a class="sidebar-link" href="../dashboard/">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../users">
+                            <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../statistics">
+                            <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../boss/sell">
+                            <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="../invoices/" class="sidebar-link">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                     <?php
-                    if ($is_boss == 1) {
+                    if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-header">
                             <?php echo $translations["settings"]; ?>
@@ -170,20 +190,57 @@ $conn->close();
                                 <span><?php echo $translations["mailpage"]; ?></span>
                             </a>
                         </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/chroom">
+                                <i class="bi bi-duffle"></i>
+                                <span><?php echo $translations["chroompage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../boss/rule">
+                                <i class="bi bi-file-ruled"></i>
+                                <span><?php echo $translations["rulepage"]; ?></span>
+                            </a>
+                        </li>
                     <?php
                     }
                     ?>
                     <li class="sidebar-header">
-                        Bolt
+                        <?php echo $translations["shopcategory"]; ?>
                     </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-item">
+                        <!-- <a class="sidebar-ling" href="../shop/gateway">
+                            <i class="bi bi-shield-lock"></i>
+                            <span><?php echo $translations["gatewaypage"]; ?></span>
+                        </a> -->
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../boss/sell">
+                            <i class="bi bi-ticket"></i>
+                            <span><?php echo $translations["ticketspage"]; ?></span>
+                        </a>
+                    </li>
+                    <li class="sidebar-header">
+                        <?php echo $translations["trainersclass"]; ?>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../trainers/timetable">
+                            <i class="bi bi-calendar-event"></i>
+                            <span><?php echo $translations["timetable"]; ?></span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../trainers/personal">
+                            <i class="bi bi-award"></i>
+                            <span><?php echo $translations["trainers"]; ?></span>
+                        </a>
+                    </li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
-                    if ($is_boss == 1) {
+                    if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-item active">
-                            <a class="sidebar-ling" href="../updater">
+                            <a class="sidebar-link" href="#">
                                 <i class="bi bi-cloud-download"></i>
                                 <span><?php echo $translations["updatepage"]; ?></span>
                                 <?php if ($is_new_version_available) : ?>

@@ -189,43 +189,124 @@ $conn->close();
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../../dashboard">
+                        <a class="sidebar-link" href="../../dashboard/">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../users">
+                            <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../statistics">
+                            <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../boss/sell">
+                            <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="../../invoices/" class="sidebar-link">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                     <?php
-                    if ($is_boss == 1) {
-                            ?>
-                            <li class="sidebar-header">
-                                <?php echo $translations["settings"]; ?>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../workers">
-                                    <i class="bi bi-people"></i>
-                                    <span><?php echo $translations["workers"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a class="sidebar-link" href="../hours">
-                                    <i class="bi bi-clock"></i>
-                                    <span><?php echo $translations["openhourspage"]; ?></span>
-                                </a>
-                            </li>
-                            <li class="sidebar-item active">
-                                <a class="sidebar-link" href="#">
-                                    <i class="bi bi-envelope-at"></i>
-                                    <span><?php echo $translations["mailpage"]; ?></span>
-                                </a>
-                            </li>
-                            <?php
-                        }
+                    if ($is_boss === 1) {
+                    ?>
+                        <li class="sidebar-header">
+                            <?php echo $translations["settings"]; ?>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/mainsettings">
+                                <i class="bi bi-gear"></i>
+                                <span><?php echo $translations["businesspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/workers">
+                                <i class="bi bi-people"></i>
+                                <span><?php echo $translations["workers"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/packages">
+                                <i class="bi bi-box-seam"></i>
+                                <span><?php echo $translations["packagepage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/hours">
+                                <i class="bi bi-clock"></i>
+                                <span><?php echo $translations["openhourspage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="#">
+                                <i class="bi bi-envelope-at"></i>
+                                <span><?php echo $translations["mailpage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/chroom">
+                                <i class="bi bi-duffle"></i>
+                                <span><?php echo $translations["chroompage"]; ?></span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="../../boss/rule">
+                                <i class="bi bi-file-ruled"></i>
+                                <span><?php echo $translations["rulepage"]; ?></span>
+                            </a>
+                        </li>
+                    <?php
+                    }
                     ?>
                     <li class="sidebar-header">
-                        Bolt
+                        <?php echo $translations["shopcategory"]; ?>
+
                     </li>
-                    <li><a href="#section3">Gender</a></li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-item">
+                        <!-- <a class="sidebar-ling" href="../shop/gateway">
+                            <i class="bi bi-shield-lock"></i>
+                            <span><?php echo $translations["gatewaypage"]; ?></span>
+                        </a> -->
+                        <a class="sidebar-ling" href="../../shop/tickets">
+                            <i class="bi bi-ticket"></i>
+                            <span><?php echo $translations["ticketspage"]; ?></span>
+                        </a>
+                    </li>
+                    <li class="sidebar-header">
+                        <?php echo $translations["trainersclass"]; ?>
+                    </li>
+                    <li><a class="sidebar-link" href="../../trainers/timetable">
+                            <i class="bi bi-calendar-event"></i>
+                            <span><?php echo $translations["timetable"]; ?></span>
+                        </a></li>
+                    <li><a class="sidebar-link" href="../../trainers/personal">
+                            <i class="bi bi-award"></i>
+                            <span><?php echo $translations["trainers"]; ?></span>
+                        </a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
+                    <?php
+                    if ($is_boss === 1) {
+                    ?>
+                        <li class="sidebar-item">
+                            <a class="sidebar-ling" href="../../updater">
+                                <i class="bi bi-cloud-download"></i>
+                                <span><?php echo $translations["updatepage"]; ?></span>
+                                <?php if ($is_new_version_available) : ?>
+                                    <span class="sidebar-badge badge">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                    <?php
+                    }
+                    ?>
                     <li class="sidebar-item">
                         <a class="sidebar-ling" href="../../log">
                             <i class="bi bi-clock-history"></i>
@@ -234,7 +315,6 @@ $conn->close();
                     </li>
                 </ul><br>
             </div>
-
             <br>
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
@@ -252,6 +332,8 @@ $conn->close();
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
                         <?php echo $translations["logout"]; ?>
                     </button>
+                    <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
+
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
@@ -261,56 +343,56 @@ $conn->close();
 
                                 <?php
                                 if ($is_boss == 1) {
-                                        ?>
-                                        <form method="POST">
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="smtp_host">SMTP <?php echo $translations["host"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="smtp_host" name="smtp_host"
-                                                        value="<?= htmlspecialchars($env_data['MAIL_HOST'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-3">
-                                                    <label for="smtp_port">SMTP <?php echo $translations["port"]; ?>:</label>
-                                                    <input type="number" min="1" max="65535" class="form-control" id="smtp_port"
-                                                        name="smtp_port"
-                                                        value="<?= htmlspecialchars($env_data['MAIL_PORT'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-3">
-                                                    <label for="smtp_encryption">SMTP
-                                                        <?php echo $translations["encry"]; ?>:</label>
-                                                    <select class="form-control" id="smtp_encryption" name="smtp_encryption">
-                                                        <option value="TLS" <?= ($env_data['MAIL_ENCRYPTION'] ?? '') == 'TLS' ? 'selected' : '' ?>>TLS</option>
-                                                        <option value="SSL" <?= ($env_data['MAIL_ENCRYPTION'] ?? '') == 'SSL' ? 'selected' : '' ?>>SSL</option>
-                                                    </select>
-                                                </div>
+                                ?>
+                                    <form method="POST">
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="smtp_host">SMTP <?php echo $translations["host"]; ?>:</label>
+                                                <input type="text" class="form-control" id="smtp_host" name="smtp_host"
+                                                    value="<?= htmlspecialchars($env_data['MAIL_HOST'] ?? '') ?>">
                                             </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="smtp_username">SMTP
-                                                        <?php echo $translations["username"]; ?>:</label>
-                                                    <input type="text" class="form-control" id="smtp_username"
-                                                        name="smtp_username"
-                                                        value="<?= htmlspecialchars($env_data['MAIL_USERNAME'] ?? '') ?>">
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label for="smtp_password">SMTP
-                                                        <?php echo $translations["password"]; ?>:</label>
-                                                    <input type="password" class="form-control" id="smtp_password"
-                                                        name="smtp_password"
-                                                        value="<?= htmlspecialchars($env_data['MAIL_PASSWORD'] ?? '') ?>">
-                                                </div>
+                                            <div class="form-group col-md-3">
+                                                <label for="smtp_port">SMTP <?php echo $translations["port"]; ?>:</label>
+                                                <input type="number" min="1" max="65535" class="form-control" id="smtp_port"
+                                                    name="smtp_port"
+                                                    value="<?= htmlspecialchars($env_data['MAIL_PORT'] ?? '') ?>">
                                             </div>
-                                            <button type="submit"
-                                                class="btn btn-primary"><?php echo $translations["save"]; ?></button>
-                                            <button type="button" class="btn btn-success" data-toggle="modal"
-                                                data-target="#emailModal">
-                                                <?php echo $translations["mailtest"]; ?>
-                                            </button>
-                                        </form>
-                                        <?php
-                                    } else {
-                                        echo $translations["dont-access"];
-                                    }
+                                            <div class="form-group col-md-3">
+                                                <label for="smtp_encryption">SMTP
+                                                    <?php echo $translations["encry"]; ?>:</label>
+                                                <select class="form-control" id="smtp_encryption" name="smtp_encryption">
+                                                    <option value="TLS" <?= ($env_data['MAIL_ENCRYPTION'] ?? '') == 'TLS' ? 'selected' : '' ?>>TLS</option>
+                                                    <option value="SSL" <?= ($env_data['MAIL_ENCRYPTION'] ?? '') == 'SSL' ? 'selected' : '' ?>>SSL</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="smtp_username">SMTP
+                                                    <?php echo $translations["username"]; ?>:</label>
+                                                <input type="text" class="form-control" id="smtp_username"
+                                                    name="smtp_username"
+                                                    value="<?= htmlspecialchars($env_data['MAIL_USERNAME'] ?? '') ?>">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="smtp_password">SMTP
+                                                    <?php echo $translations["password"]; ?>:</label>
+                                                <input type="password" class="form-control" id="smtp_password"
+                                                    name="smtp_password"
+                                                    value="<?= htmlspecialchars($env_data['MAIL_PASSWORD'] ?? '') ?>">
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary"><?php echo $translations["save"]; ?></button>
+                                        <button type="button" class="btn btn-success" data-toggle="modal"
+                                            data-target="#emailModal">
+                                            <?php echo $translations["mailtest"]; ?>
+                                        </button>
+                                    </form>
+                                <?php
+                                } else {
+                                    echo $translations["dont-access"];
+                                }
                                 ?>
 
                             </div>
@@ -374,6 +456,7 @@ $conn->close();
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="../../../assets/js/date-time.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 

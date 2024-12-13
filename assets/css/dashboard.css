@@ -126,6 +126,11 @@ p.lead.mb-4.fs-4 {
     color: #ff3e1d !important;
 }
 
+.bg-label-warning {
+    background-color: #f9f9e7 !important;
+    color: #f0ad4e !important;
+}
+
 .list-group-itemcustom {
     position: relative;
     display: block;

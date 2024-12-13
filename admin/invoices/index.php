@@ -63,6 +63,18 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$file_path = 'https://api.gymoneglobal.com/latest/version.txt';
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $file_path);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$latest_version = curl_exec($ch);
+curl_close($ch);
+
+$current_version = $version;
+
+$is_new_version_available = version_compare($latest_version, $current_version) > 0;
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -134,8 +146,8 @@ $total_pages = ceil($total_records / $records_per_page);
                 <h2><img src="../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../dashboard/">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
@@ -154,9 +166,9 @@ $total_pages = ceil($total_records / $records_per_page);
                             <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a href="../invoices/" class="sidebar-link">
-                        <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"];?>
+                    <li class="sidebar-item active">
+                        <a href="#" class="sidebar-link">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
                         </a>
                     </li>
                     <?php
@@ -211,13 +223,14 @@ $total_pages = ceil($total_records / $records_per_page);
                     }
                     ?>
                     <li class="sidebar-header">
-                        Bolt
+                        <?php echo $translations["shopcategory"]; ?>
+
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../shop/gateway">
+                        <!-- <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["gatewaypage"]; ?></span>
-                        </a>
+                        </a> -->
                         <a class="sidebar-ling" href="../shop/tickets">
                             <i class="bi bi-ticket"></i>
                             <span><?php echo $translations["ticketspage"]; ?></span>
@@ -260,7 +273,6 @@ $total_pages = ceil($total_records / $records_per_page);
                     </li>
                 </ul><br>
             </div>
-
             <div class="col-sm-10">
                 <div class="d-none topnav d-sm-inline-block">
                     <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank" rel="noopener noreferrer">

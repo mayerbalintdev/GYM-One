@@ -57,7 +57,6 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-// Előre definiált hónapok tömbje
 $months = [
     "01" => $translations["Jan"],
     "02" => $translations["Feb"],
@@ -137,7 +136,16 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
-// Query to get gender count
+$sql = "SELECT AVG(duration) AS avg_duration FROM workout_stats WHERE duration IS NOT NULL";
+$result = mysqli_query($conn, $sql);
+
+$avgDuration = 0;
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $avgDuration = round($row['avg_duration'], 0);
+}
+
+
 $sql = "SELECT gender, COUNT(*) as count FROM users GROUP BY gender";
 $result = $conn->query($sql);
 
@@ -145,13 +153,34 @@ $maleCount = 0;
 $femaleCount = 0;
 
 if ($result->num_rows > 0) {
-    // Output data of each row
     while ($row = $result->fetch_assoc()) {
         if ($row["gender"] == "Male") {
             $maleCount = $row["count"];
         } elseif ($row["gender"] == "Female") {
             $femaleCount = $row["count"];
         }
+    }
+}
+
+$sql = "
+    SELECT 
+        gender, 
+        COUNT(*) AS free_lockers 
+    FROM lockers 
+    WHERE user_id IS NULL 
+    GROUP BY gender
+";
+
+$result = $conn->query($sql);
+
+$free_lockers = [
+    'Male' => 0,
+    'Female' => 0,
+];
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $free_lockers[$row['gender']] = $row['free_lockers'];
     }
 }
 
@@ -216,6 +245,7 @@ $conn->close();
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+
 <body>
     <nav class="navbar navbar-inverse visible-xs">
         <div class="container-fluid">
@@ -240,12 +270,12 @@ $conn->close();
 
     <div class="container-fluid">
         <div class="row content">
-            <div class="col-sm-2 sidenav hidden-xs text-center ">
+            <div class="col-sm-2 sidenav hidden-xs text-center">
                 <h2><img src="../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../dashboard/">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
@@ -254,13 +284,23 @@ $conn->close();
                             <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
                         </a>
                     </li>
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="../statistics">
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="#">
                             <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
                         </a>
                     </li>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../boss/sell">
+                            <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="../invoices/" class="sidebar-link">
+                            <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
+                        </a>
+                    </li>
                     <?php
-                    if ($is_boss == 1) {
+                    if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-header">
                             <?php echo $translations["settings"]; ?>
@@ -307,33 +347,37 @@ $conn->close();
                                 <span><?php echo $translations["rulepage"]; ?></span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/tickets">
-                                <i class="bi bi-ticket"></i>
-                                <span><?php echo $translations["ticketspage"]; ?></span>
-                            </a>
-                        </li>
                     <?php
                     }
                     ?>
                     <li class="sidebar-header">
-                        Bolt
+                        <?php echo $translations["shopcategory"]; ?>
+
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../shop/gateway">
+                        <!-- <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
-                            <span><?php echo $translations["updatepage"]; ?></span>
-                            <?php if ($is_new_version_available) : ?>
-                                <span class="sidebar-badge badge">
-                                    <i class="bi bi-exclamation-circle"></i>
-                                </span>
-                            <?php endif; ?>
+                            <span><?php echo $translations["gatewaypage"]; ?></span>
+                        </a> -->
+                        <a class="sidebar-ling" href="../shop/tickets">
+                            <i class="bi bi-ticket"></i>
+                            <span><?php echo $translations["ticketspage"]; ?></span>
                         </a>
                     </li>
-                    <li><a href="#section3">Geo</a></li>
+                    <li class="sidebar-header">
+                        <?php echo $translations["trainersclass"]; ?>
+                    </li>
+                    <li><a class="sidebar-link" href="../trainers/timetable">
+                            <i class="bi bi-calendar-event"></i>
+                            <span><?php echo $translations["timetable"]; ?></span>
+                        </a></li>
+                    <li><a class="sidebar-link" href="../trainers/personal">
+                            <i class="bi bi-award"></i>
+                            <span><?php echo $translations["trainers"]; ?></span>
+                        </a></li>
                     <li class="sidebar-header"><?php echo $translations["other-header"]; ?></li>
                     <?php
-                    if ($is_boss == 1) {
+                    if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-item">
                             <a class="sidebar-ling" href="../updater">
@@ -413,6 +457,9 @@ $conn->close();
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="card">
+                            <div class="card-header">
+                                <p class="lead"><?php echo $translations["new-users"]; ?></p>
+                            </div>
                             <div class="card-body">
                                 <div class="text-center" id="userschart"></div>
                             </div>
@@ -420,15 +467,61 @@ $conn->close();
                     </div>
                     <div class="col-sm-3">
                         <div class="card">
+                            <div class="card-header">
+                                <p class="lead"><?php echo $translations["genderstats"]; ?></p>
+                            </div>
                             <div class="card-body">
                                 <div class="text-center" id="malefamalechart"></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <p class="lead"><?php echo $translations["averagetraintime"]; ?></p>
+                            </div>
+                            <div class="card-body text-center">
+                                <h1 class="lead"><?= $avgDuration; ?> <?= $translations["minutes"]; ?></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <p class="lead"><?php echo $translations["avilablelockers"]; ?></p>
+                                </div>
+                                <div class="card-body text-center">
+                                    <p class="lead">
+                                        <?php
+                                        if ($free_lockers['Male'] > 3) {
+                                            echo '<span class="badge bg-label-success">' . $translations["boy"] . ": " . $free_lockers['Male'] . '</span>';
+                                        } elseif ($free_lockers['Male'] > 0) {
+                                            echo '<span class="badge bg-label-warning">' . $translations["boy"] . ": " . $free_lockers['Male'] . '</span>';
+                                        } else {
+                                            echo '<span class="badge bg-label-danger">' . $translations["boylockernotavilable"] . '</span>';
+                                        }
+                                        ?>
+                                    </p>
+
+                                    <p class="lead">
+                                        <?php
+                                        if ($free_lockers['Female'] > 3) {
+                                            echo '<span class="badge bg-label-success">' . $translations["girl"] . ": " . $free_lockers['Female'] . '</span>';
+                                        } elseif ($free_lockers['Female'] > 0) {
+                                            echo '<span class="badge bg-label-warning">' . $translations["girl"] . ": " . $free_lockers['Female'] . '</span>';
+                                        } else {
+                                            echo '<span class="badge bg-label-danger">' . $translations["girllockernotavilable"] . '</span>';
+                                        }
+                                        ?>
+                                    </p>
+
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col text-center">
-                        <h2 class="lead"><?php echo $translations["moneystats"];?></h2>
+                        <h2 class="lead"><?php echo $translations["moneystats"]; ?></h2>
                     </div>
                 </div>
                 <div class="row">

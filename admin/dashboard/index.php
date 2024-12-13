@@ -378,13 +378,14 @@ foreach ($data as $item) {
                     }
                     ?>
                     <li class="sidebar-header">
-                        Bolt
+                        <?php echo $translations["shopcategory"]; ?>
+
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../shop/gateway">
+                        <!-- <a class="sidebar-ling" href="../shop/gateway">
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["gatewaypage"]; ?></span>
-                        </a>
+                        </a> -->
                         <a class="sidebar-ling" href="../shop/tickets">
                             <i class="bi bi-ticket"></i>
                             <span><?php echo $translations["ticketspage"]; ?></span>
@@ -510,7 +511,7 @@ foreach ($data as $item) {
                                 <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["userlogginer"]; ?></h5>
                                 <div class="text-center">
                                     <a data-toggle="modal" data-target="#Logginer_MODAL" class="btn btn-success">
-                                        <h4><?= $translations["logginer"];?></h4>
+                                        <h4><?= $translations["logginer"]; ?></h4>
                                     </a>
                                 </div>
                             </div>
@@ -533,7 +534,7 @@ foreach ($data as $item) {
                             <div class="card-body">
                                 <p><?php echo $translations["dayopendayclose"]; ?></p>
                                 <div class="d-flex justify-content-between text-center">
-                                    <?php if ($message): ?>
+                                    <!-- <?php if ($message): ?>
                                         <div class="alert alert-info" role="alert">
                                             <?php echo $message; ?>
                                         </div>
@@ -541,7 +542,7 @@ foreach ($data as $item) {
                                     <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#openModal">
                                         <?php echo $translations["dayopen"]; ?>
                                     </button>
-                                    <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a>
+                                    <a href="" class="btn btn-danger"><?php echo $translations["dayclose"]; ?></a> -->
                                 </div>
                             </div>
                         </div>
@@ -582,7 +583,7 @@ foreach ($data as $item) {
                                                 echo "<td>" . $counter . "</td>";
                                                 echo "<td>" . $row["name"] . "</td>";
                                                 echo "<td>" . $elapsed_time . "</td>";
-                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">' . $translations["userlogout"] .'</a></td>';
+                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">' . $translations["userlogout"] . '</a></td>';
                                                 echo '<td><a class= "btn btn-secondary" href="../users/edit/?user=' . $row["userid"] . '">' . $translations["editbtn"] . '</a></td>';
                                                 echo "</tr>";
 
@@ -601,7 +602,7 @@ foreach ($data as $item) {
                 <div class="row justify-content-between text-center">
                     <div class="col-sm-2">
                         <div class="card">
-                            <p><?= $translations["capacitytext"];?></p>
+                            <p><?= $translations["capacitytext"]; ?></p>
                             <div class="card-body">
                                 <div class="progress">
                                     <div class="progress-bar-<?php echo $progresscolor; ?>" role="progressbar" style="width: <?php echo number_format($capacityPercent, 2); ?>%;" aria-valuenow="<?php echo number_format($capacityPercent, 2); ?>" aria-valuemin="0" aria-valuemax="100"><?php echo number_format($capacityPercent, 0); ?>%</div>
@@ -689,8 +690,8 @@ foreach ($data as $item) {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userDetailsLabel"><?= $translations["userinfo"];?></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $translations["close"];?>">
+                    <h5 class="modal-title" id="userDetailsLabel"><?= $translations["userinfo"]; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="<?php echo $translations["close"]; ?>">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -698,8 +699,8 @@ foreach ($data as $item) {
                     <div id="userDetails"></div>
                 </div>
                 <div class="modal-footer">
-                    <button id="nextButton" class="btn btn-primary" disabled><?php echo $translations["next"];?></button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
+                    <button id="nextButton" class="btn btn-primary" disabled><?php echo $translations["next"]; ?></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"]; ?></button>
                 </div>
             </div>
         </div>
@@ -710,14 +711,14 @@ foreach ($data as $item) {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="TicketDetailsModalLabel"><?php echo $translations["ticketinfomodal"];?></h5>
+                    <h5 class="modal-title" id="TicketDetailsModalLabel"><?php echo $translations["ticketinfomodal"]; ?></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" id="ticketDetails"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"];?></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"]; ?></button>
                 </div>
             </div>
         </div>
