@@ -26,7 +26,7 @@ function read_env_file($file_path)
     return $env_data;
 }
 
-$env_data = read_env_file('../../../.env');
+$env_data = read_env_file('../../../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -40,7 +40,7 @@ $version = $env_data["APP_VERSION"] ?? '';
 
 $lang = $lang_code;
 
-$langDir = __DIR__ . "/../../../assets/lang/";
+$langDir = __DIR__ . "/../../../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -85,35 +85,24 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
-$search = "";
-if (isset($_GET['search'])) {
-    $search = $conn->real_escape_string($_GET['search']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $conn->real_escape_string($_POST['name']);
+    $description = $conn->real_escape_string($_POST['description']);
+    $price = $conn->real_escape_string($_POST['price']);
+    $stock = $conn->real_escape_string($_POST['stock']);
+    $barcode = $conn->real_escape_string($_POST['barcode']);
+
+
+    $insert_sql = "INSERT INTO products (name, description, price, stock, barcode) 
+                   VALUES ('$name', '$description', '$price', '$stock', '$barcode')";
+
+    if ($conn->query($insert_sql) === TRUE) {
+        header("Location: ../");
+        exit;
+    } else {
+        echo "UNEXPECTED ERROR: " . $conn->error;
+    }
 }
-
-$limit = 9;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$page = max($page, 1);
-$offset = ($page - 1) * $limit;
-
-$count_sql = "SELECT COUNT(*) as total FROM products WHERE name LIKE '%$search%' OR description LIKE '%$search%'";
-$count_result = $conn->query($count_sql);
-$total_products = $count_result->fetch_assoc()['total'];
-$total_pages = ceil($total_products / $limit);
-
-$sql = "SELECT COUNT(*) AS low_stock_count FROM products WHERE stock <= 5";
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $low_stock_count = $row['low_stock_count'];
-} else {
-    $low_stock_count = 0;
-}
-
-$sql = "SELECT * FROM products 
-        WHERE name LIKE '%$search%' OR description LIKE '%$search%'
-        LIMIT $limit OFFSET $offset";
-$result = $conn->query($sql);
 
 ?>
 
@@ -127,7 +116,7 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
@@ -142,7 +131,7 @@ $result = $conn->query($sql);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href="#"><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
@@ -158,7 +147,7 @@ $result = $conn->query($sql);
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item active">
@@ -289,79 +278,32 @@ $result = $conn->query($sql);
                 </ul><br>
             </div>
             <div class="col-sm-10">
-                <div class="d-none topnav d-sm-inline-block">
-                    <a href="https://gymoneglobal.com/discord" class="btn btn-primary mx-1" target="_blank"
-                        rel="noopener noreferrer">
-                        <i class="bi bi-question-circle"></i>
-                        <?php echo $translations["support"]; ?>
-                    </a>
+                <h1 class="text-center mb-4"><?php echo $translations["addpackage"];?></h1>
 
-                    <a href="https://gymoneglobal.com/docs" class="btn btn-danger" target="_blank"
-                        rel="noopener noreferrer">
-                        <i class="bi bi-journals"></i>
-                        <?php echo $translations["docs"]; ?>
-                    </a>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-                        <?php echo $translations["logout"]; ?>
-                    </button>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="card shadow">
-                            <form method="GET" class="mb-4">
-                                <div class="input-group">
-                                    <input type="text" name="search" class="form-control mt-3" placeholder="<?php echo $translations["searchbyproductname"]; ?>" value="<?php echo htmlspecialchars($search); ?>">
-                                    <button class="btn btn-primary mt-3" type="submit"><i class="bi bi-search"></i><?php echo $translations["search"]; ?>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Termék neve</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
                     </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="card shadow">
-                            <a href="add/" class="btn btn-lg btn-success"><?php echo $translations["addpackage"]; ?></a>
-                        </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label"><?php echo $translations["product-name"];?></label>
+                        <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
                     </div>
-                    <div class="col-sm-4 text-center">
-                        <div class="card shadow">
-                            <a href="inventory/" class="btn btn-lg btn-info"><?php echo $translations["werhousecorrection"]; ?>
-                                <?php if ($low_stock_count > 0): ?>
-                                    <span class="badge badge-warning"><?php echo $low_stock_count; ?></span>
-                                <?php endif; ?></a>
-                        </div>
+                    <div class="mb-3">
+                        <label for="price" class="form-label"><?php echo $translations["price"];?> <code><?php echo $currency;?></code></label>
+                        <input type="number" id="price" name="price" class="form-control" step="0.01" required>
                     </div>
-                </div>
-                <div class="row">
-                    <?php if ($result->num_rows > 0): ?>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><?php echo htmlspecialchars($row['name']); ?></h5>
-                                        <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
-                                        <p class="text-success fw-bold"><?php echo number_format($row['price'], 2); ?> <?php echo $currency; ?></p>
-                                        <a href="edit/?id=<?php echo $row['id']; ?>" class="btn btn-warning"><?php echo $translations["updatepackage"]; ?></a>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <p class="text-center">Nincs találat.</p>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Lapozó -->
-                <nav>
-                    <ul class="pagination justify-content-center">
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                            <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                                <a class="page-link" href="?search=<?php echo urlencode($search); ?>&page=<?php echo $i; ?>">
-                                    <?php echo $i; ?>
-                                </a>
-                            </li>
-                        <?php endfor; ?>
-                    </ul>
-                </nav>
+                    <div class="mb-3">
+                        <label for="stock" class="form-label"><?php echo $translations["piece"];?></label>
+                        <input type="number" id="stock" name="stock" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="barcode" class="form-label"><?php echo $translations["product-barcode"];?></label>
+                        <input type="number" id="barcode" name="barcode" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><?php echo $translations["add"];?></button>
+                    <a href="../" class="btn btn-secondary"><?php echo $translations["not-yet"];?></a>
+                </form>
             </div>
         </div>
     </div>
@@ -384,58 +326,11 @@ $result = $conn->query($sql);
             </div>
         </div>
     </div>
+    <?php
+    $conn->close();
+    ?>
     <!-- SCRIPTS! -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script>
-        function startBarcodeScanner() {
-            Quagga.init({
-                inputStream: {
-                    type: "LiveStream",
-                    constraints: {
-                        facingMode: "environment"
-                    },
-                    target: document.getElementById('reader'),
-                    willReadFrequently: true
-                },
-                decoder: {
-                    readers: ["ean_reader", "ean_8_reader"]
-                }
-            }, function(err) {
-                if (err) {
-                    console.error("A Quagga nem tudott elindulni:", err);
-                    alert("Hiba történt a kamera elindítása közben.");
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected(function(result) {
-                const barcode = result.codeResult.code;
-                console.log("Beolvasott vonalkód:", barcode);
-
-                fetch("get_BARCODE.php?barcode=" + barcode)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.id) {
-                            window.location.href = "../edit?id=" + data.id;
-                        } else {
-                            console.warn("Érvénytelen vonalkód, újrapróbálkozás...");
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Hiba történt a lekérdezés során:", err);
-                    });
-            });
-        }
-
-        // Kamera elindítása az oldal betöltődésekor
-        window.onload = function() {
-            startBarcodeScanner();
-        };
-    </script>
 </body>
 
 </html>
-<?php
-$conn->close();
-?>

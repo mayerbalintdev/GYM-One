@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_event'])) {
     header("Refresh:1");
 }
 
-$days_of_week = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Wed"], $translations["Sat"], $translations["Sun"]];
+$days_of_week = [$translations["Mon"], $translations["Tue"], $translations["Wed"], $translations["Thu"], $translations["Fri"], $translations["Sat"], $translations["Sun"]];
 $timetable = [];
 foreach ($days_of_week as $day) {
     $sql = "SELECT * FROM timetable WHERE day_of_week = ? ORDER BY start_time";

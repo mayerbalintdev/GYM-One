@@ -209,23 +209,23 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
                 </div>
                 <div class="col-md-3 offset-md-1">
                     <?php if (!empty($days)): ?>
-                    <div class="list-group">
-                        <?php foreach ($days as $day): ?>
-                            <div class="list-group-itemcustom d-flex justify-content-between align-items-center">
-                                <span><strong><?= htmlspecialchars($dayNames[$day['day']]) ?></strong></span>
-                                <span class="text-center justify-content-center">
-                                    <?php if (is_null($day['open_time']) && is_null($day['close_time'])): ?>
-                                        <span class="badge bg-danger"><?= $translations["closed"];?></span>
-                                    <?php else: ?>
-                                        <span class="badge bg-success">
-                                            <?= date('H:i', strtotime($day['open_time'])) ?> - <?= date('H:i', strtotime($day['close_time'])) ?>
-                                        </span>
-                                    <?php endif; ?>
-                                </span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                        <div class="list-group">
+                            <?php foreach ($days as $day): ?>
+                                <div class="list-group-itemcustom d-flex justify-content-between align-items-center">
+                                    <span><strong><?= htmlspecialchars($dayNames[$day['day']]) ?></strong></span>
+                                    <span class="text-center justify-content-center">
+                                        <?php if (is_null($day['open_time']) && is_null($day['close_time'])): ?>
+                                            <span class="badge bg-danger"><?= $translations["closed"]; ?></span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success">
+                                                <?= date('H:i', strtotime($day['open_time'])) ?> - <?= date('H:i', strtotime($day['close_time'])) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="col-md-2 offset-md-1">
@@ -250,10 +250,30 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
-    setTimeout(function() {
+    setTimeout(function () {
         document.getElementById('statusBar').classList.add('visible');
     }, 500);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const statusBar = document.getElementById('statusBar');
+
+        if (navbarToggler && statusBar) {
+            navbarToggler.addEventListener('click', function () {
+                const isNavbarExpanded = navbarToggler.getAttribute('aria-expanded') === 'true';
+
+                if (isNavbarExpanded) {
+                    statusBar.classList.remove('visible');
+                } else {
+                    setTimeout(function () {
+                        statusBar.classList.add('visible');
+                    }, 200);
+                }
+            });
+        }
+    });
 </script>
+
 
 
 </html>
