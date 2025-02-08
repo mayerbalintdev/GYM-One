@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?%{HTTP_HOST}/ [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|bmp|svg)$ - [F,L]
+</IfModule>

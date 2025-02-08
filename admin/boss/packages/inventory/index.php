@@ -85,11 +85,9 @@ $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
-// Termékek lekérdezése, rendezés raktárkészlet szerint
 $sql = "SELECT * FROM products ORDER BY stock ASC, name ASC";
 $result = $conn->query($sql);
 
-// Vonalkód keresés
 $searchResult = null;
 $productId = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['barcode'])) {
@@ -97,18 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['barcode'])) {
     $searchSql = "SELECT * FROM products WHERE barcode = '$barcode'";
     $searchResult = $conn->query($searchSql)->fetch_assoc();
     if ($searchResult) {
-        $productId = $searchResult['id'];  // Az id kinyerése
+        $productId = $searchResult['id'];
     }
 }
 
-// Készlet frissítése
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = (int)$_POST['id'];
     $newStock = (int)$_POST['new_stock'];
 
     $updateSql = "UPDATE products SET stock = $newStock WHERE id = $id";
     if ($conn->query($updateSql) === TRUE) {
-        // hEADERGECI
+        header("Refresh: 1");
         exit;
     } else {
         echo "Hiba a frissítés során: " . $conn->error;
@@ -133,6 +130,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+<!-- INLINE STYLE -- Reason: Collision -->
+<style>
+    #reader {
+        position: relative;
+        width: 100%;
+        height: auto;
+        max-width: 600px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    #reader video {
+        width: 100%;
+        height: auto;
+    }
+
+    #reader canvas {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        #reader {
+            height: 300px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #reader {
+            height: 200px;
+        }
+    }
+</style>
 
 
 
@@ -294,39 +323,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             <div class="col-sm-10">
                 <div class="card">
                     <div class="card-header">
-                        <h1 class="text-center mb-4">Raktárkorrektúra</h1>
+                        <h1 class="text-center mb-4"><?php echo $translations["werhousecorrection"]; ?></h1>
                     </div>
-                    
+
                 </div>
 
 
                 <div class="mb-4">
-                    <h5>Vonalkód beolvasása kamerával:</h5>
-                    <div id="reader" style="width: 100%; height: 400px;"></div>
+                    <h5><?php echo $translations["barcodescannerwithcamera"]; ?></h5>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div id="reader" style="width: 100%; height: 400px;"></div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <img src="../../../../assets/img/partner/goupcapi.svg" class="img img-fluid" alt="GoUpCPartner-GymOne-DontRemove">
+
+                        </div>
+                    </div>
                 </div>
 
                 <form method="POST" class="mt-4">
                     <div class="input-group">
-                        <input type="text" name="barcode" class="form-control" placeholder="Vonalkód keresése" required>
-                        <button type="submit" class="btn btn-primary">Keresés</button>
+                        <input type="text" name="barcode" class="form-control" placeholder="<?php echo $translations["product-barcode"]; ?>" required>
+                        <button type="submit" class="btn btn-primary"><?php echo $translations["search"]; ?></button>
                     </div>
                 </form>
 
                 <?php if ($searchResult): ?>
                     <div class="alert alert-info">
-                        <strong>Talált termék:</strong> <?php echo htmlspecialchars($searchResult['name']); ?><br>
+                        <strong>Product Name: !NOTRANSLATE</strong> <?php echo htmlspecialchars($searchResult['name']); ?><br>
                         <strong>ID:</strong> <?php echo $productId; ?>
                     </div>
                 <?php endif; ?>
-
+                
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Termék neve</th>
-                            <th>Leírás</th>
-                            <th>Raktáron</th>
-                            <th>Készlet módosítása</th>
+                            <th><?php echo $translations["product-name"]; ?></th>
+                            <th><?php echo $translations["description"]; ?></th>
+                            <th><?php echo $translations["amount"]; ?></th>
+                            <th><?php echo $translations["stockmodify"]; ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -337,11 +375,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                                 <td><?php echo htmlspecialchars($row['description']); ?></td>
                                 <td><?php echo $row['stock']; ?></td>
                                 <td>
-                                    <form method="POST" class="d-inline">
+                                    <form method="POST" class="form-inline">
                                         <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                        <input type="number" name="new_stock" class="form-control d-inline-block w-50" value="<?php echo $row['stock']; ?>" required>
-                                        <button type="submit" class="btn btn-warning">Frissítés</button>
+                                        <div class="form-group">
+                                            <input type="number" name="new_stock" class="form-control" value="<?php echo $row['stock']; ?>" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning"><?php echo $translations["save"]; ?></button>
                                     </form>
+
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -379,7 +420,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 inputStream: {
                     type: "LiveStream",
                     constraints: {
-                        facingMode: "environment"
+                        facingMode: "environment",
+                        width: {
+                            ideal: 640
+                        },
+                        height: {
+                            ideal: 480
+                        }
                     },
                     target: document.getElementById('reader'),
                     willReadFrequently: true
@@ -389,8 +436,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 }
             }, function(err) {
                 if (err) {
-                    console.error("A Quagga nem tudott elindulni:", err);
-                    alert("Hiba történt a kamera elindítása közben.");
+                    console.error("The Quagga could not start:", err);
+                    alert("An error occurred while starting the camera.");
                     return;
                 }
                 Quagga.start();
@@ -398,7 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
             Quagga.onDetected(function(result) {
                 const barcode = result.codeResult.code;
-                console.log("Beolvasott vonalkód:", barcode);
+                console.log("Scanned barcode:", barcode);
 
                 fetch("get_BARCODE.php?barcode=" + barcode)
                     .then(response => response.json())
@@ -406,11 +453,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         if (data && data.id) {
                             window.location.href = "../edit?id=" + data.id;
                         } else {
-                            console.warn("Érvénytelen vonalkód, újrapróbálkozás...");
+                            console.warn("Invalid barcode, retry...");
                         }
                     })
                     .catch(err => {
-                        console.error("Hiba történt a lekérdezés során:", err);
+                        console.error("An error occurred during the query:", err);
                     });
             });
         }
@@ -418,10 +465,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         window.onload = function() {
             startBarcodeScanner();
         };
+        window.addEventListener('resize', function() {
+            Quagga.stop();
+            startBarcodeScanner();
+        });
     </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
 </body>
 
 </html>

@@ -533,7 +533,7 @@ $conn->close();
                     $profilePicPath = '../../assets/img/profiles/' . $userid . '.png';
                     if (file_exists($profilePicPath)): ?>
                       <div class="col-md-3 text-center">
-                        <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid mb-3" width="100" height="100">
+                        <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid mb-3" height="150">
                       </div>
                     <?php endif; ?>
 

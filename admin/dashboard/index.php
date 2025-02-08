@@ -718,7 +718,9 @@ foreach ($data as $item) {
                 </div>
                 <div class="modal-body" id="ticketDetails"></div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["close"]; ?></button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="window.location.reload();">
+                        <?php echo $translations["close"]; ?>
+                    </button>
                 </div>
             </div>
         </div>

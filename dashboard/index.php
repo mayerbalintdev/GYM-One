@@ -56,19 +56,32 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM current_tickets WHERE userid = ?";
+$sql = "SELECT * FROM current_tickets WHERE userid = ? ORDER BY expiredate DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
 $result = $stmt->get_result();
-$id = $ticketname = $buydate = $expiredate = $opportunities = null;
 
-if ($row = $result->fetch_assoc()) {
-    $id = $row['id'];
-    $ticketname = $row['ticketname'];
-    $buydate = $row['buydate'];
-    $expiredate = $row['expiredate'];
-    $opportunities = $row['opportunities'];
+$id = $ticketname = $buydate = $expiredate = $opportunities = null;
+$currentDate = new DateTime();
+$currentDate = $currentDate->format('Y-m-d'); // Csak az év-hónap-nap kell
+
+$validTicketFound = false;
+
+while ($row = $result->fetch_assoc()) {
+    $expireDate = new DateTime($row['expiredate']);
+    $expireDate = $expireDate->format('Y-m-d'); // Csak az év-hónap-nap kell
+
+    // Ha a lejárati dátum egyenlő vagy nagyobb, mint a mai nap, akkor még érvényes
+    if ($expireDate >= $currentDate) {
+        $id = $row['id'];
+        $ticketname = $row['ticketname'];
+        $buydate = $row['buydate'];
+        $expiredate = $row['expiredate'];
+        $opportunities = $row['opportunities'];
+        $validTicketFound = true;
+        break;
+    }
 }
 
 $stmt->close();
@@ -97,15 +110,16 @@ $latest_training = ($result_latest_training->num_rows > 0) ? $result_latest_trai
 
 
 
-$sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
+$sql = "SELECT firstname, lastname, profile_balance FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname, $firstname);
+$stmt->bind_result($firstname, $lastname, $profile_balance);
 $stmt->fetch();
 
-
 $stmt->close();
+
+
 
 $conn->close();
 
@@ -257,7 +271,7 @@ if (!file_exists($filename)) {
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title fw-semibold"><?php echo $translations["profilebalance"]; ?></h4>
-                                <h1><strong></strong><?php echo $currency; ?></h1>
+                                <h1><strong><?php echo $profile_balance;?></strong><?php echo $currency; ?></h1>
                             </div>
                         </div>
                     </div>

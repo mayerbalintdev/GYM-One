@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Termék neve</label>
+                        <label for="name" class="form-label"><?php echo $translations["product-name"];?></label>
                         <input type="text" id="name" name="name" class="form-control" required>
                     </div>
                     <div class="mb-3">
@@ -290,15 +290,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="price" class="form-label"><?php echo $translations["price"];?> <code><?php echo $currency;?></code></label>
+                        <label for="price" class="form-label"><?php echo $translations["price"];?> <code><?php echo $currency;?></code>:</label>
                         <input type="number" id="price" name="price" class="form-control" step="0.01" required>
                     </div>
                     <div class="mb-3">
-                        <label for="stock" class="form-label"><?php echo $translations["piece"];?></label>
+                        <label for="stock" class="form-label"><?php echo $translations["piece"];?>:</label>
                         <input type="number" id="stock" name="stock" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="barcode" class="form-label"><?php echo $translations["product-barcode"];?></label>
+                        <label for="barcode" class="form-label"><?php echo $translations["product-barcode"];?>:</label>
                         <input type="number" id="barcode" name="barcode" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary"><?php echo $translations["add"];?></button>

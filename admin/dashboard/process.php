@@ -68,7 +68,8 @@ if ($result && $result->num_rows > 0) {
     $response['birthdate'] = $row['birthdate'];
     $response['gender'] = $row["gender"];
 
-    $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode'";
+    // A legújabb érvényes jegy keresése
+    $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode' ORDER BY expiredate DESC";
     $ticketResult = $conn->query($ticketSql);
 
     if ($ticketResult && $ticketResult->num_rows > 0) {
@@ -76,10 +77,19 @@ if ($result && $result->num_rows > 0) {
         $opportunities = $ticketRow['opportunities'];
         $expiredate = $ticketRow['expiredate'];
 
-        if (($opportunities > 0 || is_null($opportunities)) && $expiredate >= date('Y-m-d')) {
+        $currentDate = date('Y-m-d');
+
+        if (($opportunities > 0 || is_null($opportunities)) && $expiredate >= $currentDate) {
             $response['ticket_status'] = 'Érvényes';
             $response['remaining_opportunities'] = $opportunities;
             $response['expiredate'] = $expiredate;
+
+            if ($expiredate == $currentDate) {
+                $response['expiredate_message'] = $translations["todayexpire"];
+            } else {
+                $interval = date_diff(date_create($currentDate), date_create($expiredate));
+                $response['remaining_days'] = $interval->days;
+            }
 
             $gender = $row['gender'];
             $lockerSql = "SELECT lockernum FROM lockers WHERE gender = '$gender' AND user_id IS NULL"; 
@@ -109,7 +119,7 @@ if ($result && $result->num_rows > 0) {
             } else {
                 $response['assigned_locker'] = $translations["locker_notavilable"]; 
             }
-        } elseif ($opportunities == 0 || $expiredate < date('Y-m-d')) {
+        } elseif ($opportunities == 0 || $expiredate < $currentDate) {
             $response['ticket_status'] = $translations["expired"];
         }
     } else {

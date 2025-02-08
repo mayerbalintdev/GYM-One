@@ -289,3 +289,90 @@ i.bi.bi-exclamation-circle {
     color: red;
 }
 
+.mt-0 {
+    margin-top: 0px !important;
+}
+
+.mt-1 {
+    margin-top: 5px !important;
+}
+
+.mt-2 {
+    margin-top: 10px !important;
+}
+
+.mt-3 {
+    margin-top: 15px !important;
+}
+
+.mt-4 {
+    margin-top: 20px !important;
+}
+
+.mt-5 {
+    margin-top: 30px !important;
+}
+
+.mt-6 {
+    margin-top: 40px !important;
+}
+
+.mt-7 {
+    margin-top: 50px !important;
+}
+
+.mt-8 {
+    margin-top: 60px !important;
+}
+
+.mt-9 {
+    margin-top: 70px !important;
+}
+
+.mt-10 {
+    margin-top: 80px !important;
+}
+
+.mb-0 {
+    margin-bottom: 0px !important;
+}
+
+.mb-1 {
+    margin-bottom: 5px !important;
+}
+
+.mb-2 {
+    margin-bottom: 10px !important;
+}
+
+.mb-3 {
+    margin-bottom: 15px !important;
+}
+
+.mb-4 {
+    margin-bottom: 20px !important;
+}
+
+.mb-5 {
+    margin-bottom: 30px !important;
+}
+
+.mb-6 {
+    margin-bottom: 40px !important;
+}
+
+.mb-7 {
+    margin-bottom: 50px !important;
+}
+
+.mb-8 {
+    margin-bottom: 60px !important;
+}
+
+.mb-9 {
+    margin-bottom: 70px !important;
+}
+
+.mb-10 {
+    margin-bottom: 80px !important;
+}
