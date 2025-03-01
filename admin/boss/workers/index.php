@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_user"])) {
 
     if ($conn->query($sql) === TRUE) {
         $alerts_html .= "<div class='alert alert-success'>{$translations["success-add"]}</div>";
-        $action = $translations['success-add-new-worker'] . ' ' . $newuserid;
+        $action = $translations['success-add-new-worker'] . ' ' . $newuserid . ' ' . $username;
         $actioncolor = 'success';
         $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
             VALUES (?, ?, ?, NOW())";

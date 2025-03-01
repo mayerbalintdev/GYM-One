@@ -7,7 +7,7 @@ if (!isset($_SESSION['adminuser'])) {
 }
 
 $userid = $_SESSION['adminuser'];
-$logid= $_SESSION['adminuser'];
+$logid = $_SESSION['adminuser'];
 
 function read_env_file($file_path)
 {
@@ -29,12 +29,12 @@ function read_env_file($file_path)
 
 if (isset($_GET['userid'])) {
     $tickerbuyerid = isset($_GET['userid']) ? intval($_GET['userid']) : 0;
-    $ticketid = isset($_GET['ticketid']) ? intval($_GET['ticketid']) : 0;
+    $balance = isset($_GET['balance']) ? intval($_GET['balance']) : 0;
 } else {
     exit;
 }
 
-$env_data = read_env_file('../../../../.env');
+$env_data = read_env_file('../../../../../.env');
 
 $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
@@ -64,7 +64,7 @@ $lang = $lang_code;
 
 $alerts_html = "";
 
-$langDir = __DIR__ . "/../../../../assets/lang/";
+$langDir = __DIR__ . "/../../../../../assets/lang/";
 
 $langFile = $langDir . "$lang.json";
 
@@ -80,7 +80,6 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 $curryear = date("Y");
-
 
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
@@ -113,6 +112,7 @@ if ($result->num_rows > 0) {
     $city = $row["city"];
     $street = $row["street"];
     $house_number = $row["house_number"];
+    $current_balance = $row["profile_balance"];
 }
 
 $stmt->close();
@@ -147,7 +147,7 @@ if (is_null($expire_day) || $expire_day == 0) {
 $modalpayertext = str_replace('{$moneyplaceholder}', $ticketprice, $translations["modalpayertext"]);
 
 
-require_once __DIR__ . '/../../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../../../vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
@@ -167,11 +167,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $clientAddress = $street . ' ' . $hause_no;
     $clientEmail = $email;
 
-    $logoPath = __DIR__ . '/../../../../assets/img/brand/logo.png';
+    $logoPath = __DIR__ . '/../../../../../assets/img/brand/logo.png';
     $logoData = base64_encode(file_get_contents($logoPath));
     $logoSrc = 'data:image/png;base64,' . $logoData;
 
-    $partnerLogoPath = __DIR__ . '/../../../../assets/img/logo.png';
+    $partnerLogoPath = __DIR__ . '/../../../../../assets/img/logo.png';
     $partnerLogoData = base64_encode(file_get_contents($partnerLogoPath));
     $partnerLogoSrc = 'data:image/png;base64,' . $partnerLogoData;
 
@@ -272,13 +272,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>" . $ticketid . "</td>
-                        <td>" . $ticketname . "</td>
-                        <td>" . $ticketprice . "</td>
+                        <td>" . $translations["balanceuploadinvoice"] . "</td>
+                        <td>" . $translations["balanceuploadinvoice"] . "</td>
+                        <td>" . $balance . "</td>
                     </tr>
                     <tr>
                         <td colspan='2' class='text-right'><strong>" . $translations["invoiceamount"] . "</strong></td>
-                        <td><strong>" . $ticketprice . " " . $currency . "</strong></td>
+                        <td><strong>" . $balance . " " . $currency . "</strong></td>
                     </tr>
                 </tbody>
             </table>
@@ -301,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mpdf = new Mpdf();
     $mpdf->WriteHTML($invoiceHtml);
 
-    $invoicePath = __DIR__ . "/../../../../assets/docs/invoices/{$userid}-{$invoiceNumber}.pdf";
+    $invoicePath = __DIR__ . "/../../../../../assets/docs/invoices/{$userid}-{$invoiceNumber}.pdf";
     $mpdf->Output($invoicePath, \Mpdf\Output\Destination::FILE);
 
     $alerts_html .= '<div class="alert alert-success" role="alert">
@@ -313,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $status = "paid";
     $pathinvoicesql = "{$userid}-{$invoiceNumber}.pdf";
-    $stmt->bind_param("isdss", $userid, $fullname, $ticketprice, $status, $pathinvoicesql);
+    $stmt->bind_param("isdss", $userid, $fullname, $balance, $status, $pathinvoicesql);
 
     if ($stmt->execute()) {
         $alerts_html .= '<div class="alert alert-success" role="alert">
@@ -325,27 +325,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
 
-    $sql = "INSERT INTO current_tickets (userid, ticketname, buydate, expiredate, opportunities) 
-        VALUES (?, ?, ?, ?, ?)";
-
+    $sql = "UPDATE users SET profile_balance = profile_balance + ? WHERE userid = ?";
     $stmt = $conn->prepare($sql);
-
-    $stmt->bind_param("isssi", $userid, $ticketname, $date, $expire_date, $occasions);
-
+    $stmt->bind_param("di", $balance, $userid);
     if ($stmt->execute()) {
-        $alerts_html .= '<div class="alert alert-success" role="alert">
-                            ' . $translations["ticketadded"] . '
-                        </div>';
-        $action = $translations['log_ticketbuy'] . ' ID: ' . $tickerbuyerid . ' - ' . $ticketname . ' - ' . $paymentMethod . ' - ' . $userid . '-' . $invoiceNumber . '.pdf';
-        $actioncolor = 'success';
-        $sql = "INSERT INTO logs (userid, action, actioncolor, time) VALUES (?, ?, ?, NOW())";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $logid, $action, $actioncolor);
-        $stmt->execute();
-        header("Location: ../../../dashboard");
+        echo "Egyenleg sikeresen frissítve!";
     } else {
-        echo "Hiba történt: " . $stmt->error;
+        echo "Hiba történt az egyenleg frissítése során: " . $stmt->error;
     }
 
     $stmt->close();
@@ -377,7 +363,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../../../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
 <!-- ApexCharts -->
@@ -579,11 +565,8 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                         <div class="card">
                             <div class="card-body">
                                 <p class="lead"><?= $translations["ticketinfo"]; ?></p>
-                                <p><?php echo $translations["ticketspassname"]; ?>: <b><?= $ticketname; ?></b></p>
-                                <p><?= $translations["price"]; ?>: <B><?= $ticketprice; ?></B> <?= $currency; ?></p>
-                                <p><?= $translations["expiredate"]; ?> <code><b><?= $expire_date; ?></b></code> (<?= $expire_day; ?> <?= $translations["day"]; ?>)</p>
-                                <p><?= $translations["occasions"]; ?>: <b><?= $occasions; ?></b></p>
-
+                                <p><?= $translations["price"]; ?>: <B><?= $balance; ?></B> <?= $currency; ?></p>
+                                <p><?= $translations["newprofilebalance"]; ?> <b><?= $current_balance+$balance; ?> <?= $currency;?></b></p>
                             </div>
                         </div>
                     </div>
@@ -613,7 +596,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                 <div class="modal-body text-center">
                     <h1><?= $translations["payment"]; ?></h1>
                     <p><?= $modalpayertext; ?></p>
-                    <p><?= $translations["invoiceamount"]; ?>: <?php echo $ticketprice; ?> <?php echo $currency; ?></p>
+                    <p><?= $translations["invoiceamount"]; ?>: <?php echo $balance; ?> <?php echo $currency; ?></p>
                     <form method="post">
                         <div class="form">
                             <select id="paymentMethod" name="paymentMethod" class="form-control">

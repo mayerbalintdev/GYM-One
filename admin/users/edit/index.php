@@ -32,6 +32,7 @@ $db_host = $env_data['DB_SERVER'] ?? '';
 $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
+$currency = $env_data['CURRENCY'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -99,6 +100,7 @@ if (isset($_GET['user']) && is_numeric($_GET['user'])) {
     $lastlogin = $row['lastlogin'];
     $verify = $row['confirmed'];
     $lastip = $row['lastip'];
+    $balance =$row['profile_balance'];
   } else {
     echo "The user does not exist!";
     exit;
@@ -139,7 +141,6 @@ if (isset($_POST['save'])) {
 }
 
 if (isset($_POST['delete_user'])) {
-  $useridgymuser = $_POST['userid'];
 
   $sql = "DELETE FROM users WHERE userid = ?";
 
@@ -166,21 +167,29 @@ if (isset($_POST['delete_user'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
-  $useridgymuser = $_POST['userid'];
-
-  $sql = "UPDATE users SET confirmed = 'Yes' WHERE userid = $useridgymuser";
-
-  if ($conn->query($sql) === TRUE) {
-    $alerts_html .= '<div class="alert alert-success" role="alert">
-    ' . $translations["regconfirm"] . '
-</div>';
-    header("Refresh:2");
+  
+  $sql_update = "UPDATE users SET confirmed = 'Yes' WHERE userid = $useridgymuser";
+  
+  if ($conn->query($sql_update) === TRUE) {
+      $alerts_html .= '<div class="alert alert-success" role="alert">' . $translations["regconfirm"] . '</div>';
+      
+      $action = $translations['regconfirm'] . ' ID: ' . $useridgymuser;
+      $actioncolor = 'success';
+      $sql = "INSERT INTO logs (userid, action, actioncolor, time) VALUES (?, ?, ?, NOW())";
+      
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("iss", $userid, $action, $actioncolor);
+      $stmt->execute();
+      
+      header("Refresh:2");
+      exit;
   } else {
-    echo "Error updating record: " . $conn->error;
+      $alerts_html .= '<div class="alert alert-danger" role="alert">Unexpected error: ' . $conn->error . '</div>';
   }
-
+  
   $conn->close();
 }
+
 
 ?>
 
@@ -446,6 +455,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                 <div class="form-group">
                   <label for="lastLoginInput"><?php echo $translations["last-login"]; ?></label>
                   <input type="text" class="form-control" id="lastLoginInput" value="<?php echo $lastlogin; ?>" disabled>
+                </div>
+                <div class="form-group">
+                  <label for="Profile_balance"><?php echo $translations["profilebalance"]; ?></label>
+                  <input type="text" class="form-control" id="Profile_balance" value="<?php echo $balance; ?> <?php echo $currency;?>" disabled>
                 </div>
                 <div class="form-group">
                   <label for="emailVerifiedInput"><?php echo $translations["regconfirm"]; ?></label>

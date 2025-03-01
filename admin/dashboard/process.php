@@ -68,7 +68,6 @@ if ($result && $result->num_rows > 0) {
     $response['birthdate'] = $row['birthdate'];
     $response['gender'] = $row["gender"];
 
-    // A legújabb érvényes jegy keresése
     $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode' ORDER BY expiredate DESC";
     $ticketResult = $conn->query($ticketSql);
 
@@ -116,6 +115,7 @@ if ($result && $result->num_rows > 0) {
 
                 $logUserSql = "INSERT INTO temp_loggeduser (name, userid, login_date, lockerid) VALUES ('{$row['firstname']} {$row['lastname']}', '$qrCode', NOW(), '$randomLocker')";
                 $conn->query($logUserSql);
+                
             } else {
                 $response['assigned_locker'] = $translations["locker_notavilable"]; 
             }

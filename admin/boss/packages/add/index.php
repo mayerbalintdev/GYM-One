@@ -97,6 +97,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    VALUES ('$name', '$description', '$price', '$stock', '$barcode')";
 
     if ($conn->query($insert_sql) === TRUE) {
+        $action = $translations['log_newpackage'] . ' ' . $translations["product-name"] . '' . $name . ' ' . $translations["price"] . ':' . $price . ' ' . $translations["product-barcode"] . ':' . $barcode;
+        $actioncolor = 'success';
+        $sql = "INSERT INTO logs (userid, action, actioncolor, time) VALUES (?, ?, ?, NOW())";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $userid, $action, $actioncolor);
+        $stmt->execute();
         header("Location: ../");
         exit;
     } else {
@@ -150,28 +157,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h2><img src="../../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="sidebar-item active">
-                        <a class="sidebar-link" href="#">
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="../../../dashboard">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../users">
+                        <a class="sidebar-link" href="../../../users">
                             <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../statistics">
+                        <a class="sidebar-link" href="../../../statistics">
                             <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../boss/sell">
+                        <a class="sidebar-link" href="../../../boss/sell">
                             <i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a href="../invoices/" class="sidebar-link">
+                        <a href="../../../invoices" class="sidebar-link">
                             <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
                         </a>
                     </li>
@@ -182,43 +189,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php echo $translations["settings"]; ?>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/mainsettings">
+                            <a class="sidebar-link" href="../../../boss/mainsettings">
                                 <i class="bi bi-gear"></i>
                                 <span><?php echo $translations["businesspage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/workers">
+                            <a class="sidebar-link" href="../../../boss/workers">
                                 <i class="bi bi-people"></i>
                                 <span><?php echo $translations["workers"]; ?></span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/packages">
+                        <li class="sidebar-item active">
+                            <a class="sidebar-link" href="../../../boss/packages">
                                 <i class="bi bi-box-seam"></i>
                                 <span><?php echo $translations["packagepage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/hours">
+                            <a class="sidebar-link" href="../../../boss/hours">
                                 <i class="bi bi-clock"></i>
                                 <span><?php echo $translations["openhourspage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/smtp">
+                            <a class="sidebar-link" href="../../../boss/smtp">
                                 <i class="bi bi-envelope-at"></i>
                                 <span><?php echo $translations["mailpage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/chroom">
+                            <a class="sidebar-link" href="../../../boss/chroom">
                                 <i class="bi bi-duffle"></i>
                                 <span><?php echo $translations["chroompage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../boss/rule">
+                            <a class="sidebar-link" href="../../../boss/rule">
                                 <i class="bi bi-file-ruled"></i>
                                 <span><?php echo $translations["rulepage"]; ?></span>
                             </a>
@@ -235,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["gatewaypage"]; ?></span>
                         </a> -->
-                        <a class="sidebar-ling" href="../shop/tickets">
+                        <a class="sidebar-ling" href="../../../shop/tickets">
                             <i class="bi bi-ticket"></i>
                             <span><?php echo $translations["ticketspage"]; ?></span>
                         </a>
@@ -243,11 +250,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li class="sidebar-header">
                         <?php echo $translations["trainersclass"]; ?>
                     </li>
-                    <li><a class="sidebar-link" href="../trainers/timetable">
+                    <li><a class="sidebar-link" href="../../../trainers/timetable">
                             <i class="bi bi-calendar-event"></i>
                             <span><?php echo $translations["timetable"]; ?></span>
                         </a></li>
-                    <li><a class="sidebar-link" href="../trainers/personal">
+                    <li><a class="sidebar-link" href="../../../trainers/personal">
                             <i class="bi bi-award"></i>
                             <span><?php echo $translations["trainers"]; ?></span>
                         </a></li>
@@ -256,7 +263,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-item">
-                            <a class="sidebar-ling" href="../updater">
+                            <a class="sidebar-ling" href="../../../updater">
                                 <i class="bi bi-cloud-download"></i>
                                 <span><?php echo $translations["updatepage"]; ?></span>
                                 <?php if ($is_new_version_available) : ?>
@@ -270,39 +277,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     ?>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../log">
+                        <a class="sidebar-ling" href="../../../log">
                             <i class="bi bi-clock-history"></i>
                             <span><?php echo $translations["logpage"]; ?></span>
                         </a>
                     </li>
                 </ul><br>
             </div>
+            <br>
             <div class="col-sm-10">
-                <h1 class="text-center mb-4"><?php echo $translations["addpackage"];?></h1>
+                <h1 class="text-center mb-4"><?php echo $translations["addpackage"]; ?></h1>
 
                 <form method="POST">
                     <div class="mb-3">
-                        <label for="name" class="form-label"><?php echo $translations["product-name"];?></label>
+                        <label for="name" class="form-label"><?php echo $translations["product-name"]; ?></label>
                         <input type="text" id="name" name="name" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="description" class="form-label"><?php echo $translations["product-name"];?></label>
+                        <label for="description" class="form-label"><?php echo $translations["description"]; ?>:</label>
                         <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label for="price" class="form-label"><?php echo $translations["price"];?> <code><?php echo $currency;?></code>:</label>
+                        <label for="price" class="form-label"><?php echo $translations["price"]; ?> <code><?php echo $currency; ?></code>:</label>
                         <input type="number" id="price" name="price" class="form-control" step="0.01" required>
                     </div>
                     <div class="mb-3">
-                        <label for="stock" class="form-label"><?php echo $translations["piece"];?>:</label>
+                        <label for="stock" class="form-label"><?php echo $translations["piece"]; ?>:</label>
                         <input type="number" id="stock" name="stock" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="barcode" class="form-label"><?php echo $translations["product-barcode"];?>:</label>
+                        <label for="barcode" class="form-label"><?php echo $translations["product-barcode"]; ?>:</label>
                         <input type="number" id="barcode" name="barcode" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary"><?php echo $translations["add"];?></button>
-                    <a href="../" class="btn btn-secondary"><?php echo $translations["not-yet"];?></a>
+                    <button type="submit" class="btn btn-primary"><?php echo $translations["add"]; ?></button>
+                    <a href="../" class="btn btn-secondary"><?php echo $translations["not-yet"]; ?></a>
                 </form>
             </div>
         </div>

@@ -219,7 +219,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     }
                     ?>
                     <li class="sidebar-header">
-                        <?php echo $translations["shopcategory"];?>
+                        <?php echo $translations["shopcategory"]; ?>
                     </li>
                     <li class="sidebar-item">
                         <!-- <a class="sidebar-ling" href="../shop/gateway">
@@ -304,6 +304,31 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                         <p class="text-center"><?php echo $translations["notickets"]; ?></p>
                     <?php endif; ?>
                 </div>
+                <div class="row text-center justify-content-center">
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo $translations["customaddmoneyheader"]; ?></h5>
+                                <form method="post" action="process_balance.php" class="form-inline">
+                                    <div class="form-group">
+                                        <label for="amount"><?php echo $translations["price"]; ?></label>
+                                        <div class="input-group">
+                                            <input type="text" id="amount" name="amount" class="form-control" placeholder="<?php echo $translations['balancegiveadd']; ?>" required>
+                                            <span class="input-group-addon"><?php echo $currency; ?></span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="userid" name="userid" value="<?php echo $ticketbuyerid; ?>">
+
+                                    <button type="submit" class="btn btn-primary"><?php echo $translations["add"]; ?></button>
+                                </form>
+
+                                <p class="card-text mt-3">
+                                    <code><?php echo $translations["profilebalanceattencion"]; ?></code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -330,4 +355,4 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
     <script src="../../../../assets/js/date-time.js"></script>
 </body>
 
-</html>a
+</html>
