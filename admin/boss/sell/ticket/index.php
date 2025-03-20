@@ -80,6 +80,10 @@ $result = $conn->query($sql);
 
 $stmt->close();
 
+$product_stmt = $conn->prepare("SELECT * FROM products");
+$product_stmt->execute();
+$product_result = $product_stmt->get_result();
+
 $message = "";
 
 $file_path = 'https://api.gymoneglobal.com/latest/version.txt';
@@ -93,6 +97,8 @@ curl_close($ch);
 $current_version = $version;
 
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
+
+
 
 ?>
 
@@ -123,14 +129,40 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href="#"><img src="../../../../assets/img/logo.png" width="50px" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
+                    <li><a href="../../../dashboard"><i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?></a></li>
+                    <li><a href="../../../users"><i class="bi bi-people"></i> <?php echo $translations["users"]; ?></a></li>
+                    <li><a href="../../../statistics"><i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?></a></li>
+                    <li class="active"><a href="../"><i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?></a></li>
+                    <li><a href="../../../invoices"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
+                    <?php if ($is_boss === 1) { ?>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="bi bi-gear"></i> <?php echo $translations["settings"]; ?> <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="../../../boss/mainsettings"><?php echo $translations["businesspage"]; ?></a></li>
+                                <li><a href="../../../boss/workers"><?php echo $translations["workers"]; ?></a></li>
+                                <li><a href="../../../boss/packages"><?php echo $translations["packagepage"]; ?></a></li>
+                                <li><a href="../../../boss/hours"><?php echo $translations["openhourspage"]; ?></a></li>
+                                <li><a href="../../../boss/smtp"><?php echo $translations["mailpage"]; ?></a></li>
+                                <li><a href="../../../boss/chroom"><?php echo $translations["chroompage"]; ?></a></li>
+                                <li><a href="../../../boss/rule"><?php echo $translations["rulepage"]; ?></a></li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <li><a href="../../../shop/tickets"><i class="bi bi-ticket"></i> <?php echo $translations["ticketspage"]; ?></a></li>
+                    <li><a href="../../../trainers/timetable"><i class="bi bi-calendar-event"></i> <?php echo $translations["timetable"]; ?></a></li>
+                    <li><a href="../../../trainers/personal"><i class="bi bi-award"></i> <?php echo $translations["trainers"]; ?></a></li>
+                    <?php if ($is_boss === 1) { ?>
+                        <li><a href="../../../updater"><i class="bi bi-cloud-download"></i> <?php echo $translations["updatepage"]; ?>
+                                <?php if ($is_new_version_available) : ?>
+                                    <span class="badge badge-warning"><i class="bi bi-exclamation-circle"></i></span>
+                                <?php endif; ?>
+                            </a></li>
+                    <?php } ?>
+                    <li><a href="../../../log"><i class="bi bi-clock-history"></i> <?php echo $translations["logpage"]; ?></a></li>
                 </ul>
             </div>
         </div>
@@ -329,30 +361,87 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+                <div class="row">
+                    <div class="col-sm-4 mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="<?= $translations["search"]; ?>..." oninput="searchProducts()">
+                    </div>
 
-    <!-- EXIT MODAL -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
+                    <?php if ($product_result->num_rows > 0): ?>
+                        <form action="cart_process.php" method="post">
+                            <div id="productList">
+                                <?php while ($row = $product_result->fetch_assoc()): ?>
+                                    <div class="col-sm-4 product-item mb-4">
+                                        <div class="card shadow">
+                                            <div class="card-heading">
+                                                <h5 class="card-title"><?php echo htmlspecialchars($row['name']); ?></h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="card-body">
+                                                        <p class="card-text"><?php echo nl2br(htmlspecialchars($row['description'])); ?></p>
+                                                        <p><strong><?= $translations["price"]; ?>:</strong> <?php echo number_format($row['price'], 2, ',', '.'); ?> Ft</p>
+                                                        <p><strong><?= $translations["piece"]; ?>:</strong> <?php echo $row['stock']; ?> db</p>
+                                                        <label for="quantity_<?php echo $row['id']; ?>"><?= $translations["piece"]; ?>:</label>
+                                                        <input type="number" id="quantity_<?php echo $row['id']; ?>" name="quantities[<?php echo $row['id']; ?>]" class="form-control mb-2" min="0" max="<?php echo $row['stock']; ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <img src="../../../../assets/img/packageimg/<?php echo htmlspecialchars($row['barcode']); ?>.png" alt="<?php echo htmlspecialchars($row['name']); ?>" class="img-rounded img-fluid mb-3" style="max-height: 130px; width: auto;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
+                            </div>
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" class="btn btn-success"><?= $translations["next"]; ?></button>
+                            </div>
+                        </form>
+                    <?php else: ?>
+                        <p><?= $translations["packagepage"]; ?></p>
+                    <?php endif; ?>
                 </div>
-                <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../../../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+
+            </div>
+        </div>
+
+        <!-- EXIT MODAL -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="lead"><?php echo $translations["exit-modal"]; ?></p>
+                    </div>
+                    <div class="modal-footer">
+                        <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
+                        <a href="../../../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <?php
-    $conn->close();
-    ?>
-    <!-- SCRIPTS! -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="../../../../assets/js/date-time.js"></script>
+        <?php
+        $conn->close();
+        ?>
+        <!-- SCRIPTS! -->
+        <script>
+            function searchProducts() {
+                var input = document.getElementById("searchInput");
+                var filter = input.value.toLowerCase();
+                var productList = document.getElementById("productList");
+                var products = productList.getElementsByClassName("product-item");
+
+                for (var i = 0; i < products.length; i++) {
+                    var productName = products[i].getElementsByClassName("card-title")[0].innerText;
+                    if (productName.toLowerCase().indexOf(filter) > -1) {
+                        products[i].style.display = "";
+                    } else {
+                        products[i].style.display = "none";
+                    }
+                }
+            }
+        </script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="../../../../assets/js/date-time.js"></script>
 </body>
 
 </html>

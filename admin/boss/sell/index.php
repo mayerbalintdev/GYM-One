@@ -123,14 +123,40 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#"><img src="../../assets/img/logo.png" width="105px" alt="Logo"></a>
+                <a class="navbar-brand" href="#"><img src="../../../assets/img/logo.png" width="50px" alt="Logo"></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#"><?php echo $translations["mainpage"]; ?></a></li>
-                    <li><a href="#">Age</a></li>
-                    <li><a href="#">Gender</a></li>
-                    <li><a href="#">Geo</a></li>
+                    <li><a href="../../dashboard"><i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?></a></li>
+                    <li><a href="../../users"><i class="bi bi-people"></i> <?php echo $translations["users"]; ?></a></li>
+                    <li><a href="../../statistics"><i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?></a></li>
+                    <li class="active"><a href="#"><i class="bi bi-shop"></i> <?php echo $translations["sellpage"]; ?></a></li>
+                    <li><a href="../../invoices"><i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?></a></li>
+                    <?php if ($is_boss === 1) { ?>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="bi bi-gear"></i> <?php echo $translations["settings"]; ?> <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="../../boss/mainsettings"><?php echo $translations["businesspage"]; ?></a></li>
+                                <li><a href="../../boss/workers"><?php echo $translations["workers"]; ?></a></li>
+                                <li><a href="../../boss/packages"><?php echo $translations["packagepage"]; ?></a></li>
+                                <li><a href="../../boss/hours"><?php echo $translations["openhourspage"]; ?></a></li>
+                                <li><a href="../../boss/smtp"><?php echo $translations["mailpage"]; ?></a></li>
+                                <li><a href="../../boss/chroom"><?php echo $translations["chroompage"]; ?></a></li>
+                                <li><a href="../../boss/rule"><?php echo $translations["rulepage"]; ?></a></li>
+                            </ul>
+                        </li>
+                    <?php } ?>
+                    <li><a href="../../shop/tickets"><i class="bi bi-ticket"></i> <?php echo $translations["ticketspage"]; ?></a></li>
+                    <li><a href="../../trainers/timetable"><i class="bi bi-calendar-event"></i> <?php echo $translations["timetable"]; ?></a></li>
+                    <li><a href="../../trainers/personal"><i class="bi bi-award"></i> <?php echo $translations["trainers"]; ?></a></li>
+                    <?php if ($is_boss === 1) { ?>
+                        <li><a href="../../updater"><i class="bi bi-cloud-download"></i> <?php echo $translations["updatepage"]; ?>
+                                <?php if ($is_new_version_available) : ?>
+                                    <span class="badge badge-warning"><i class="bi bi-exclamation-circle"></i></span>
+                                <?php endif; ?>
+                            </a></li>
+                    <?php } ?>
+                    <li><a href="../../log"><i class="bi bi-clock-history"></i> <?php echo $translations["logpage"]; ?></a></li>
                 </ul>
             </div>
         </div>
