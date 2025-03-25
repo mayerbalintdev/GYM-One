@@ -349,7 +349,7 @@ $conn->close();
                         </a> -->
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../../boss/sell">
+                        <a class="sidebar-link" href="../../shop/tickets">
                             <i class="bi bi-ticket"></i>
                             <span><?php echo $translations["ticketspage"]; ?></span>
                         </a>
@@ -560,7 +560,7 @@ $conn->close();
                     <div class="modal-footer">
                         <a type="button" class="btn btn-secondary"
                             data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                        <a href="../logout.php" type="button"
+                        <a href="../../logout.php" type="button"
                             class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                     </div>
                 </div>

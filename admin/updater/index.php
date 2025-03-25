@@ -330,7 +330,7 @@ $conn->close();
                                     <h2><?php echo $translations["thisislatest"]; ?></h2>
                                     <p>
                                         <?php echo $translations["latest-text"]; ?> -
-                                        <a class="blacka" href="https://github.com/mayerbalintdev/GYM-One/releases/">
+                                        <a class="blacka" target="_blank" href="https://github.com/mayerbalintdev/GYM-One/releases/">
                                             <?php echo $translations["changelog"]; ?>
                                         </a>
                                         <code><?php echo $latest_version; ?></code>

@@ -160,7 +160,7 @@ $conn->close();
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <body>
-<nav class="navbar navbar-inverse visible-xs">
+    <nav class="navbar navbar-inverse visible-xs">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -366,37 +366,38 @@ $conn->close();
                         <?php echo $alerts_html; ?>
                         <div class="card shadow">
                             <div class="card-body">
-
                                 <?php
                                 if ($is_boss == 1) {
                                 ?>
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col"><?php echo $translations["firstname"]; ?></th>
-                                                <th scope="col"><?php echo $translations["lastname"]; ?></th>
-                                                <th scope="col"><?php echo $translations["username"]; ?></th>
-                                                <th scope="col"><?php echo $translations["position"]; ?></th>
-                                                <th scope="col"><?php echo $translations["action"]; ?></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            if ($result->num_rows > 0) {
-                                                while ($row = $result->fetch_assoc()) {
-                                                    echo "<tr>
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col"><?php echo $translations["firstname"]; ?></th>
+                                                    <th scope="col"><?php echo $translations["lastname"]; ?></th>
+                                                    <th scope="col"><?php echo $translations["username"]; ?></th>
+                                                    <th scope="col"><?php echo $translations["position"]; ?></th>
+                                                    <th scope="col"><?php echo $translations["action"]; ?></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                if ($result->num_rows > 0) {
+                                                    while ($row = $result->fetch_assoc()) {
+                                                        echo "<tr>
                                 <td>{$row["Firstname"]}</td>
                                 <td>{$row["Lastname"]}</td>
                                 <td>{$row["username"]}</td>
                                 <td>";
 
-                                                    if ($row["is_boss"] == 1) {
-                                                        echo $translations["boss"];
-                                                    } else {
-                                                        echo $translations["worker"];
-                                                    }
+                                                        if ($row["is_boss"] == 1) {
+                                                            echo $translations["boss"];
+                                                        } else {
+                                                            echo $translations["worker"];
+                                                        }
 
-                                                    echo "</td>
+                                                        echo "</td>
                                 <td>
                                     <form method='post' style='display: inline;'>
                                         <input type='hidden' name='userid' value='{$row["userid"]}'>
@@ -404,20 +405,20 @@ $conn->close();
                                     </form>
                                 </td>
                               </tr>";
+                                                    }
+                                                } else {
+                                                    echo "<tr><td colspan='5'>Users do not exist!</td></tr>";
                                                 }
-                                            } else {
-                                                echo "<tr><td colspan='5'>Users do not exist!</td></tr>";
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 <?php
                                 } else {
                                     echo $translations["dont-access"];
                                 }
 
                                 ?>
-
                             </div>
                         </div>
                         <div class="row">

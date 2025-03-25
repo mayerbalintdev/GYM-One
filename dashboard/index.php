@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 if (!isset($_SESSION['userid'])) {
@@ -87,19 +88,26 @@ while ($row = $result->fetch_assoc()) {
 $stmt->close();
 
 $currentDate = new DateTime();
-$expireDate = new DateTime($expiredate);
-$interval = $currentDate->diff($expireDate);
-$daysRemaining = $interval->days;
-if ($expireDate < $currentDate) {
-    $daysRemaining = "-";
-} else {
+
+if (!empty($expiredate) && strtotime($expiredate) !== false) {
+    $expireDate = new DateTime($expiredate);
     $interval = $currentDate->diff($expireDate);
     $daysRemaining = $interval->days;
 
-    if ($expireDate >= $currentDate) {
-        $daysRemaining++;
+    if ($expireDate < $currentDate) {
+        $daysRemaining = "-";
+    } else {
+        $interval = $currentDate->diff($expireDate);
+        $daysRemaining = $interval->days;
+
+        if ($expireDate >= $currentDate) {
+            $daysRemaining++;
+        }
     }
+} else {
+    $daysRemaining = "-";
 }
+
 
 $sql_latest_training = "SELECT workout_date FROM workout_stats WHERE userid = $userid ORDER BY workout_date DESC LIMIT 1";
 $result_latest_training = $conn->query($sql_latest_training);

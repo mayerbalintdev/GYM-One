@@ -76,6 +76,7 @@
     "faqrewritesolution": "Edit the Apache2 configuration (by default in <code>/etc/apache2/sites-available/000-default.conf</code>) and add these lines to the <code>'VirtualHost'</code> tags:",
     "faquploadsize": "When uploading an image, the file was not uploaded",
     "profileimg": "Profile Picture",
+    "log_delete_trainer": "Edző sikeresen törölve!",
     "faquploadsizeheader": "The problem occurs when you upload an image larger than the maximum size allowed by PHP (2 MB by default).",
     "faquploadsizeheadertwo": "In the PHP configuration (in the <code>php.ini</code> file), you can change the maximum size allowed when uploading by changing the following values:",
     "faquploadsizereduce": "It is strongly recommended that you do not change it, as large images can increase the load time of your site and affect search engine optimization. Instead, it is recommended to reduce the image size (below 1 MB).",

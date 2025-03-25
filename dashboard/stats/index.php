@@ -212,7 +212,7 @@ $conn->close();
                             <div class="card-body text-start">
                                 <div class="row">
                                     <div class="col-xs-10 text-start">
-                                        <h4 class="card-title fw-semibold"><?php echo $translations["averagetraintime"]; ?>:</h4>
+                                        <h4 class="card-title fw-semibold"><?php echo $translations["averagetraintime"]; ?></h4>
                                     </div>
                                     <div class="col-auto">
                                         <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">

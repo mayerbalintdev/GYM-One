@@ -84,23 +84,40 @@ $result = $conn->query($sql);
 
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    $sql = "DELETE FROM lockers WHERE id=$id";
-    if ($conn->query($sql) === TRUE) {
-        $alerts_html .= '<div class="alert alert-success" role="alert">
-                            ' . $translations["success-delete-locker"] . '
-                        </div>';
-        $action = $translations['success-delete-locker'] . ' ' . $id;
-        $actioncolor = 'warning';
-        $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
+    
+    // Lekérdezzük a lockernum értékét az id alapján
+    $sql = "SELECT lockernum FROM lockers WHERE id=$id";
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $lockernum = $row['lockernum'];
+        
+        // Törlés végrehajtása
+        $sql = "DELETE FROM lockers WHERE id=$id";
+        if ($conn->query($sql) === TRUE) {
+            $alerts_html .= '<div class="alert alert-success" role="alert">
+                                ' . $translations["success-delete-locker"] . '
+                            </div>';
+            $action = $translations['success-delete-locker'] . ' ' . $lockernum;
+            $actioncolor = 'warning';
+            
+            // Log rögzítése
+            $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
                             VALUES (?, ?, ?, NOW())";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $userid, $action, $actioncolor);
-        $stmt->execute();
-        header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iss", $userid, $action, $actioncolor);
+            $stmt->execute();
+            
+            header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
+        } else {
+            $alerts_html .= "Error: " . $conn->error;
+        }
     } else {
-        $alerts_html .= "Error: " . $conn->error;
+        $alerts_html .= "Error: Locker not found.";
     }
 }
+
 
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);

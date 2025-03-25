@@ -6,6 +6,7 @@ if (!isset($_SESSION['adminuser'])) {
     exit();
 }
 
+
 $userid = $_SESSION['adminuser'];
 
 function read_env_file($file_path)
@@ -33,14 +34,28 @@ $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
 
+$business_name = $env_data['BUSINESS_NAME'] ?? '';
+$lang_code = $env_data['LANG_CODE'] ?? '';
+$version = $env_data["APP_VERSION"] ?? '';
+$capacity = $env_data["CAPACITY"] ?? '';
+
+$lang = $lang_code;
+
+$langDir = __DIR__ . "/../../../../assets/lang/";
+
+$langFile = $langDir . "$lang.json";
+
+if (!file_exists($langFile)) {
+    die("A nyelvi fájl nem található: $langFile");
+}
+
+$translations = json_decode(file_get_contents($langFile), true);
+
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
-
-$translations = json_decode(file_get_contents(__DIR__ . "/../../../../assets/lang/" . ($env_data['LANG_CODE'] ?? 'en') . ".json"), true);
-
 if (!isset($_GET['id'])) {
     header("Location: ../");
     exit();
@@ -77,8 +92,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $trainer_id);
 
 if ($stmt->execute()) {
-    // Log az adatbázisba
-    $action = $translations["delete-trainer-log"];
+    $action = $translations["log_delete_trainer"]  . ' ID: ' . $trainer_id;
     $actioncolor = 'danger';
     $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
             VALUES (?, ?, ?, NOW())";
