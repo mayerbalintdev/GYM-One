@@ -133,7 +133,6 @@ $conn->close();
                     <div class="mt-3"></div>
                     <button type="submit" class="btn btn-primary"><?php echo $translations["login"]; ?></button>
                 </form>
-
             </div>
         </div>
     </div>

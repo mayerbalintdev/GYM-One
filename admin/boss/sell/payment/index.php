@@ -113,6 +113,7 @@ if ($result->num_rows > 0) {
     $city = $row["city"];
     $street = $row["street"];
     $house_number = $row["house_number"];
+    $profile_balance_odd = $row["profile_balance"];
 }
 
 $stmt->close();
@@ -153,12 +154,54 @@ use Mpdf\Mpdf;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $paymentMethod = $_POST['paymentMethod'] ?? '';
+    $date = date('Y-m-d');
+    $amount = $ticketprice;
+    $method = $paymentMethod;
+
+    if ($paymentmethod !== 'profile') {
+        $field = ($method === 'card') ? 'bank_card' : 'cash';
+
+        $sql = "SELECT id FROM revenu_stats WHERE date = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $date);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+
+            $updateSql = "UPDATE revenu_stats SET $field = $field + ? WHERE id = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bind_param("di", $amount, $row['id']);
+            $updateStmt->execute();
+            $updateStmt->close();
+        } else {
+            $insertSql = "INSERT INTO revenu_stats (date, bank_card, cash) VALUES (?, ?, ?)";
+            $insertStmt = $conn->prepare($insertSql);
+
+            $bank_card = ($method === 'card') ? $amount : 0;
+            $cash = ($method === 'cash') ? $amount : 0;
+
+            $insertStmt->bind_param("sdd", $date, $bank_card, $cash);
+            $insertStmt->execute();
+            $insertId = $insertStmt->insert_id;
+            $insertStmt->close();
+        }
+    }
+
+    $userid = $tickerbuyerid;
     if ($paymentMethod == 'cash') {
         $paymentMethod = $translations["cash"];
     } elseif ($paymentMethod == 'card') {
         $paymentMethod = $translations["card"];
+    } elseif ($paymentMethod == 'profile') {
+        $sql = "UPDATE users SET profile_balance = profile_balance - ? WHERE userid = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("di", $ticketprice, $tickerbuyerid);
+        $stmt->execute();
+        $paymentMethod = $translations["profilebalancepay"];
     }
-    $userid = $tickerbuyerid;
+
     $invoiceNumber = bin2hex(random_bytes(8));
     $date = date('Y-m-d');
     $dueDate = $expire_date;
@@ -255,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
                         <td>" .
-        ($paymentMethod == 'cash' ? $translations["cash"] : $translations["card"]) .
+        ($method == 'profile' ? $translations["profilebalancepay"] : ($paymentMethod == 'cash' ? $translations["cash"] : $translations["card"])) .
         "</td>
                         <td>$date</td>
                     </tr>
@@ -645,6 +688,10 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
                                 <option selected value="cash"><?= $translations["cash"]; ?></option>
                                 <option value="card"><?= $translations["card"]; ?></option>
+                                <?php if ($profile_balance_odd > $ticketprice): ?>
+                                    <option value="profile"><?= $translations["profilebalancepay"]; ?></option>
+                                <?php endif; ?>
+
                             </select>
                         </div>
                         <button type="submit" class="btn btn-success mt-3"><?= $translations["next"]; ?></button>

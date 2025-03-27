@@ -71,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $gkey_env = $_POST['gkey'] ?? '';
         $capacity_env = $_POST["capacity"] ?? '';
         $phoneno_env = $_POST["phone_no"] ?? '';
+        $about = $_POST['about'] ?? '';
 
         $env_data["BUSINESS_NAME"] = $business_name;
         $env_data['STREET'] = $street_env;
@@ -84,6 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $env_data['GOOGLE_KEY'] = $gkey_env;
         $env_data["CAPACITY"] = $capacity_env;
         $env_data["PHONE_NO"] = $phoneno_env;
+        $env_data["ABOUT"] = $about;
 
         $env_content = '';
         foreach ($env_data as $key => $value) {
@@ -471,6 +473,12 @@ $conn->close();
                                                     <input type="text" class="form-control" id="gkey" name="gkey"
                                                         value="<?= htmlspecialchars($env_data['GOOGLE_KEY'] ?? '') ?>">
                                                     <small><?php echo $translations["googlekeyonly"]; ?></small>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="form-group col-sm-12">
+                                                    <label for="about"><?php echo $translations["aboutdesc"]; ?>:</label>
+                                                    <textarea class="form-control" id="about" name="about" rows="3"><?= htmlspecialchars($env_data['ABOUT'] ?? '') ?></textarea>
                                                 </div>
                                             </div>
 

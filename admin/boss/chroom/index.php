@@ -85,7 +85,6 @@ $result = $conn->query($sql);
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     
-    // Lekérdezzük a lockernum értékét az id alapján
     $sql = "SELECT lockernum FROM lockers WHERE id=$id";
     $result = $conn->query($sql);
     
@@ -93,7 +92,6 @@ if (isset($_GET['delete'])) {
         $row = $result->fetch_assoc();
         $lockernum = $row['lockernum'];
         
-        // Törlés végrehajtása
         $sql = "DELETE FROM lockers WHERE id=$id";
         if ($conn->query($sql) === TRUE) {
             $alerts_html .= '<div class="alert alert-success" role="alert">
@@ -102,7 +100,6 @@ if (isset($_GET['delete'])) {
             $action = $translations['success-delete-locker'] . ' ' . $lockernum;
             $actioncolor = 'warning';
             
-            // Log rögzítése
             $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
                             VALUES (?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);

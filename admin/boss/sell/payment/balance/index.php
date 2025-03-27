@@ -153,6 +153,38 @@ use Mpdf\Mpdf;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $paymentMethod = $_POST['paymentMethod'] ?? '';
+    $date = date('Y-m-d');
+    $amount = $balance;
+    $method = $paymentMethod;
+
+    $field = ($method === 'card') ? 'bank_card' : 'cash';
+
+    $sql = "SELECT id FROM revenu_stats WHERE date = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $date);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+
+        $updateSql = "UPDATE revenu_stats SET $field = $field + ? WHERE id = ?";
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->bind_param("di", $amount, $row['id']);
+        $updateStmt->execute();
+        $updateStmt->close();
+    } else {
+        $insertSql = "INSERT INTO revenu_stats (date, bank_card, cash) VALUES (?, ?, ?)";
+        $insertStmt = $conn->prepare($insertSql);
+
+        $bank_card = ($method === 'card') ? $amount : 0;
+        $cash = ($method === 'cash') ? $amount : 0;
+
+        $insertStmt->bind_param("sdd", $date, $bank_card, $cash);
+        $insertStmt->execute();
+        $insertId = $insertStmt->insert_id;
+        $insertStmt->close();
+    }
     if ($paymentMethod == 'cash') {
         $paymentMethod = $translations["cash"];
     } elseif ($paymentMethod == 'card') {
@@ -422,21 +454,21 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
     <div class="container-fluid">
         <div class="row content">
             <div class="col-sm-2 sidenav hidden-xs text-center">
-                <h2><img src="../../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
+                <h2><img src="../../../../../assets/img/logo.png" width="105px" alt="Logo"></h2>
                 <p class="lead mb-4 fs-4"><?php echo $business_name ?> - <?php echo $version; ?></p>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../../../dashboard/">
+                        <a class="sidebar-link" href="../../../../dashboard/">
                             <i class="bi bi-speedometer"></i> <?php echo $translations["mainpage"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../../../users/">
+                        <a class="sidebar-link" href="../../../../users/">
                             <i class="bi bi-people"></i> <?php echo $translations["users"]; ?>
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="../../../statistics">
+                        <a class="sidebar-link" href="../../../../statistics">
                             <i class="bi bi-bar-chart"></i> <?php echo $translations["statspage"]; ?>
                         </a>
                     </li>
@@ -446,7 +478,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a href="../../../invoices/" class="sidebar-link">
+                        <a href="../../../../invoices/" class="sidebar-link">
                             <i class="bi bi-receipt"></i> <?php echo $translations["invoicepage"]; ?>
                         </a>
                     </li>
@@ -457,43 +489,43 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                             <?php echo $translations["settings"]; ?>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/mainsettings">
+                            <a class="sidebar-link" href="../../../../boss/mainsettings">
                                 <i class="bi bi-gear"></i>
                                 <span><?php echo $translations["businesspage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/workers">
+                            <a class="sidebar-link" href="../../../../boss/workers">
                                 <i class="bi bi-people"></i>
                                 <span><?php echo $translations["workers"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/packages">
+                            <a class="sidebar-link" href="../../../../boss/packages">
                                 <i class="bi bi-box-seam"></i>
                                 <span><?php echo $translations["packagepage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/hours">
+                            <a class="sidebar-link" href="../../../../boss/hours">
                                 <i class="bi bi-clock"></i>
                                 <span><?php echo $translations["openhourspage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/smtp">
+                            <a class="sidebar-link" href="../../../../boss/smtp">
                                 <i class="bi bi-envelope-at"></i>
                                 <span><?php echo $translations["mailpage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/chroom">
+                            <a class="sidebar-link" href="../../../../boss/chroom">
                                 <i class="bi bi-duffle"></i>
                                 <span><?php echo $translations["chroompage"]; ?></span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="../../../boss/rule">
+                            <a class="sidebar-link" href="../../../../boss/rule">
                                 <i class="bi bi-file-ruled"></i>
                                 <span><?php echo $translations["rulepage"]; ?></span>
                             </a>
@@ -509,7 +541,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                             <i class="bi bi-shield-lock"></i>
                             <span><?php echo $translations["gatewaypage"]; ?></span>
                         </a> -->
-                        <a class="sidebar-ling" href="../../../shop/tickets">
+                        <a class="sidebar-ling" href="../../../../shop/tickets">
                             <i class="bi bi-ticket"></i>
                             <span><?php echo $translations["ticketspage"]; ?></span>
                         </a>
@@ -517,11 +549,11 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     <li class="sidebar-header">
                         <?php echo $translations["trainersclass"]; ?>
                     </li>
-                    <li><a class="sidebar-link" href="../../../trainers/timetable">
+                    <li><a class="sidebar-link" href="../../../../trainers/timetable">
                             <i class="bi bi-calendar-event"></i>
                             <span><?php echo $translations["timetable"]; ?></span>
                         </a></li>
-                    <li><a class="sidebar-link" href="../../../trainers/personal">
+                    <li><a class="sidebar-link" href="../../../../trainers/personal">
                             <i class="bi bi-award"></i>
                             <span><?php echo $translations["trainers"]; ?></span>
                         </a></li>
@@ -530,7 +562,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     if ($is_boss === 1) {
                     ?>
                         <li class="sidebar-item">
-                            <a class="sidebar-ling" href="../../../updater">
+                            <a class="sidebar-ling" href="../../../../updater">
                                 <i class="bi bi-cloud-download"></i>
                                 <span><?php echo $translations["updatepage"]; ?></span>
                                 <?php if ($is_new_version_available) : ?>
@@ -544,7 +576,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     }
                     ?>
                     <li class="sidebar-item">
-                        <a class="sidebar-ling" href="../../../log">
+                        <a class="sidebar-ling" href="../../../../log">
                             <i class="bi bi-clock-history"></i>
                             <span><?php echo $translations["logpage"]; ?></span>
                         </a>

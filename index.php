@@ -31,6 +31,7 @@ $description = $env_data['DESCRIPTION'] ?? '';
 $metakey = $env_data['META_KEY'] ?? '';
 $gkey = $env_data['GOOGLE_KEY'] ?? '';
 $capacity = $env_data['CAPACITY'] ?? '';
+$about_us = $env_data['ABOUT'] ??'';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -177,8 +178,8 @@ if ($capacityPercent >= 0 && $capacityPercent < 70) {
         </div>
         <div class="row text-center justify-content-center">
             <div class="col-sm-6">
-                <h1>Rólunk</h1>
-                <p>CMSTEXT</p>
+                <h1><?php echo $translations["about-us"];?></h1>
+                <p><?php echo $about_us;?></p>
             </div>
             <div class="status-bar mt-3" id="statusBar">
                 <h2><?php echo $translations["capacitytext"]; ?></h2>

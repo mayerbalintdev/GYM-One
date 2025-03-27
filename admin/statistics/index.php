@@ -674,10 +674,10 @@ $conn->close();
                 fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
 
                 toolbar: {
-                    show: false // Eltávolítja az eszköztárat (nincs nyomtatás/exportálás)
+                    show: false 
                 },
                 zoom: {
-                    enabled: false // Letiltja a zoomolást
+                    enabled: false 
                 }
             },
             colors: ['#59F8E4', '#FB7B18'],

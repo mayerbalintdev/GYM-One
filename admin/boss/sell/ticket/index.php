@@ -62,6 +62,10 @@ if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
+$sql = "DELETE FROM temp_cart";
+
+$conn->query($sql);
+
 $sql = "SELECT is_boss FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
@@ -379,7 +383,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                                 <div class="col-md-8">
                                                     <div class="card-body">
                                                         <p class="card-text"><?php echo nl2br(htmlspecialchars($row['description'])); ?></p>
-                                                        <p><strong><?= $translations["price"]; ?>:</strong> <?php echo number_format($row['price'], 2, ',', '.'); ?> Ft</p>
+                                                        <p><strong><?= $translations["price"]; ?>:</strong> <?php echo number_format($row['price'], 2, ',', '.'); ?> <?php echo $currency; ?></p>
                                                         <p><strong><?= $translations["piece"]; ?>:</strong> <?php echo $row['stock']; ?> db</p>
                                                         <label for="quantity_<?php echo $row['id']; ?>"><?= $translations["piece"]; ?>:</label>
                                                         <input type="number" id="quantity_<?php echo $row['id']; ?>" name="quantities[<?php echo $row['id']; ?>]" class="form-control mb-2" min="0" max="<?php echo $row['stock']; ?>">
@@ -394,6 +398,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                 <?php endwhile; ?>
                             </div>
                             <div class="col-sm-12 text-center">
+                                <input type="hidden" id="userid" name="userid" value="<?php echo $ticketbuyerid; ?>">
                                 <button type="submit" class="btn btn-success"><?= $translations["next"]; ?></button>
                             </div>
                         </form>

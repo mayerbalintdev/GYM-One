@@ -1,31 +1,76 @@
 <?php
-// Indítjuk a session-t, hogy tárolhassuk a kosár tartalmát
 session_start();
 
-// Ha még nincs kosár, hozzuk létre
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
+function read_env_file($file_path)
+{
+    $env_file = file_get_contents($file_path);
+    $env_lines = explode("\n", $env_file);
+    $env_data = [];
 
-// Ellenőrizzük, hogy a form elküldésre került-e
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['quantities'])) {
-    // Bejárjuk a választott mennyiségeket
-    foreach ($_POST['quantities'] as $product_id => $quantity) {
-        // Ha a mennyiség nagyobb, mint 0 és a termék érvényes, adjuk hozzá a kosárhoz
-        if ($quantity > 0) {
-            // Ellenőrizzük, hogy már szerepel-e a termék a kosárban
-            if (isset($_SESSION['cart'][$product_id])) {
-                // Ha már benne van, frissítjük a mennyiséget
-                $_SESSION['cart'][$product_id] += $quantity;
-            } else {
-                // Ha még nincs, hozzáadjuk újként
-                $_SESSION['cart'][$product_id] = $quantity;
-            }
+    foreach ($env_lines as $line) {
+        $line_parts = explode('=', $line);
+        if (count($line_parts) == 2) {
+            $key = trim($line_parts[0]);
+            $value = trim($line_parts[1]);
+            $env_data[$key] = $value;
         }
     }
+
+    return $env_data;
 }
 
-// Átirányítjuk a felhasználót a kosár oldalra
-header('Location: ../payment/item/index.php');
-exit();
+if (isset($_GET['userid'])) {
+    $ticketbuyerid = htmlspecialchars($_GET['userid']);
+} else {
+    $ticketbuyerid = 'N/A';
+}
+
+$env_data = read_env_file('../../../../.env');
+
+$db_host = $env_data['DB_SERVER'] ?? '';
+$db_username = $env_data['DB_USERNAME'] ?? '';
+$db_password = $env_data['DB_PASSWORD'] ?? '';
+$db_name = $env_data['DB_NAME'] ?? '';
+$currency = $env_data['CURRENCY'] ?? '';
+
+$business_name = $env_data['BUSINESS_NAME'] ?? '';
+$lang_code = $env_data['LANG_CODE'] ?? '';
+$version = $env_data["APP_VERSION"] ?? '';
+
+$lang = $lang_code;
+
+$langDir = __DIR__ . "/../../../../assets/lang/";
+
+$langFile = $langDir . "$lang.json";
+
+if (!file_exists($langFile)) {
+    die("A nyelvi fájl nem található: $langFile");
+}
+
+$translations = json_decode(file_get_contents($langFile), true);
+
+$conn = new mysqli($db_host, $db_username, $db_password, $db_name);
+
+if ($conn->connect_error) {
+    die("Kapcsolódási hiba: " . $conn->connect_error);
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['quantities'])) {
+        $userid = $_POST['userid'];
+        $quantities = $_POST['quantities'];
+
+        $stmt = $conn->prepare("INSERT INTO temp_cart (product_id, quantity) VALUES (?, ?)");
+
+        foreach ($quantities as $product_id => $quantity) {
+            if ($quantity > 0) {
+                $stmt->bind_param("ii", $product_id, $quantity);
+                $stmt->execute();
+            }
+        }
+
+        header("Location: ../payment/item/index.php?userid=$userid");
+        exit;
+    }
+}
 ?>
