@@ -117,6 +117,8 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 
+$total = 0;
+
 $sql = "SELECT firstname, lastname FROM workers WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $_SESSION['adminuser']);
@@ -148,6 +150,16 @@ $sql = "SELECT p.name, p.description, p.price, c.quantity, c.id AS cart_id FROM 
 $result = $conn->query($sql);
 
 
+$total = 0;
+$data = [];
+
+while ($row = $result->fetch_assoc()) {
+    $subtotal = $row['price'] * $row['quantity'];
+    $total += $subtotal;
+    $data[] = $row + ['subtotal' => $subtotal];
+}
+
+
 
 $modalpayertext = str_replace('{$moneyplaceholder}', $total, $translations["modalpayertext"]);
 
@@ -156,13 +168,13 @@ require_once __DIR__ . '/../../../../../vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) {
     $paymentMethod = $_POST['paymentMethod'] ?? '';
     $date = date('Y-m-d');
-    $amount = $ticketprice;
+    $amount = floatval($total);
     $method = $paymentMethod;
 
-    if ($paymentmethod !== 'profile') {
+    if ($paymentMethod !== 'profile') {
         $field = ($method === 'card') ? 'bank_card' : 'cash';
 
         $sql = "SELECT id FROM revenu_stats WHERE date = ?";
@@ -201,14 +213,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($paymentMethod == 'profile') {
         $sql = "UPDATE users SET profile_balance = profile_balance - ? WHERE userid = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("di", $ticketprice, $tickerbuyerid);
+        $stmt->bind_param("di", $total, $tickerbuyerid);
         $stmt->execute();
         $paymentMethod = $translations["profilebalancepay"];
     }
 
+    $cart_items_sql = "SELECT product_id, quantity FROM temp_cart";
+    $cart_result = $conn->query($cart_items_sql);
+
+    while ($cart_item = $cart_result->fetch_assoc()) {
+        $product_id = $cart_item['product_id'];
+        $quantity = $cart_item['quantity'];
+
+        $check_stock_sql = "SELECT stock FROM products WHERE id = ?";
+        $check_stmt = $conn->prepare($check_stock_sql);
+        $check_stmt->bind_param("i", $product_id);
+        $check_stmt->execute();
+        $check_stmt->bind_result($current_stock);
+        $check_stmt->fetch();
+        $check_stmt->close();
+
+
+        $update_stock_sql = "UPDATE products SET stock = stock - ? WHERE id = ?";
+        $update_stmt = $conn->prepare($update_stock_sql);
+        $update_stmt->bind_param("ii", $quantity, $product_id);
+
+        if (!$update_stmt->execute()) {
+            die("Hiba történt a készlet frissítésekor (Termék ID: $product_id)");
+        }
+        $update_stmt->close();
+    }
+
+    $clear_cart_sql = "DELETE FROM temp_cart";
+    if (!$conn->query($clear_cart_sql)) {
+        error_log("Hiba történt a kosár ürítésekor: " . $conn->error);
+    }
+    header("Location: ../../../../dashboard");
+
     $invoiceNumber = bin2hex(random_bytes(8));
     $date = date('Y-m-d');
-    $dueDate = $expire_date;
     $clientName = $firstname . ' ' . $lastname;
     $clientCity = $city;
     $clientAddress = $street . ' ' . $hause_no;
@@ -288,8 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>&emsp;$clientCity</p>
                 <p>&emsp;$clientAddress</p>
                 <p>&emsp;$clientEmail</p>
-            </div>
-            <hr class='hr' />
+            </div><hr class='hr' />
             <table class='table'>
                 <thead>
                     <tr>
@@ -301,34 +343,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <tbody>
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
-                        <td>" .
-        ($paymentMethod == 'cash' ? $translations["cash"] : $translations["card"]) .
+                        <td>" . $paymentMethod .
         "</td>
                         <td>$date</td>
                     </tr>
                 </tbody>
             </table>
             <hr class='hr' />
+
             <table class='table'>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>" . $translations["invoicedescription"] . "</th>
                         <th>" . $translations["unitprice"] . "</th>
+                        <th>" . $translations["piece"] . "</th>
+                        <th>" . $translations["price"] . "</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody>";
+
+    $totalAmount = 0;
+
+    if ($result->num_rows > 0) {
+        foreach ($data as $row) {
+            $quantity = $row['quantity'];
+            $unitPrice = $row['price'];
+            $totalPrice = $quantity * $unitPrice;
+            $totalAmount += $totalPrice;
+
+            $invoiceHtml .= "
+                        <tr>
+                            <td>" . htmlspecialchars($row['name']) . "</td>
+                            <td>" . htmlspecialchars($row['description']) . "</td>
+                            <td>" . number_format($unitPrice, 2, '.', ' ') . " " . $currency . "</td>
+                            <td>" . $quantity . "</td>
+                            <td>" . number_format($totalPrice, 2, '.', ' ') . " " . $currency . "</td>
+                        </tr>";
+        }
+    }
+
+    $invoiceHtml .= "
                     <tr>
-                        <td>" . $translations["balanceuploadinvoice"] . "</td>
-                        <td>" . $translations["balanceuploadinvoice"] . "</td>
-                        <td>" . $balance . "</td>
-                    </tr>
-                    <tr>
-                        <td colspan='2' class='text-right'><strong>" . $translations["invoiceamount"] . "</strong></td>
-                        <td><strong>" . $balance . " " . $currency . "</strong></td>
+                        <td colspan='4' class='text-right'><strong>" . $translations["invoiceamount"] . "</strong></td>
+                        <td><strong>" . number_format($totalAmount, 2, '.', ' ') . " " . $currency . "</strong></td>
                     </tr>
                 </tbody>
             </table>
+
             <!-- Lábléc -->
             <table class='row' style='margin-top: 20px;'>
                 <tr>
@@ -343,7 +405,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </body>
     </html>
-    ";
+";
+
+
 
     $mpdf = new Mpdf();
     $mpdf->WriteHTML($invoiceHtml);
@@ -369,18 +433,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Hiba történt: " . $stmt->error;
     }
-    $stmt->close();
-
-
-    $sql = "UPDATE users SET profile_balance = profile_balance + ? WHERE userid = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("di", $balance, $userid);
-    if ($stmt->execute()) {
-        header("Location: ../../../../dashboard");
-    } else {
-        echo "Unexpected Error: " . $stmt->error;
-    }
-
     $stmt->close();
 }
 
@@ -645,17 +697,11 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                                 <th><?php echo $translations["invoicedescription"]; ?></th>
                                                 <th><?php echo $translations["price"]; ?></th>
                                                 <th><?php echo $translations["amount"]; ?></th>
-                                                <th><?php echo $translations["price"]; ?></th>
-                                                <th></th>
+                                                <th><?php echo $translations["action"]; ?></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php
-                                            $total = 0;
-                                            while ($row = $result->fetch_assoc()) {
-                                                $subtotal = $row['price'] * $row['quantity'];
-                                                $total += $subtotal;
-                                            ?>
+                                            <?php foreach ($data as $row) { ?>
                                                 <tr>
                                                     <td><?php echo htmlspecialchars($row['name']); ?></td>
                                                     <td><?php echo htmlspecialchars($row['description']); ?></td>
@@ -667,7 +713,6 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                                             <button type="submit" name="update_quantity" class="btn btn-primary btn-sm mt-2"><?php echo $translations["save"]; ?></button>
                                                         </form>
                                                     </td>
-                                                    <td><?php echo number_format($subtotal, 2, '.', ' '); ?> <?php echo $currency; ?></td>
                                                     <td>
                                                         <form action="" method="POST">
                                                             <input type="hidden" name="cart_id" value="<?php echo $row['cart_id']; ?>">
@@ -679,7 +724,6 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                                             <tr>
                                                 <th colspan="4"><?php echo $translations["invoiceamount"]; ?>:</th>
                                                 <th><?php echo number_format($total, 2, '.', ' '); ?> <?php echo $currency; ?></th>
-                                                <th colspan="2"></th>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -721,12 +765,12 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
                                 <option selected value="cash"><?= $translations["cash"]; ?></option>
                                 <option value="card"><?= $translations["card"]; ?></option>
-                                <?php if ($profile_balance_odd > $ticketprice): ?>
+                                <?php if ($profile_balance_odd >= $total): ?>
                                     <option value="profile"><?= $translations["profilebalancepay"]; ?></option>
                                 <?php endif; ?>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-success mt-3"><?= $translations["next"]; ?></button>
+                        <button type="submit" name="generate_invoice" class="btn btn-success mt-3"><?= $translations["next"]; ?></button>
                     </form>
                 </div>
             </div>

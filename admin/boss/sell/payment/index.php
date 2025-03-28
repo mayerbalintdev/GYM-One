@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $ticketprice;
     $method = $paymentMethod;
 
-    if ($paymentmethod !== 'profile') {
+    if ($paymentMethod !== 'profile') {
         $field = ($method === 'card') ? 'bank_card' : 'cash';
 
         $sql = "SELECT id FROM revenu_stats WHERE date = ?";
@@ -688,7 +688,7 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                             <select id="paymentMethod" name="paymentMethod" class="form-control">
                                 <option selected value="cash"><?= $translations["cash"]; ?></option>
                                 <option value="card"><?= $translations["card"]; ?></option>
-                                <?php if ($profile_balance_odd > $ticketprice): ?>
+                                <?php if ($profile_balance_odd >= $ticketprice): ?>
                                     <option value="profile"><?= $translations["profilebalancepay"]; ?></option>
                                 <?php endif; ?>
 
