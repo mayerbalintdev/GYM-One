@@ -5,6 +5,10 @@
 <p align="center"><img src="https://gymoneglobal.com/assets/img/text-color-logo.png" alt="project-image"></p>
 
 
+
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Nunito&size=32&duration=4000&pause=1000&color=1834F7&center=true&vCenter=true&width=435&lines=Hello+world!)](https://git.io/typing-svg)
+
+
 Welcome to GYM One! This open-source gym management software is designed to help fitness centers, personal trainers, and sports clubs streamline their operations. With its user-friendly interface and powerful features, GYM One makes managing your gym simpler and more efficient.
 
 ## Table of Contents
