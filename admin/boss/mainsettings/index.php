@@ -401,6 +401,7 @@ $conn->close();
                                                 <label for="lang_code"><?php echo $translations["lang"] ?>:</label>
                                                 <select class="form-control" id="lang_code" name="lang_code">
                                                     <option value="HU" <?= ($env_data['LANG_CODE'] ?? '') == 'HU' ? 'selected' : '' ?>><?php echo $translations["HU"]; ?></option>
+                                                    <option value="ES" <?= ($env_data['LANG_CODE'] ?? '') == 'ES' ? 'selected' : '' ?>><?php echo $translations["ES"]; ?></option>
                                                     <option value="GB" <?= ($env_data['LANG_CODE'] ?? '') == 'GB' ? 'selected' : '' ?>><?php echo $translations["GB"]; ?></option>
                                                     <option value="DE" <?= ($env_data['LANG_CODE'] ?? '') == 'DE' ? 'selected' : '' ?>><?php echo $translations["DE"]; ?></option>
 
