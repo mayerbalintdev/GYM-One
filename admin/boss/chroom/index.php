@@ -84,14 +84,14 @@ $result = $conn->query($sql);
 
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    
+
     $sql = "SELECT lockernum FROM lockers WHERE id=$id";
     $result = $conn->query($sql);
-    
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $lockernum = $row['lockernum'];
-        
+
         $sql = "DELETE FROM lockers WHERE id=$id";
         if ($conn->query($sql) === TRUE) {
             $alerts_html .= '<div class="alert alert-success" role="alert">
@@ -99,13 +99,13 @@ if (isset($_GET['delete'])) {
                             </div>';
             $action = $translations['success-delete-locker'] . ' ' . $lockernum;
             $actioncolor = 'warning';
-            
+
             $sql = "INSERT INTO logs (userid, action, actioncolor, time) 
                             VALUES (?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("iss", $userid, $action, $actioncolor);
             $stmt->execute();
-            
+
             header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
         } else {
             $alerts_html .= "Error: " . $conn->error;
@@ -153,6 +153,7 @@ $conn->close();
     <meta charset="UTF-8">
     <title><?php echo $translations["dashboard"]; ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../../assets/css/dashboard.css">
@@ -441,7 +442,7 @@ $conn->close();
                 </div>
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
+                    <a href="../../logout.php" type="button" class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>
         </div>

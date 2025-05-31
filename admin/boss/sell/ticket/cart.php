@@ -49,14 +49,12 @@ if (!file_exists($langFile)) {
 
 $translations = json_decode(file_get_contents($langFile), true);
 
-// Helyes adatbázis kapcsolat használata
 $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
 
-// Ha nincs termék a kosárban, üzenetet jelenítünk meg
 if (empty($_SESSION['cart'])) {
     echo "<p>A kosár üres.</p>";
 } else {
@@ -65,18 +63,15 @@ if (empty($_SESSION['cart'])) {
     echo "<thead><tr><th>Termék</th><th>Mennyiség</th><th>Ár</th><th>Összesen</th></tr></thead>";
     echo "<tbody>";
 
-    // Itt bejárjuk a kosárban lévő termékeket
     foreach ($_SESSION['cart'] as $product_id => $quantity) {
-        // A termék adatainak lekérése az adatbázisból
         $query = "SELECT name, price FROM products WHERE id = ?";
-        $stmt = $conn->prepare($query);  // Használjuk a helyes változót: $conn
+        $stmt = $conn->prepare($query); 
         $stmt->bind_param('i', $product_id);
         $stmt->execute();
         $stmt->bind_result($name, $price);
         $stmt->fetch();
         $stmt->close();
 
-        // Megjelenítjük a termék adatait
         $total_price = $price * $quantity;
         echo "<tr>";
         echo "<td>" . htmlspecialchars($name) . "</td>";
@@ -87,28 +82,22 @@ if (empty($_SESSION['cart'])) {
     }
 
     echo "</tbody></table>";
-    // Kosár kiürítése gomb
     echo "<a href='?clear_cart=true' class='btn btn-danger'>Kosár ürítése</a>";
 }
 ?>
 
-<!-- JavaScript a kosár törléséhez, ha elhagyják az oldalt -->
 <script>
-    // Amikor az oldalról való kilépést próbálja a felhasználó
     window.addEventListener("beforeunload", function(event) {
-        // AJAX kérés a kosár törléséhez
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "?clear_cart=true", true);  // Az aktuális oldalra küldött kérés, hogy töröljük a kosarat
+        xhr.open("GET", "?clear_cart=true", true);
         xhr.send();
 
-        // Az alapértelmezett viselkedés megakadályozása, hogy a felhasználót figyelmeztessük
         event.preventDefault();
-        event.returnValue = '';  // Modern böngészők nem jelenítenek meg üzenetet, ha ezt nem állítjuk
+        event.returnValue = '';
     });
 </script>
 
 <?php
-// Kosár törlése, ha a GET paramétert megkapjuk
 if (isset($_GET['clear_cart']) && $_GET['clear_cart'] === 'true') {
     unset($_SESSION['cart']);
     header('Location: ' . $_SERVER['PHP_SELF']);

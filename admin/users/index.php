@@ -120,11 +120,24 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <title><?php echo $translations["dashboard"]; ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
+    <style>
+        .search-form .form-group {
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -330,53 +343,63 @@ $result = $conn->query($sql);
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="card shadow">
-                            <form method="GET" class="mb-4">
+                            <form method="GET" class="mb-4 search-form">
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="<?= $translations["name-search"]; ?>" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="<?= $translations["name-search"]; ?>" name="search_name" value="<?php echo htmlspecialchars($search_name); ?>">
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <input type="text" class="form-control" placeholder="<?= $translations["email-search"]; ?>" name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" placeholder="<?= $translations["email-search"]; ?>" name="search_email" value="<?php echo htmlspecialchars($search_email); ?>">
+                                        </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn btn-primary"><?php echo $translations["search"]; ?></button>
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary btn-block"><?php echo $translations["search"]; ?></button>
+                                        </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <a href="index.php" class="btn btn-success"><?php echo $translations["resetbtn"]; ?></a>
+                                    <div class="col-lg-3 col-md-4 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <a href="index.php" class="btn btn-success btn-block"><?php echo $translations["resetbtn"]; ?></a>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
 
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th><?php echo $translations["firstname"]; ?></th>
-                                        <th><?php echo $translations["lastname"]; ?></th>
-                                        <th><?php echo $translations["email"]; ?></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    if ($result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
-                                            echo "<tr>";
-                                            echo "<td>" . $row["firstname"] . "</td>";
-                                            echo "<td>" . $row["lastname"] . "</td>";
-                                            echo "<td>" . $row["email"];
-                                            if ($row["confirmed"] == "No") {
-                                                echo " <span class='text-danger bi bi-exclamation-triangle-fill' data-bs-toggle='tooltip' title='" . $translations["waitingconfirm"] . "'></span>";
+                            <div class="table-responsive">
+                                <table class="table table-dark table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th><?php echo $translations["firstname"]; ?></th>
+                                            <th><?php echo $translations["lastname"]; ?></th>
+                                            <th><?php echo $translations["email"]; ?></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        if ($result->num_rows > 0) {
+                                            while ($row = $result->fetch_assoc()) {
+                                                echo "<tr>";
+                                                echo "<td>" . $row["firstname"] . "</td>";
+                                                echo "<td>" . $row["lastname"] . "</td>";
+                                                echo "<td>" . $row["email"];
+                                                if ($row["confirmed"] == "No") {
+                                                    echo " <span class='text-danger bi bi-exclamation-triangle-fill' data-bs-toggle='tooltip' title='" . $translations["waitingconfirm"] . "'></span>";
+                                                }
+                                                echo "</td>";
+                                                echo '<td><a class="btn btn-primary" href="edit/?user=' . $row["userid"] . '">' . $translations["profilesee"] . '</a></td>';
+                                                echo "</tr>";
                                             }
-                                            echo "</td>";
-                                            echo '<td><a class="btn btn-primary" href="edit/?user=' . $row["userid"] . '">' . $translations["profilesee"] . '</a></td>';
-                                            echo "</tr>";
+                                        } else {
+                                            echo "<tr><td colspan='4'>No user data!</td></tr>";
                                         }
-                                    } else {
-                                        echo "<tr><td colspan='4'>No user data!</td></tr>";
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <?php
                             $sql = "SELECT COUNT(*) AS total FROM users";

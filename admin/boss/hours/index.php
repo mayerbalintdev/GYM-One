@@ -149,6 +149,7 @@ $conn->close();
     <meta charset="UTF-8">
     <title><?php echo $translations["dashboard"]; ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../../assets/css/dashboard.css">
@@ -421,7 +422,7 @@ $conn->close();
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["not-yet"]; ?></a>
-                    <a href="../logout.php" type="button"
+                    <a href="../../logout.php" type="button"
                         class="btn btn-danger"><?php echo $translations["confirm"]; ?></a>
                 </div>
             </div>

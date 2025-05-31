@@ -6,8 +6,6 @@
 
 
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Nunito&size=32&duration=4000&pause=1000&color=1834F7&center=true&vCenter=true&width=435&lines=Hello+world!)](https://git.io/typing-svg)
-
 
 Welcome to GYM One! This open-source gym management software is designed to help fitness centers, personal trainers, and sports clubs streamline their operations. With its user-friendly interface and powerful features, GYM One makes managing your gym simpler and more efficient.
 
@@ -46,7 +44,13 @@ To run GYM One, ensure that you have the following:
 
 ## Installation
 
-**The GYM One installer is not yet available. Please check back soon!**
+### ⚠️ Please Use the Official GYM One Installer Repository!
+
+To properly install and configure GYM One, **always use the official installer repository**:
+
+👉 [GYM One Installer Repository](https://github.com/mayerbalintdev/GYM-One-Installer)
+
+This ensures you get the latest version, correct file structure, and access to automatic updates.
 
 
 ## Configuration

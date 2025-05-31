@@ -202,6 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
 <head>
   <meta charset="UTF-8">
   <title><?php echo $translations["dashboard"]; ?></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -421,7 +422,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
               </div>
               <form method="POST">
                 <div class="row">
-                  <div class="col-md-9">
+                  <div class="col-12 col-lg-9 order-2 order-lg-1">
                     <div class="mb-3">
                       <div class="form-group">
                         <label for="firstname"><?php echo $translations["firstname"]; ?></label>
@@ -436,13 +437,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                     </div>
                   </div>
 
-                  <div class="col-md-3 text-center">
+                  <div class="col-12 col-lg-3 text-center order-1 order-lg-2 mb-3 mb-lg-0">
                     <?php
                     $profilePicPath = '../../../assets/img/profiles/' . $useridgymuser . '.png';
                     if (file_exists($profilePicPath)): ?>
-                      <div class="col-md-3 text-center">
-                        <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid mb-3" height="150">
-                      </div>
+                      <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid" style="max-height: 150px; width: auto;">
                     <?php endif; ?>
                   </div>
                 </div>
