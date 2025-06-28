@@ -374,7 +374,7 @@ $result = $conn->query($sql);
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <p class="text-center">Nincs találat.</p>
+                        <p class="text-center"><?php echo $translations["nopackages"];?></p>
                     <?php endif; ?>
                 </div>
 

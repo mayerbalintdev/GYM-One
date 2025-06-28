@@ -157,7 +157,7 @@ $result = $conn->query($sql);
         </div>
         <div class="row mt-2 text-center justify-content-center">
             <div class="col-sm-5">
-                <h1>Árlista</h1>
+                <h1><?php echo $translations["pricelist"];?></h1>
             </div>
         </div>
         <?php

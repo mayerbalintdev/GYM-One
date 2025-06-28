@@ -190,16 +190,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $userid = $tickerbuyerid;
+    
+    $translatedPaymentMethod = '';
+    
     if ($paymentMethod == 'cash') {
-        $paymentMethod = $translations["cash"];
+        $translatedPaymentMethod = $translations["cash"];
     } elseif ($paymentMethod == 'card') {
-        $paymentMethod = $translations["card"];
+        $translatedPaymentMethod = $translations["card"];
     } elseif ($paymentMethod == 'profile') {
         $sql = "UPDATE users SET profile_balance = profile_balance - ? WHERE userid = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("di", $ticketprice, $tickerbuyerid);
         $stmt->execute();
-        $paymentMethod = $translations["profilebalancepay"];
+        $translatedPaymentMethod = $translations["profilebalancepay"];
     }
 
     $invoiceNumber = bin2hex(random_bytes(8));
@@ -298,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
                         <td>" .
-        ($method == 'profile' ? $translations["profilebalancepay"] : ($paymentMethod == 'cash' ? $translations["cash"] : $translations["card"])) .
+        ($method == 'profile' ? $translations["profilebalancepay"] : ($method == 'cash' ? $translations["cash"] : $translations["card"])) .
         "</td>
                         <td>$date</td>
                     </tr>
@@ -379,7 +382,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $alerts_html .= '<div class="alert alert-success" role="alert">
                             ' . $translations["ticketadded"] . '
                         </div>';
-        $action = $translations['log_ticketbuy'] . ' ID: ' . $tickerbuyerid . ' - ' . $ticketname . ' - ' . $paymentMethod . ' - ' . $userid . '-' . $invoiceNumber . '.pdf';
+        $action = $translations['log_ticketbuy'] . ' ID: ' . $tickerbuyerid . ' - ' . $ticketname . ' - ' . $translatedPaymentMethod . ' - ' . $userid . '-' . $invoiceNumber . '.pdf';
         $actioncolor = 'success';
         $sql = "INSERT INTO logs (userid, action, actioncolor, time) VALUES (?, ?, ?, NOW())";
 

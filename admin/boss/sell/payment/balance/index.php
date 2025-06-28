@@ -286,7 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <tbody>
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
-                        <td>" . $paymentMethod .
+                        <td>" .
+        ($method == 'profile' ? $translations["profilebalancepay"] : ($method == 'cash' ? $translations["cash"] : $translations["card"])) .
         "</td>
                         <td>$date</td>
                     </tr>

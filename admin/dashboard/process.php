@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+
 function read_env_file($file_path)
 {
     $env_file = file_get_contents($file_path);
@@ -25,15 +26,10 @@ $db_username = $env_data['DB_USERNAME'] ?? '';
 $db_password = $env_data['DB_PASSWORD'] ?? '';
 $db_name = $env_data['DB_NAME'] ?? '';
 
-$business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
-$version = $env_data["APP_VERSION"] ?? '';
-$capacity = $env_data["CAPACITY"] ?? '';
-
 $lang = $lang_code;
 
 $langDir = __DIR__ . "/../../assets/lang/";
-
 $langFile = $langDir . "$lang.json";
 
 if (!file_exists($langFile)) {
@@ -42,12 +38,7 @@ if (!file_exists($langFile)) {
 
 $translations = json_decode(file_get_contents($langFile), true);
 
-$host = $db_host;
-$db = $db_name;
-$user = $db_username;
-$pass = $db_password;
-
-$conn = new mysqli($host, $user, $pass, $db);
+$conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'error' => 'Database connection failed']));
@@ -68,7 +59,15 @@ if ($result && $result->num_rows > 0) {
     $response['birthdate'] = $row['birthdate'];
     $response['gender'] = $row["gender"];
 
-    $ticketSql = "SELECT opportunities, expiredate FROM current_tickets WHERE userid = '$qrCode' ORDER BY expiredate DESC";
+    // Javított SQL lekérdezés
+    $ticketSql = "SELECT opportunities, expiredate 
+                  FROM current_tickets 
+                  WHERE userid = '$qrCode' 
+                    AND (opportunities > 0 OR opportunities IS NULL)
+                    AND expiredate >= CURDATE()
+                  ORDER BY expiredate ASC 
+                  LIMIT 1";
+
     $ticketResult = $conn->query($ticketSql);
 
     if ($ticketResult && $ticketResult->num_rows > 0) {
@@ -78,58 +77,56 @@ if ($result && $result->num_rows > 0) {
 
         $currentDate = date('Y-m-d');
 
-        if (($opportunities > 0 || is_null($opportunities)) && $expiredate >= $currentDate) {
-            $response['ticket_status'] = 'Érvényes';
-            $response['remaining_opportunities'] = $opportunities;
-            $response['expiredate'] = $expiredate;
+        $response['ticket_status'] = 'Érvényes';
+        $response['remaining_opportunities'] = $opportunities;
+        $response['expiredate'] = $expiredate;
 
-            if ($expiredate == $currentDate) {
-                $response['expiredate_message'] = $translations["todayexpire"];
-            } else {
-                $interval = date_diff(date_create($currentDate), date_create($expiredate));
-                $response['remaining_days'] = $interval->days;
+        if ($expiredate == $currentDate) {
+            $response['expiredate_message'] = $translations["todayexpire"];
+        } else {
+            $interval = date_diff(date_create($currentDate), date_create($expiredate));
+            $response['remaining_days'] = $interval->days;
+        }
+
+        $gender = $row['gender'];
+        $lockerSql = "SELECT lockernum FROM lockers WHERE gender = '$gender' AND user_id IS NULL"; 
+        $lockerResult = $conn->query($lockerSql);
+
+        if ($lockerResult && $lockerResult->num_rows > 0) {
+            $lockers = [];
+            while ($lockerRow = $lockerResult->fetch_assoc()) {
+                $lockers[] = $lockerRow['lockernum'];
             }
 
-            $gender = $row['gender'];
-            $lockerSql = "SELECT lockernum FROM lockers WHERE gender = '$gender' AND user_id IS NULL"; 
-            $lockerResult = $conn->query($lockerSql);
+            $randomLocker = $lockers[array_rand($lockers)];
+            $response['assigned_locker'] = $randomLocker;
 
-            if ($lockerResult && $lockerResult->num_rows > 0) {
-                $lockers = [];
-                while ($lockerRow = $lockerResult->fetch_assoc()) {
-                    $lockers[] = $lockerRow['lockernum'];
-                }
+            $assignLockerSql = "UPDATE lockers SET user_id = '$qrCode' WHERE lockernum = '$randomLocker'";
+            $conn->query($assignLockerSql);
 
-                $randomLocker = $lockers[array_rand($lockers)];
-                $response['assigned_locker'] = $randomLocker;
-
-                $assignLockerSql = "UPDATE lockers SET user_id = '$qrCode' WHERE lockernum = '$randomLocker'";
-                $conn->query($assignLockerSql);
-
-                if (!is_null($opportunities) && $opportunities > 0) {
-                    $newOpportunities = $opportunities - 1;
-                    $updateTicketSql = "UPDATE current_tickets SET opportunities = '$newOpportunities' WHERE userid = '$qrCode'";
-                    $conn->query($updateTicketSql);
-                    $response['remaining_opportunities'] = $newOpportunities;
-                }
-
-                $logUserSql = "INSERT INTO temp_loggeduser (name, userid, login_date, lockerid) VALUES ('{$row['firstname']} {$row['lastname']}', '$qrCode', NOW(), '$randomLocker')";
-                $conn->query($logUserSql);
-                
-            } else {
-                $response['assigned_locker'] = $translations["locker_notavilable"]; 
+            if (!is_null($opportunities) && $opportunities > 0) {
+                $newOpportunities = $opportunities - 1;
+                $updateTicketSql = "UPDATE current_tickets 
+                                    SET opportunities = '$newOpportunities' 
+                                    WHERE userid = '$qrCode' 
+                                      AND expiredate = '$expiredate'";
+                $conn->query($updateTicketSql);
+                $response['remaining_opportunities'] = $newOpportunities;
             }
-        } elseif ($opportunities == 0 || $expiredate < $currentDate) {
-            $response['ticket_status'] = $translations["expired"];
+
+            $logUserSql = "INSERT INTO temp_loggeduser (name, userid, login_date, lockerid) 
+                           VALUES ('{$row['firstname']} {$row['lastname']}', '$qrCode', NOW(), '$randomLocker')";
+            $conn->query($logUserSql);
+        } else {
+            $response['assigned_locker'] = $translations["locker_notavilable"]; 
         }
     } else {
-        $response['ticket_status'] = $translations["youdonthaveticket"];
+        $response['ticket_status'] = $translations["expired"];
     }
 } else {
     $response['error'] = 'User not found';
 }
 
 $conn->close();
-
 echo json_encode($response);
 ?>
