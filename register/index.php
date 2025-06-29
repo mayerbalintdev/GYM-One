@@ -3,20 +3,20 @@ session_start();
 
 function read_env_file($file_path)
 {
-  $env_file = file_get_contents($file_path);
-  $env_lines = explode("\n", $env_file);
-  $env_data = [];
+    $env_file = file_get_contents($file_path);
+    $env_lines = explode("\n", $env_file);
+    $env_data = [];
 
-  foreach ($env_lines as $line) {
-    $line_parts = explode('=', $line);
-    if (count($line_parts) == 2) {
-      $key = trim($line_parts[0]);
-      $value = trim($line_parts[1]);
-      $env_data[$key] = $value;
+    foreach ($env_lines as $line) {
+        $line_parts = explode('=', $line);
+        if (count($line_parts) == 2) {
+            $key = trim($line_parts[0]);
+            $value = trim($line_parts[1]);
+            $env_data[$key] = $value;
+        }
     }
-  }
 
-  return $env_data;
+    return $env_data;
 }
 
 $alerts_html = "";
@@ -47,7 +47,6 @@ $smtp_port = $env_data['MAIL_PORT'] ?? '';
 $smtp_username = $env_data["MAIL_USERNAME"] ?? '';
 $smtp_encryption = $env_data['MAIL_ENCRYPTION'] ?? '';
 $smtp_host = $env_data['MAIL_HOST'] ?? '';
-$autoaccept = $env_data['AUTOACCEPT'] ?? '';
 
 $business_name = $env_data['BUSINESS_NAME'] ?? '';
 $lang_code = $env_data['LANG_CODE'] ?? '';
@@ -59,63 +58,58 @@ $langDir = __DIR__ . "/../assets/lang/";
 $langFile = $langDir . "$lang.json";
 
 if (!file_exists($langFile)) {
-  die("A nyelvi fájl nem található: $langFile");
+    die("A nyelvi fájl nem található: $langFile");
 }
 
 $translations = json_decode(file_get_contents($langFile), true);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $firstname = $_POST['firstname'];
-  $lastname = $_POST['lastname'];
-  $email = $_POST['email'];
-  $password = $_POST['password'];
-  $confirm_password = $_POST['confirm_password'];
-  $gender = $_POST['gender'];
-  $birthdate = $_POST['birthdate'];
-  $city = $_POST['city'];
-  $street = $_POST['street'];
-  $house_number = $_POST['house_number'];
-  if ($password !== $confirm_password) {
-    $alerts_html .= '<div class="alert alert-danger">' . $translations["twopasswordnot"] . '</div>';
-    header("Refresh: 5");
-  } else {
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-    $userid = rand(pow(10, 9), pow(10, 10) - 1);
-
-    if ($autoaccept === TRUE) {
-      $confirmed = 'YES';
+    $firstname = $_POST['firstname'];
+    $lastname = $_POST['lastname'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $gender = $_POST['gender'];
+    $birthdate = $_POST['birthdate'];
+    $city = $_POST['city'];
+    $street = $_POST['street'];
+    $house_number = $_POST['house_number'];
+    if ($password !== $confirm_password) {
+        $alerts_html .= '<div class="alert alert-danger">' . $translations["twopasswordnot"] . '</div>';
+        header("Refresh: 5");
     } else {
-      $confirmed = 'NO';
-    }
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
+        $userid = rand(pow(10, 9), pow(10, 10) - 1);
 
-    $registration_date = date('Y-m-d H:i:s');
+        $confirmed = 'No';
 
-    $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
+        $registration_date = date('Y-m-d H:i:s');
 
-    if ($conn->connect_error) {
-      die("Kapcsolódási hiba: " . $conn->connect_error);
-    }
+        $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 
-    $stmt = $conn->prepare("INSERT INTO users (userid, firstname, lastname, email, password, gender, birthdate, city, street, house_number, registration_date, confirmed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($conn->connect_error) {
+            die("Kapcsolódási hiba: " . $conn->connect_error);
+        }
 
-    if ($stmt === false) {
-      die("Hiba az előkészített állítás létrehozása során: " . $conn->error);
-    }
+        $stmt = $conn->prepare("INSERT INTO users (userid, firstname, lastname, email, password, gender, birthdate, city, street, house_number, registration_date, confirmed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    $stmt->bind_param("isssssssssss", $userid, $firstname, $lastname, $email, $hashed_password, $gender, $birthdate, $city, $street, $house_number, $registration_date, $confirmed);
+        if ($stmt === false) {
+            die("Hiba az előkészített állítás létrehozása során: " . $conn->error);
+        }
 
-    if ($stmt->execute()) {
-      $alerts_html .= '<div class="alert alert-success">Sikeres regisztráció!</div>';
-      header("Refresh: 5");
-      $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
-        ->setUsername($smtp_username)
-        ->setPassword($smtp_password);
+        $stmt->bind_param("isssssssssss", $userid, $firstname, $lastname, $email, $hashed_password, $gender, $birthdate, $city, $street, $house_number, $registration_date, $confirmed);
 
-      $mailer = new Swift_Mailer($transport);
+        if ($stmt->execute()) {
+            $alerts_html .= '<div class="alert alert-success">Sikeres regisztráció!</div>';
+            header("Refresh: 5");
+            $transport = (new Swift_SmtpTransport($smtp_host, $smtp_port, $smtp_encryption))
+                ->setUsername($smtp_username)
+                ->setPassword($smtp_password);
 
-      $successEmailContent = <<<EOD
+            $mailer = new Swift_Mailer($transport);
+
+            $successEmailContent = <<<EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -358,24 +352,24 @@ ol ol ol ol {
 EOD;
 
 
-      $recipientEmail = $email;
-      $subject = $translations["confirmemailmailsub"];
+            $recipientEmail = $email;
+            $subject = $translations["confirmemailmailsub"];
 
-      $isRegistrationSuccessful = true;
+            $isRegistrationSuccessful = true;
 
-      if ($isRegistrationSuccessful) {
-        $message = (new Swift_Message($subject))
-          ->setFrom(["{$smtp_username}" => "{$business_name} - {$translations['confirmemailpage']}"])
-          ->setTo([$recipientEmail])
-          ->setBody($successEmailContent, 'text/html');
-      }
-      $result = $mailer->send($message);
-      header("Refresh: 5");
+            if ($isRegistrationSuccessful) {
+                $message = (new Swift_Message($subject))
+                    ->setFrom(["{$smtp_username}" => "{$business_name} - {$translations['confirmemailpage']}"])
+                    ->setTo([$recipientEmail])
+                    ->setBody($successEmailContent, 'text/html');
+            }
+            $result = $mailer->send($message);
+            header("Refresh: 5");
+        }
+
+        $stmt->close();
+        $conn->close();
     }
-
-    $stmt->close();
-    $conn->close();
-  }
 }
 ?>
 
@@ -383,106 +377,106 @@ EOD;
 <html lang="<?php echo $lang_code; ?>">
 
 <head>
-  <meta charset="UTF-8">
-  <title><?php echo $business_name; ?> - <?php echo $translations["register"]; ?></title>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../assets/css/login-register.css">
-  <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title><?php echo $business_name; ?> - <?php echo $translations["register"]; ?></title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/login-register.css">
+    <link rel="shortcut icon" href="../assets/img/brand/favicon.png" type="image/x-icon">
 </head>
 
 <body>
-  <div id="register">
-    <div class="container">
-      <div class="row justify-content-center pt-4">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-body">
-              <div class="text-center">
-                <h2><?php echo $translations["login"]; ?></h2>
-                <img class="img mb-3 mt-3 img-fluid" src="../assets/img/brand/logo.png" title="<?php echo $business_name; ?>" alt="<?php echo $business_name; ?>">
-              </div>
-              <?php if (!empty($login_error)) : ?>
-                <div class="alert alert-danger"><?php echo $login_error; ?></div>
-              <?php endif; ?>
-              <?php if (!empty($alerts_html)) : ?>
-                <?php echo $alerts_html; ?>
-              <?php endif; ?>
+    <div id="register">
+        <div class="container">
+            <div class="row justify-content-center pt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <h2><?php echo $translations["login"]; ?></h2>
+                                <img class="img mb-3 mt-3 img-fluid" src="../assets/img/brand/logo.png" title="<?php echo $business_name; ?>" alt="<?php echo $business_name; ?>">
+                            </div>
+                            <?php if (!empty($login_error)) : ?>
+                                <div class="alert alert-danger"><?php echo $login_error; ?></div>
+                            <?php endif; ?>
+                            <?php if (!empty($alerts_html)) : ?>
+                                <?php echo $alerts_html; ?>
+                            <?php endif; ?>
 
-              <form method="POST">
-                <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label for="firstname"><?php echo $translations["firstname"]; ?></label>
-                    <input type="text" class="form-control" id="firstname" name="firstname" required>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="lastname"><?php echo $translations["lastname"]; ?></label>
-                    <input type="text" class="form-control" id="lastname" name="lastname" required>
-                  </div>
+                            <form method="POST">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="firstname"><?php echo $translations["firstname"]; ?></label>
+                                        <input type="text" class="form-control" id="firstname" name="firstname" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="lastname"><?php echo $translations["lastname"]; ?></label>
+                                        <input type="text" class="form-control" id="lastname" name="lastname" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email"><?php echo $translations["email"]; ?></label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="password"><?php echo $translations["password"]; ?></label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="confirm_password"><?php echo $translations["password-confirm"]; ?></label>
+                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender"><?php echo $translations["gender"]; ?></label>
+                                    <select class="form-control" id="gender" name="gender" required>
+                                        <option value="Male"><?php echo $translations["boy"]; ?></option>
+                                        <option value="Female"><?php echo $translations["girl"]; ?></option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="birthdate"><?php echo $translations["birthday"]; ?></label>
+                                    <input type="date" class="form-control" id="birthdate" name="birthdate" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-5">
+                                        <label for="city"><?php echo $translations["city"]; ?></label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label for="street"><?php echo $translations["street"]; ?></label>
+                                        <input type="text" class="form-control" id="street" name="street" required>
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="house_number"><?php echo $translations["hause-no"]; ?></label>
+                                        <input type="number" class="form-control" id="house_number" name="house_number" required>
+                                    </div>
+                                </div>
+                                <iframe src="../admin/boss/rule/rule.html" width="100%" height="200px" frameborder="0"></iframe>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        <?php echo $translations["acceptrules"]; ?>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><?php echo $translations["register"]; ?></button>
+                            </form>
+                            <div class="text-start mt-1">
+                                <small><?php echo $translations["doyouhaveaccount"]; ?> <span><a href="../login/"><?php echo $translations["login"]; ?></a></span></small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                  <label for="email"><?php echo $translations["email"]; ?></label>
-                  <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label for="password"><?php echo $translations["password"]; ?></label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="confirm_password"><?php echo $translations["password-confirm"]; ?></label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="gender"><?php echo $translations["gender"]; ?></label>
-                  <select class="form-control" id="gender" name="gender" required>
-                    <option value="Male"><?php echo $translations["boy"]; ?></option>
-                    <option value="Female"><?php echo $translations["girl"]; ?></option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="birthdate"><?php echo $translations["birthday"]; ?></label>
-                  <input type="date" class="form-control" id="birthdate" name="birthdate" required>
-                </div>
-                <div class="form-row">
-                  <div class="form-group col-md-5">
-                    <label for="city"><?php echo $translations["city"]; ?></label>
-                    <input type="text" class="form-control" id="city" name="city" required>
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="street"><?php echo $translations["street"]; ?></label>
-                    <input type="text" class="form-control" id="street" name="street" required>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="house_number"><?php echo $translations["hause-no"]; ?></label>
-                    <input type="number" class="form-control" id="house_number" name="house_number" required>
-                  </div>
-                </div>
-                <iframe src="../admin/boss/rule/rule.html" width="100%" height="200px" frameborder="0"></iframe>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" required>
-                  <label class="form-check-label" for="flexCheckDefault">
-                    <?php echo $translations["acceptrules"]; ?>
-                  </label>
-                </div>
-                <button type="submit" class="btn btn-primary"><?php echo $translations["register"]; ?></button>
-              </form>
-              <div class="text-start mt-1">
-                <small><?php echo $translations["doyouhaveaccount"]; ?> <span><a href="../login/"><?php echo $translations["login"]; ?></a></span></small>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 319">
-    <path fill="whitesmoke" fill-opacity="1" d="M0,64L1440,192L1440,320L0,320Z"></path>
-  </svg>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 319">
+        <path fill="whitesmoke" fill-opacity="1" d="M0,64L1440,192L1440,320L0,320Z"></path>
+    </svg>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

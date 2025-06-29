@@ -205,18 +205,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) 
         }
     }
 
-    $translatedPaymentMethod = '';
-
+    $userid = $tickerbuyerid;
     if ($paymentMethod == 'cash') {
-        $translatedPaymentMethod = $translations["cash"];
+        $paymentMethod = $translations["cash"];
     } elseif ($paymentMethod == 'card') {
-        $translatedPaymentMethod = $translations["card"];
+        $paymentMethod = $translations["card"];
     } elseif ($paymentMethod == 'profile') {
         $sql = "UPDATE users SET profile_balance = profile_balance - ? WHERE userid = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("di", $ticketprice, $tickerbuyerid);
+        $stmt->bind_param("di", $total, $tickerbuyerid);
         $stmt->execute();
-        $translatedPaymentMethod = $translations["profilebalancepay"];
+        $paymentMethod = $translations["profilebalancepay"];
     }
 
     $cart_items_sql = "SELECT product_id, quantity FROM temp_cart";
@@ -344,8 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) 
                 <tbody>
                     <tr>
                         <td>$workerfirstname $workerlastname</td>
-                        <td>" .
-        ($method == 'profile' ? $translations["profilebalancepay"] : ($method == 'cash' ? $translations["cash"] : $translations["card"])) .
+                        <td>" . $paymentMethod .
         "</td>
                         <td>$date</td>
                     </tr>

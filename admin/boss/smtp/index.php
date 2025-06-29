@@ -63,14 +63,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $smtp_username = $_POST['smtp_username'] ?? '';
         $smtp_password = $_POST['smtp_password'] ?? '';
         $smtp_encryption = $_POST['smtp_encryption'] ?? '';
-        $autoaccept = $_POST['autoaccept'] ?? '';
 
         $env_data['MAIL_HOST'] = $smtp_host;
         $env_data['MAIL_PORT'] = $smtp_port;
         $env_data['MAIL_USERNAME'] = $smtp_username;
         $env_data['MAIL_PASSWORD'] = $smtp_password;
         $env_data['MAIL_ENCRYPTION'] = $smtp_encryption;
-        $env_data['AUTOACCEPT'] = $autoaccept;
 
         $env_content = '';
         foreach ($env_data as $key => $value) {
@@ -403,23 +401,13 @@ $conn->close();
                                                     name="smtp_username"
                                                     value="<?= htmlspecialchars($env_data['MAIL_USERNAME'] ?? '') ?>">
                                             </div>
-                                            <div class="form-group col-md-3">
+                                            <div class="form-group col-md-6">
                                                 <label for="smtp_password">SMTP
                                                     <?php echo $translations["password"]; ?>:</label>
                                                 <input type="password" class="form-control" id="smtp_password"
                                                     name="smtp_password"
                                                     value="<?= htmlspecialchars($env_data['MAIL_PASSWORD'] ?? '') ?>">
                                             </div>
-                                            <div class="form-group col-md-3">
-                                                <label for="autoaccept"><?php echo $translations["autoacceptbuttonform"];?></label>
-                                                <div class="custom-control custom-switch">
-                                                    <input type="hidden" name="autoaccept" value="FALSE">
-                                                    <input type="checkbox" class="custom-control-input" id="autoaccept" name="autoaccept" value="TRUE"
-                                                        <?= (htmlspecialchars($env_data['AUTOACCEPT'] ?? '') === 'TRUE') ? 'checked' : '' ?>>
-                                                    <label class="custom-control-label" for="autoaccept"><?php echo $translations["onswitch"];?></label>
-                                                </div>
-                                            </div>
-
                                         </div>
                                         <button type="submit"
                                             class="btn btn-primary"><?php echo $translations["save"]; ?></button>
@@ -438,6 +426,15 @@ $conn->close();
                         </div>
                     </div>
                 </div>
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <p class="mb-0 py-2 text-center text-body-secondary">
+                            Powered by <a href="https://azuriom.com" target="_blank"
+                                rel="noopener noreferrer">Azuriom</a> ©
+                            2019-2024. Panel designed by <a href="https://adminkit.io/" target="_blank"
+                                rel="noopener noreferrer">AdminKit</a>. </p>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>

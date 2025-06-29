@@ -1,31 +1,4 @@
 <?php
-
-$envPath = __DIR__ . '../../../.env';
-$key = 'AUTOACCEPT';
-$defaultValue = 'FALSE';
-
-if (file_exists($envPath)) {
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-} else {
-    $lines = [];
-}
-
-$found = FALSE;
-foreach ($lines as $line) {
-    if (stripos(trim($line), $key . '=') === 0) {
-        $found = true;
-        break;
-    }
-}
-
-if (!$found) {
-    $lines[] = "$key=$defaultValue";
-    file_put_contents($envPath, implode(PHP_EOL, $lines) . PHP_EOL);
-}
-?>
-
-
-<?php
 session_start();
 
 if (!isset($_SESSION['adminuser'])) {

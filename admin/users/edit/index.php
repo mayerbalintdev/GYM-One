@@ -166,60 +166,6 @@ if (isset($_POST['delete_user'])) {
   $conn->close();
 }
 
-$today = date('Y-m-d');
-
-$sql = "SELECT * FROM current_tickets WHERE userid = ? AND expiredate >= ? ORDER BY expiredate DESC LIMIT 1";
-
-if ($stmt = $conn->prepare($sql)) {
-  $stmt->bind_param("is", $useridgymuser, $today);
-  $stmt->execute();
-  $result = $stmt->get_result();
-
-  if ($row = $result->fetch_assoc()) {
-    $ticket_name = $row['ticketname'];
-    $ticket_buydate = $row['buydate'];
-    $ticket_expiredate = $row['expiredate'];
-    $ticket_opportunities = $row['opportunities'];
-
-    $buyDate = new DateTime($ticket_buydate);
-    $expireDate = new DateTime($ticket_expiredate);
-    $todayDate = new DateTime($today);
-
-    $ticket_total_days = $buyDate->diff($expireDate)->days;
-
-    if ($todayDate <= $expireDate) {
-      $ticket_remaining_days = $todayDate->diff($expireDate)->days;
-    } else {
-      $ticket_remaining_days = 0;
-    }
-
-    $ticket_remaining_percent = $ticket_total_days > 0
-      ? round(($ticket_remaining_days / $ticket_total_days) * 100)
-      : 0;
-  } else {
-    $ticket_name = null;
-    $ticket_buydate = null;
-    $ticket_expiredate = null;
-    $ticket_opportunities = null;
-
-    $ticket_total_days = 0;
-    $ticket_remaining_days = 0;
-    $ticket_remaining_percent = 0;
-  }
-
-  $translated_text = str_replace(
-    ['{totalday}', '{leftday}'],
-    [$ticket_total_days, $ticket_remaining_days],
-    $translations['daytovalidity']
-  );
-
-  $stmt->close();
-} else {
-  echo "Hiba a lekérdezés előkészítésekor: " . $conn->error;
-}
-
-
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
 
   $sql_update = "UPDATE users SET confirmed = 'Yes' WHERE userid = $useridgymuser";
@@ -243,6 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
 
   $conn->close();
 }
+
 
 ?>
 
@@ -561,147 +508,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="panel panel-default">
-              <div class="panel-heading text-center" style="background: rgb(9, 80, 220);
-    background: -moz-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
-    background: -webkit-linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
-    background: linear-gradient(90deg, rgba(9, 80, 220, 1) 0%, rgba(9, 88, 210, 1) 50%, rgba(9, 110, 210, 1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=' #0950dc', endColorstr='#096ed2' , GradientType=1); color: white;">
-                <div style="margin-bottom: 10px;">
-                  <span class="label <?php
-                                      if (!isset($row) || $row === null) {
-                                        echo 'label-danger';
-                                      } else {
-                                        $expire = new DateTime($row['expiredate']);
-                                        $today = new DateTime(date('Y-m-d'));
-                                        $interval = $today->diff($expire)->format('%r%a');
 
-                                        if ($interval < 0) {
-                                          echo 'label-danger';
-                                        } elseif ($interval == 0) {
-                                          echo 'label-warning';
-                                        } else {
-                                          echo 'label-success';
-                                        }
-                                      }
-                                      ?>" style="font-size: 14px; padding: 8px 15px;">
-                    <?php
-                    if (!isset($row) || $row === null) {
-                      echo '✗ ' . $translations["expired"];
-                    } else {
-                      $expire = new DateTime($row['expiredate']);
-                      $today = new DateTime(date('Y-m-d'));
-                      $interval = $today->diff($expire)->format('%r%a');
-
-                      if ($interval < 0) {
-                        echo '✗ ' . $translations["expired"];
-                      } elseif ($interval == 0) {
-                        echo $translations["expiresoon"];
-                      } else {
-                        echo '✓ ' . $translations["valid"];
-                      }
-                    }
-                    ?>
-                  </span>
-                </div>
-                <h4 style="margin: 0;"><?php echo $translations["status"]; ?></h4>
-              </div>
-
-              <div class="panel-body">
-                <div class="row">
-                  <div class="col-xs-12" style="margin-bottom: 15px;">
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <div class="media">
-                          <div class="media-left">
-                            <div class="btn btn-success btn-circle" style="width: 40px; height: 40px; border-radius: 50%; padding: 8px;">
-                              📅
-                            </div>
-                          </div>
-                          <div class="media-body">
-                            <small class="text-muted" style="text-transform: uppercase; font-weight: bold;"><?php echo $translations["buytime"]; ?></small>
-                            <div style="font-weight: bold; font-size: 16px;"><?php echo $ticket_buydate; ?></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-xs-12" style="margin-bottom: 15px;">
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <div class="media">
-                          <div class="media-left">
-                            <div class="btn btn-danger btn-circle" style="width: 40px; height: 40px; border-radius: 50%; padding: 8px;">
-                              🎯
-                            </div>
-                          </div>
-                          <div class="media-body">
-                            <small class="text-muted" style="text-transform: uppercase; font-weight: bold;"><?php echo $translations["ticketspassname"]; ?></small>
-                            <div style="font-weight: bold; font-size: 16px;"><?php echo $ticket_name; ?></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-xs-12" style="margin-bottom: 15px;">
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <div class="media" style="margin-bottom: 15px;">
-                          <div class="media-left">
-                            <div class="btn btn-warning btn-circle" style="width: 40px; height: 40px; border-radius: 50%; padding: 8px;">
-                              ⏰
-                            </div>
-                          </div>
-                          <div class="media-body">
-                            <small class="text-muted" style="text-transform: uppercase; font-weight: bold;"><?php echo $translations["validity"]; ?></small>
-                            <div style="font-weight: bold; font-size: 16px;"><?php echo $translated_text; ?></div>
-                          </div>
-                        </div>
-                        <div class="progress" style="margin-bottom: 10px;">
-                          <div class="progress-bar <?php
-                                                    echo ($ticket_remaining_percent < 20)
-                                                      ? 'progress-bar-danger'
-                                                      : (($ticket_remaining_percent < 40)
-                                                        ? 'progress-bar-warning'
-                                                        : 'progress-bar-info');
-                                                    ?>" role="progressbar" style="width: <?php echo $ticket_remaining_percent; ?>%">
-                            <?php echo $ticket_remaining_percent; ?>%
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-xs-12" style="margin-bottom: 15px;">
-                    <div class="panel panel-default">
-                      <div class="panel-body">
-                        <div class="media" style="margin-bottom: 15px;">
-                          <div class="media-left">
-                            <div class="btn btn-info btn-circle" style="width: 40px; height: 40px; border-radius: 50%; padding: 8px;">
-                              💪
-                            </div>
-                          </div>
-                          <div class="media-body">
-                            <small class="text-muted" style="text-transform: uppercase; font-weight: bold;"><?php echo $translations["tickettableoccassion"]; ?></small>
-                            <div style="font-weight: bold; font-size: 16px;"><?php
-                                                                              echo is_null($ticket_opportunities) ? $translations["unlimited"] : $ticket_opportunities . ' '. $translations["occassion_left"];
-                                                                              ?>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
