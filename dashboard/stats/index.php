@@ -100,11 +100,19 @@ if ($result->num_rows > 0) {
 $chart_dates = array_keys($dates);
 $chart_durations = array_values($dates);
 
+// Összes edzés száma (30 nap) – kis extra a kártyához
+$total_sessions = 0;
+foreach ($chart_durations as $d) {
+    if ($d > 0) {
+        $total_sessions++;
+    }
+}
+
 $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname, $firstname);
+$stmt->bind_result($firstname, $lastname,);
 $stmt->fetch();
 $stmt->close();
 
@@ -123,6 +131,64 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
+    <style>
+        /* ====== Modern dashboard tartalom (scoped: .dsh) ====== */
+        .dsh {
+            --d-accent: #0950dc;
+            --d-ink: #0f172a;
+            --d-muted: #64748b;
+            --d-line: rgba(15, 23, 42, .08);
+        }
+
+        /* Üdvözlő fejléc */
+        .dsh-welcome {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+            background: linear-gradient(135deg, #0950dc, #2f73f0);
+            color: #fff; border-radius: 20px; padding: 22px 26px; margin-bottom: 22px;
+            box-shadow: 0 16px 40px rgba(9, 80, 220, .28);
+        }
+        .dsh-welcome-hi { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+        .dsh-welcome-name { font-size: 24px; font-weight: 800; margin-top: 2px; }
+        .dsh-logout {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .16);
+            color: #fff; border: 1px solid rgba(255, 255, 255, .35); border-radius: 12px;
+            padding: 9px 18px; font-weight: 700; cursor: pointer; transition: .15s;
+        }
+        .dsh-logout:hover { background: rgba(255, 255, 255, .26); color: #fff; }
+
+        /* Statisztika kártyák */
+        .dsh-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        @media (max-width: 991px) { .dsh-stats { grid-template-columns: 1fr; } }
+
+        .dsh-stat {
+            display: flex; align-items: center; gap: 14px;
+            background: #fff; border: 1px solid var(--d-line); border-radius: 18px; padding: 18px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, .06); transition: transform .15s, box-shadow .15s;
+        }
+        .dsh-stat:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(9, 80, 220, .12); }
+        .dsh-stat-icon {
+            width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        .dsh-ic-blue { background: #e6efff; color: #0950dc; }
+        .dsh-ic-green { background: #dcfce7; color: #16a34a; }
+        .dsh-ic-amber { background: #fef3c7; color: #d97706; }
+        .dsh-ic-violet { background: #ede9fe; color: #7c3aed; }
+        .dsh-stat-label { font-size: 13px; color: var(--d-muted); font-weight: 600; }
+        .dsh-stat-value { font-size: 22px; font-weight: 800; color: var(--d-ink); line-height: 1.15; margin-top: 2px; word-break: break-word; }
+        .dsh-stat-value .dsh-unit { font-size: 14px; font-weight: 700; color: var(--d-muted); margin-left: 3px; }
+
+        /* Kártya (grafikon) */
+        .dsh-card {
+            background: #fff; border: 1px solid var(--d-line); border-radius: 18px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, .06); overflow: hidden; margin-bottom: 16px;
+        }
+        .dsh-card-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--d-line); }
+        .dsh-card-head i { color: var(--d-accent); font-size: 18px; }
+        .dsh-card-head h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--d-ink); }
+        .dsh-card-head .dsh-chip { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--d-accent); background: #eef4ff; padding: 4px 12px; border-radius: 999px; }
+        .dsh-card-body { padding: 14px 12px 6px; }
+    </style>
 </head>
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -182,91 +248,52 @@ $conn->close();
             </div>
             <br>
             <div class="col-sm-10">
-                <div class="d-none topnav d-sm-inline-block">
-                    <h4><?php echo $translations["welcome"]; ?> <?php echo $lastname; ?> <?php echo $firstname; ?></h4>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-                        <?php echo $translations["logout"]; ?>
-                    </button>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="card">
-                            <div class="card-body text-start">
-                                <div class="row">
-                                    <div class="col-xs-10 text-start">
-                                        <h4 class="card-title fw-semibold">
-                                            <?php echo $translations["latestsessiontime"]; ?></h4>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-stopwatch"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col">
-                                        <h2><b><?php echo $latest_session_time; ?></b>
-                                            <?php echo $translations["minutes"]; ?></h2>
-                                    </div>
-                                </div>
+                <div class="dsh">
+                    <!-- Üdvözlő fejléc -->
+                    <div class="dsh-welcome">
+                        <div>
+                            <div class="dsh-welcome-hi"><?php echo $translations["welcome"]; ?></div>
+                            <div class="dsh-welcome-name"><?php echo htmlspecialchars($lastname . ' ' . $firstname); ?></div>
+                        </div>
+                        <button type="button" class="dsh-logout" data-toggle="modal" data-target="#logoutModal">
+                            <i class="bi bi-box-arrow-right"></i> <?php echo $translations["logout"]; ?>
+                        </button>
+                    </div>
+
+                    <!-- Statisztika kártyák -->
+                    <div class="dsh-stats">
+                        <div class="dsh-stat">
+                            <div class="dsh-stat-icon dsh-ic-blue"><i class="bi bi-stopwatch"></i></div>
+                            <div>
+                                <div class="dsh-stat-label"><?php echo $translations["latestsessiontime"]; ?></div>
+                                <div class="dsh-stat-value"><?php echo $latest_session_time; ?><span class="dsh-unit"><?php echo $translations["minutes"]; ?></span></div>
+                            </div>
+                        </div>
+                        <div class="dsh-stat">
+                            <div class="dsh-stat-icon dsh-ic-violet"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <div class="dsh-stat-label"><?php echo $translations["averagetraintime"]; ?></div>
+                                <div class="dsh-stat-value"><?php echo $avg_duration; ?><span class="dsh-unit"><?php echo $translations["minutes"]; ?></span></div>
+                            </div>
+                        </div>
+                        <div class="dsh-stat">
+                            <div class="dsh-stat-icon dsh-ic-amber"><i class="bi bi-calendar-check-fill"></i></div>
+                            <div>
+                                <div class="dsh-stat-label"><?php echo $translations["latesttraining"]; ?></div>
+                                <div class="dsh-stat-value"><?php echo htmlspecialchars($latest_training); ?></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="card">
-                            <div class="card-body text-start">
-                                <div class="row">
-                                    <div class="col-xs-10 text-start">
-                                        <h4 class="card-title fw-semibold">
-                                            <?php echo $translations["averagetraintime"]; ?></h4>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-hourglass-split"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col">
-                                        <h2><b><?php echo $avg_duration; ?></b> <?php echo $translations["minutes"]; ?>
-                                        </h2>
-                                    </div>
-                                </div>
-                            </div>
+
+                    <!-- 30 napos grafikon -->
+                    <div class="dsh-card">
+                        <div class="dsh-card-head">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <h4><?php echo $translations["thirtydaychart"]; ?></h4>
+                            <span class="dsh-chip"><i class="bi bi-activity"></i> <?php echo (int) $total_sessions; ?> / 30</span>
                         </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="card">
-                            <div class="card-body text-start">
-                                <div class="row">
-                                    <div class="col-xs-10 text-start">
-                                        <h4 class="card-title fw-semibold">
-                                            <?php echo $translations["latesttraining"]; ?></h4>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="d-inline-block fs-1 lh-1 text-primary roundbg p-4 rounded-pill">
-                                            <i class="bi bi-calendar-check"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col">
-                                        <h2><b><?php echo $latest_training; ?></b></h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-8">
-                        <div class="card shadow">
-                            <div class="card-body text-start">
-                                <h4 class="card-title fw-semibold">
-                                    <?php echo $translations["thirtydaychart"]; ?>
-                                </h4>
-                                <div id="chart"></div>
-                            </div>
+                        <div class="dsh-card-body">
+                            <div id="chart"></div>
                         </div>
                     </div>
                 </div>
@@ -313,19 +340,27 @@ $conn->close();
             var durations = <?php echo json_encode($chart_durations); ?>;
             var options = {
                 chart: {
-                    type: 'line',
+                    type: 'area',
                     height: 350,
-                    zoom: {
-                        enabled: false
-                    },
-                    toolbar: {
-                        show: false
-                    }
+                    fontFamily: 'Segoe UI, system-ui, sans-serif',
+                    zoom: { enabled: false },
+                    toolbar: { show: false }
                 },
                 stroke: {
-                    curve: 'smooth'
+                    curve: 'smooth',
+                    width: 3
                 },
-                colors: ['#59F8E4'],
+                colors: ['#0950dc'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.35,
+                        opacityTo: 0.02,
+                        stops: [0, 90, 100]
+                    }
+                },
+                dataLabels: { enabled: false },
                 series: [{
                     name: '<?php echo $translations["chartminutestraintime"]; ?>',
                     data: durations
@@ -333,12 +368,24 @@ $conn->close();
                 xaxis: {
                     categories: dates,
                     labels: {
-                        rotate: -45
-                    }
+                        rotate: -45,
+                        style: { colors: '#94a3b8', fontSize: '11px' }
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    tooltip: { enabled: false }
                 },
                 yaxis: {
-                    min: 0
+                    min: 0,
+                    labels: { style: { colors: '#94a3b8' } }
                 },
+                grid: {
+                    borderColor: '#eef2f7',
+                    strokeDashArray: 4,
+                    padding: { left: 8, right: 8 }
+                },
+                markers: { size: 0, hover: { size: 5 } },
+                tooltip: { theme: 'light' }
             };
 
             var chart = new ApexCharts(document.querySelector("#chart"), options);

@@ -128,21 +128,27 @@ $stmt->fetch();
 $stmt->close();
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_quantity'])) {
-    $cart_id = $_POST['cart_id'];
-    $new_quantity = $_POST['quantity'];
+    $cart_id = (int) ($_POST['cart_id'] ?? 0);
+    $new_quantity = (int) ($_POST['quantity'] ?? 0);
 
-    if ($new_quantity > 0) {
-        $update_sql = "UPDATE temp_cart SET quantity = $new_quantity WHERE id = $cart_id";
-        $conn->query($update_sql);
+    if ($new_quantity > 0 && $cart_id > 0) {
+        $update_stmt = $conn->prepare("UPDATE temp_cart SET quantity = ? WHERE id = ?");
+        $update_stmt->bind_param("ii", $new_quantity, $cart_id);
+        $update_stmt->execute();
+        $update_stmt->close();
     } else {
         echo "A mennyiségnek pozitív számnak kell lennie!";
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
-    $cart_id = $_POST['cart_id'];
-    $delete_sql = "DELETE FROM temp_cart WHERE id = $cart_id";
-    $conn->query($delete_sql);
+    $cart_id = (int) ($_POST['cart_id'] ?? 0);
+    if ($cart_id > 0) {
+        $delete_stmt = $conn->prepare("DELETE FROM temp_cart WHERE id = ?");
+        $delete_stmt->bind_param("i", $cart_id);
+        $delete_stmt->execute();
+        $delete_stmt->close();
+    }
 }
 
 $sql = "SELECT p.name, p.description, p.price, c.quantity, c.id AS cart_id FROM temp_cart c
@@ -214,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) 
     } elseif ($paymentMethod == 'profile') {
         $sql = "UPDATE users SET profile_balance = profile_balance - ? WHERE userid = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("di", $ticketprice, $tickerbuyerid);
+        $stmt->bind_param("di", $amount, $tickerbuyerid);
         $stmt->execute();
         $translatedPaymentMethod = $translations["profilebalancepay"];
     }
@@ -234,10 +240,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) 
         $check_stmt->fetch();
         $check_stmt->close();
 
+        // A készlet nem mehet mínuszba: csak a ténylegesen elérhető mennyiséget vonjuk le.
+        $quantity = min((int) $quantity, (int) $current_stock);
+        if ($quantity <= 0) {
+            continue;
+        }
 
-        $update_stock_sql = "UPDATE products SET stock = stock - ? WHERE id = ?";
+        // Atomi, feltételes levonás, hogy párhuzamos eladásnál se csússzon mínuszba.
+        $update_stock_sql = "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?";
         $update_stmt = $conn->prepare($update_stock_sql);
-        $update_stmt->bind_param("ii", $quantity, $product_id);
+        $update_stmt->bind_param("iii", $quantity, $product_id, $quantity);
 
         if (!$update_stmt->execute()) {
             die("Hiba történt a készlet frissítésekor (Termék ID: $product_id)");
@@ -259,157 +271,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_invoice'])) 
     $clientEmail = $email;
 
     $logoPath = __DIR__ . '/../../../../../assets/img/brand/logo.png';
-    $logoData = base64_encode(file_get_contents($logoPath));
-    $logoSrc = 'data:image/png;base64,' . $logoData;
-
     $partnerLogoPath = __DIR__ . '/../../../../../assets/img/logo.png';
-    $partnerLogoData = base64_encode(file_get_contents($partnerLogoPath));
-    $partnerLogoSrc = 'data:image/png;base64,' . $partnerLogoData;
 
-    $invoiceHtml = "
-    <!doctype html>
-    <html lang='hu'>
-    <head>
-        <meta charset='utf-8'>
-        <title>" . $translations["invoice"] . " - " . $invoiceNumber . "</title>
-        <style>
-            body { font-family: Arial, sans-serif; }
-            .container { width: 100%; max-width: 800px; margin: auto; }
-            .text-center { text-align: center; }
-            .text-left { text-align: left; }
-            .text-right { text-align: right; }
-            .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            .table, .table th, .table td { border: 1px solid black; }
-            .table th, .table td { padding: 8px; text-align: center; }
-            .hr { border-top: 1px solid black; margin-top: 20px; margin-bottom: 20px; }
-            .img-fluid { max-width: 100%; height: auto; }
-            .row { width: 100%; display: table; }
-            .col-6 { display: table-cell; width: 50%; vertical-align: middle; }
-            .col-12 { width: 100%; }
-            .align-center { vertical-align: middle; }
-            .mb-0 { margin-bottom: 0; }
-            .mt-2 { margin-top: 20px; }
-            .me-2 { margin-right: 8px; }
-            .d-flex { display: flex; }
-            .justify-content-center { justify-content: center; }
-            .align-items-center { align-items: center; }
-            .blue{color:#0950dc;}
-        </style>
-    </head>
+    require_once __DIR__ . '/../_invoice.php';
 
-    <body>
-        <div class='container mt-2'>
-            <!-- Fejléc -->
-            <table class='row text-center'>
+$inv_pm = ($method == 'profile') ? $translations["profilebalancepay"] : (($method == 'cash') ? $translations["cash"] : $translations["card"]);
+
+    $inv_total = 0;
+    $inv_rows = "";
+    foreach ($data as $row) {
+        $q = (int) $row['quantity'];
+        $unit = (float) $row['price'];
+        $line = $q * $unit;
+        $inv_total += $line;
+        $inv_rows .= "
                 <tr>
-                    <td class='col-6 align-center'>
-                        <img src='$logoSrc' class='img-fluid' alt='Logo'>
-                    </td>
-                    <td class='col-6 align-center'>
-                        <h1 class='blue'>" . $translations['invoice'] . "</h1>
-                    </td>
-                </tr>
-            </table>
-            <hr class='hr' />
-            <table class='row text-left'>
-                <tr>
-                    <td class='col-6 align-center'>
-                        <h4 class='blue'>" . $business_name . "</h4>
-                        <p><small>" . $smtp_username . "</small></p>
-                        <p><small>" . $phoneno . "</small></p>
-                    </td>
-                    <td class='col-6 align-center text-right'>
-                        <p><b class='blue'>" . $translations["date-log"] . ":</b> $date</p>
-                        <p><b class='blue'>" . $translations["invoiceid"] . "</b> $invoiceNumber</p>
-                        <p><b class='blue'>" . $translations["userid"] . "</b> $userid</p>
-                    </td>
-                </tr>
-            </table>
-            <hr class='hr' />
-            <div class='text-left'>
-                <p><strong>" . $translations["adressedinvoice"] . "</strong></p>
-                <p>&emsp;<strong>$clientName</strong></p>
-                <p>&emsp;$clientCity</p>
-                <p>&emsp;$clientAddress</p>
-                <p>&emsp;$clientEmail</p>
-            </div><hr class='hr' />
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th>" . $translations["workerinvoice"] . "</th>
-                        <th>" . $translations["paymenttype"] . "</th>
-                        <th>" . $translations["date-log"] . "</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>$workerfirstname $workerlastname</td>
-                        <td>" .
-        ($method == 'profile' ? $translations["profilebalancepay"] : ($method == 'cash' ? $translations["cash"] : $translations["card"])) .
-        "</td>
-                        <td>$date</td>
-                    </tr>
-                </tbody>
-            </table>
-            <hr class='hr' />
-
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>" . $translations["invoicedescription"] . "</th>
-                        <th>" . $translations["unitprice"] . "</th>
-                        <th>" . $translations["piece"] . "</th>
-                        <th>" . $translations["price"] . "</th>
-                    </tr>
-                </thead>
-                <tbody>";
-
-    $totalAmount = 0;
-
-    if ($result->num_rows > 0) {
-        foreach ($data as $row) {
-            $quantity = $row['quantity'];
-            $unitPrice = $row['price'];
-            $totalPrice = $quantity * $unitPrice;
-            $totalAmount += $totalPrice;
-
-            $invoiceHtml .= "
-                        <tr>
-                            <td>" . htmlspecialchars($row['name']) . "</td>
-                            <td>" . htmlspecialchars($row['description']) . "</td>
-                            <td>" . number_format($unitPrice, 2, '.', ' ') . " " . $currency . "</td>
-                            <td>" . $quantity . "</td>
-                            <td>" . number_format($totalPrice, 2, '.', ' ') . " " . $currency . "</td>
-                        </tr>";
-        }
+                    <td>" . htmlspecialchars($row['name']) . "</td>
+                    <td>" . htmlspecialchars($row['description']) . "</td>
+                    <td class='inv-r'>" . number_format($unit, 0, ',', '.') . " " . $currency . "</td>
+                    <td class='inv-r'>" . $q . "</td>
+                    <td class='inv-r'>" . number_format($line, 0, ',', '.') . " " . $currency . "</td>
+                </tr>";
     }
 
-    $invoiceHtml .= "
-                    <tr>
-                        <td colspan='4' class='text-right'><strong>" . $translations["invoiceamount"] . "</strong></td>
-                        <td><strong>" . number_format($totalAmount, 2, '.', ' ') . " " . $currency . "</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Lábléc -->
-            <table class='row' style='margin-top: 20px;'>
+    $inv_items = "
+        <table class='inv-table'>
+            <thead>
                 <tr>
-                    <td class='col-6 align-center'>
-                        <img src='$partnerLogoSrc' width='100' class='img-fluid' alt='GYM ONE Logo COPYRIGHT DO NOT REMOVE'>
-                    </td>
-                    <td class='col-6 align-center text-left'>
-                        <p class='mb-0'>Partner Program - © " . $curryear . " GYM One</p>
-                    </td>
+                    <th class='inv-th'>" . htmlspecialchars($translations["product-name"] ?? $translations["invoicedescription"]) . "</th>
+                    <th class='inv-th'>" . htmlspecialchars($translations["invoicedescription"]) . "</th>
+                    <th class='inv-th inv-r'>" . htmlspecialchars($translations["unitprice"]) . "</th>
+                    <th class='inv-th inv-r'>" . htmlspecialchars($translations["piece"]) . "</th>
+                    <th class='inv-th inv-r'>" . htmlspecialchars($translations["price"]) . "</th>
                 </tr>
-            </table>
-        </div>
-    </body>
-    </html>
-";
+            </thead>
+            <tbody>" . $inv_rows . "
+                <tr class='inv-total-row'>
+                    <td colspan='4' class='inv-r'>" . htmlspecialchars($translations["invoiceamount"]) . "</td>
+                    <td class='inv-r'>" . number_format($inv_total, 0, ',', '.') . " " . $currency . "</td>
+                </tr>
+            </tbody>
+        </table>";
 
-
+    $invoiceHtml = gymone_invoice_shell([
+        't' => $translations,
+        'title' => $translations["invoice"],
+        'logoPath' => $logoPath,
+        'partnerLogoPath' => $partnerLogoPath,
+        'year' => $curryear,
+        'businessName' => $business_name,
+        'businessEmail' => $smtp_username,
+        'businessPhone' => $phoneno,
+        'date' => $date,
+        'invoiceNumber' => $invoiceNumber,
+        'userid' => $userid,
+        'clientName' => $clientName,
+        'clientCity' => $clientCity,
+        'clientAddress' => $clientAddress,
+        'clientEmail' => $clientEmail,
+        'workerName' => $workerfirstname . ' ' . $workerlastname,
+        'paymentType' => $inv_pm,
+    ], $inv_items);
 
     $mpdf = new Mpdf();
     $mpdf->WriteHTML($invoiceHtml);
@@ -898,69 +820,97 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
                     <h5 id="clock" style="display: inline-block; margin-bottom: 0;"></h5>
 
                 </div>
-                <div class="row">
-                    <?= $alerts_html; ?>
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="lead"><?php echo $firstname; ?> <?php echo $lastname; ?> (<?= $tickerbuyerid; ?>)</p>
-                                <p><?= $email; ?></p>
-                                <p><?= $city; ?> <?= $street; ?> <?= $house_number; ?></p>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-body">
-                                <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#paymentModal">
-                                    <i class="bi bi-wallet2"></i> <?php echo $translations["paybutton"]; ?>
-                                </button>
-                            </div>
+                <?php
+                $pc_ini = function ($a, $b) {
+                    $i = mb_strtoupper(mb_substr(trim((string) $a), 0, 1, 'UTF-8') . mb_substr(trim((string) $b), 0, 1, 'UTF-8'), 'UTF-8');
+                    return $i !== '' ? $i : '?';
+                };
+                ?>
+                <div class="pc">
+                    <div class="pc-head">
+                        <a href="../../ticket/?userid=<?php echo urlencode($tickerbuyerid); ?>" class="pc-back">
+                            <i class="bi bi-arrow-left"></i> <?php echo $translations['sell-change'] ?? 'Vissza'; ?>
+                        </a>
+                        <div class="pc-head-title">
+                            <span class="pc-head-icon"><i class="bi bi-bag-check-fill"></i></span>
+                            <h3><?php echo $translations['shopcategory'] ?? 'Termékek'; ?></h3>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <?php if ($result->num_rows > 0): ?>
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th><?php echo $translations["product-name"]; ?></th>
-                                                <th><?php echo $translations["invoicedescription"]; ?></th>
-                                                <th><?php echo $translations["price"]; ?></th>
-                                                <th><?php echo $translations["amount"]; ?></th>
-                                                <th><?php echo $translations["action"]; ?></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($data as $row) { ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                                    <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                                    <td><?php echo number_format($row['price'], 2, '.', ' '); ?> <?php echo $currency; ?></td>
-                                                    <td>
-                                                        <form action="" method="POST">
-                                                            <input type="number" name="quantity" value="<?php echo $row['quantity']; ?>" min="1" class="form-control" style="width: 60px;" required>
-                                                            <input type="hidden" name="cart_id" value="<?php echo $row['cart_id']; ?>">
-                                                            <button type="submit" name="update_quantity" class="btn btn-primary btn-sm mt-2"><?php echo $translations["save"]; ?></button>
-                                                        </form>
-                                                    </td>
-                                                    <td>
-                                                        <form action="" method="POST">
-                                                            <input type="hidden" name="cart_id" value="<?php echo $row['cart_id']; ?>">
-                                                            <button type="submit" name="delete" class="btn btn-danger btn-sm"><?php echo $translations["delete"]; ?></button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            <?php } ?>
-                                            <tr>
-                                                <th colspan="4"><?php echo $translations["invoiceamount"]; ?>:</th>
-                                                <th><?php echo number_format($total, 2, '.', ' '); ?> <?php echo $currency; ?></th>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                <?php else: ?>
-                                    <p><?php echo $translations["empty"]; ?></p>
-                                <?php endif; ?>
+
+                    <div class="pc-alerts"><?= $alerts_html; ?></div>
+
+                    <div class="pc-grid">
+                        <!-- Vásárló -->
+                        <div class="pc-card">
+                            <div class="pc-card-head">
+                                <span class="pc-card-icon"><i class="bi bi-person"></i></span>
+                                <h5><?php echo $translations['selected-member'] ?? 'Vásárló'; ?></h5>
                             </div>
+                            <div class="pc-buyer">
+                                <div class="pc-avatar">
+                                    <span class="pc-ava-ini"><?php echo htmlspecialchars($pc_ini($firstname, $lastname)); ?></span>
+                                    <img class="pc-ava-img" src="../../../../../assets/img/profiles/<?php echo htmlspecialchars($tickerbuyerid); ?>.png" alt="" onerror="this.remove()">
+                                </div>
+                                <div>
+                                    <div class="pc-buyer-name"><?php echo htmlspecialchars($firstname . ' ' . $lastname); ?></div>
+                                    <div class="pc-buyer-id"><i class="bi bi-person-badge"></i> <?php echo htmlspecialchars($tickerbuyerid); ?></div>
+                                </div>
+                            </div>
+                            <ul class="pc-meta">
+                                <li><i class="bi bi-envelope"></i> <span><?php echo htmlspecialchars($email); ?></span></li>
+                                <li><i class="bi bi-geo-alt"></i> <span><?php echo htmlspecialchars(trim($city . ' ' . $street . ' ' . $house_number)); ?></span></li>
+                            </ul>
+                            <button type="button" class="pc-btn pc-btn-primary pc-block <?php echo (!empty($data)) ? '' : 'pc-disabled'; ?>"
+                                data-toggle="modal" data-target="#paymentModal" <?php echo (!empty($data)) ? '' : 'disabled'; ?>>
+                                <i class="bi bi-wallet2"></i> <?php echo $translations["paybutton"]; ?>
+                            </button>
+                        </div>
+
+                        <!-- Kosár -->
+                        <div class="pc-card pc-summary">
+                            <div class="pc-card-head">
+                                <span class="pc-card-icon"><i class="bi bi-cart3"></i></span>
+                                <h5><?php echo $translations["ticketinfo"] ?? 'Kosár'; ?></h5>
+                            </div>
+                            <?php if (!empty($data)): ?>
+                                <div class="pc-items">
+                                    <?php foreach ($data as $row): ?>
+                                        <div class="pc-item">
+                                            <div class="pc-item-main">
+                                                <div class="pc-item-name"><?php echo htmlspecialchars($row['name']); ?></div>
+                                                <?php if (!empty($row['description'])): ?>
+                                                    <div class="pc-item-desc"><?php echo htmlspecialchars($row['description']); ?></div>
+                                                <?php endif; ?>
+                                                <div class="pc-item-price">
+                                                    <?php echo number_format($row['price'], 0, ',', '.'); ?> <?php echo $currency; ?>
+                                                    &times; <?php echo (int) $row['quantity']; ?> =
+                                                    <b><?php echo number_format($row['subtotal'], 0, ',', '.'); ?> <?php echo $currency; ?></b>
+                                                </div>
+                                            </div>
+                                            <div class="pc-item-side">
+                                                <form action="" method="POST" class="pc-qtyform">
+                                                    <input type="number" name="quantity" value="<?php echo (int) $row['quantity']; ?>" min="1" class="pc-qty" required>
+                                                    <input type="hidden" name="cart_id" value="<?php echo (int) $row['cart_id']; ?>">
+                                                    <button type="submit" name="update_quantity" class="pc-iconbtn pc-iconbtn-save" title="<?php echo $translations["save"]; ?>"><i class="bi bi-check-lg"></i></button>
+                                                </form>
+                                                <form action="" method="POST">
+                                                    <input type="hidden" name="cart_id" value="<?php echo (int) $row['cart_id']; ?>">
+                                                    <button type="submit" name="delete" class="pc-iconbtn pc-iconbtn-del" title="<?php echo $translations["delete"]; ?>"><i class="bi bi-trash3"></i></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="pc-total">
+                                    <span><?php echo $translations["invoiceamount"]; ?></span>
+                                    <span class="pc-total-val"><?php echo number_format($total, 0, ',', '.'); ?> <?php echo $currency; ?></span>
+                                </div>
+                            <?php else: ?>
+                                <div class="pc-empty">
+                                    <i class="bi bi-cart-x"></i>
+                                    <p><?php echo $translations["empty"]; ?></p>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1004,29 +954,48 @@ $is_new_version_available = version_compare($latest_version, $current_version) >
         </div>
     </div>
     <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal fade pc-modal" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-body text-center">
-                    <h1><?= $translations["payment"]; ?></h1>
-                    <p><?= $modalpayertext; ?></p>
-                    <p><?= $translations["invoiceamount"]; ?>: <?php echo $total; ?> <?php echo $currency; ?></p>
+                <div class="modal-body">
+                    <div class="pc-modal-top">
+                        <span class="pc-modal-icon"><i class="bi bi-bag-check"></i></span>
+                        <h4><?= $translations["payment"]; ?></h4>
+                        <p class="pc-modal-sub"><?= $modalpayertext; ?></p>
+                    </div>
+                    <div class="pc-modal-amount">
+                        <span><?= $translations["invoiceamount"]; ?></span>
+                        <b><?php echo number_format((float) $total, 0, ',', '.'); ?> <?php echo $currency; ?></b>
+                    </div>
                     <form method="post">
-                        <div class="form">
-                            <select id="paymentMethod" name="paymentMethod" class="form-control">
-                                <option selected value="cash"><?= $translations["cash"]; ?></option>
-                                <option value="card"><?= $translations["card"]; ?></option>
-                                <?php if ($profile_balance_odd >= $total): ?>
-                                    <option value="profile"><?= $translations["profilebalancepay"]; ?></option>
-                                <?php endif; ?>
-                            </select>
+                        <div class="pc-methods">
+                            <label class="pc-method">
+                                <input type="radio" name="paymentMethod" value="cash" checked>
+                                <span class="pc-method-box"><i class="bi bi-cash-coin"></i><span><?= $translations["cash"]; ?></span></span>
+                            </label>
+                            <label class="pc-method">
+                                <input type="radio" name="paymentMethod" value="card">
+                                <span class="pc-method-box"><i class="bi bi-credit-card-2-front"></i><span><?= $translations["card"]; ?></span></span>
+                            </label>
+                            <?php if ($profile_balance_odd >= $total): ?>
+                                <label class="pc-method">
+                                    <input type="radio" name="paymentMethod" value="profile">
+                                    <span class="pc-method-box"><i class="bi bi-person-badge"></i><span><?= $translations["profilebalancepay"]; ?></span></span>
+                                </label>
+                            <?php endif; ?>
                         </div>
-                        <button type="submit" name="generate_invoice" class="btn btn-success mt-3"><?= $translations["next"]; ?></button>
+                        <div class="pc-modal-actions">
+                            <button type="button" class="pc-btn pc-btn-ghost" data-dismiss="modal"><?= $translations["not-yet"] ?? 'Mégse'; ?></button>
+                            <button type="submit" name="generate_invoice" class="pc-btn pc-btn-success"><i class="bi bi-check-lg"></i> <?= $translations["next"]; ?></button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <?php include __DIR__ . '/../_pc_assets.php'; ?>
+
     <?php
     $conn->close();
     ?>

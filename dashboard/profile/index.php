@@ -115,7 +115,7 @@ $sql = "SELECT firstname, lastname, email FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname, $firstname, $mail);
+$stmt->bind_result($firstname, $lastname, $mail);
 $stmt->fetch();
 
 $stmt->close();
@@ -322,6 +322,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_user'])) {
 
 
 $conn->close();
+
+// Profilkép elérési útja + monogram az identitás-fejléchez
+$profilePicPath = '../../assets/img/profiles/' . $userid . '.png';
+$hasProfilePic = file_exists($profilePicPath);
+$initials = strtoupper(mb_substr((string) $lastname, 0, 1) . mb_substr((string) $firstname, 0, 1));
 ?>
 
 
@@ -330,15 +335,61 @@ $conn->close();
 
 <head>
   <meta charset="UTF-8">
-  <title><?php echo $business_name; ?> - <?php echo $translations["dashboard"]; ?></title>
+  <title><?php echo $business_name; ?> - <?php echo $translations["profilepage"]; ?></title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="../../assets/css/dashboard.css">
   <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
-</head>
-<!-- ApexCharts -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    /* ====== Modern profil (scoped: .dsh) ====== */
+    .dsh { --d-accent: #0950dc; --d-accent2: #2f73f0; --d-ink: #0f172a; --d-muted: #64748b; --d-line: rgba(15, 23, 42, .08); }
+    .dsh * { box-sizing: border-box; }
+
+    .dsh-welcome {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      background: linear-gradient(135deg, #0950dc, #2f73f0); color: #fff; border-radius: 20px;
+      padding: 22px 26px; margin-bottom: 22px; box-shadow: 0 16px 40px rgba(9, 80, 220, .28);
+    }
+    .dsh-logout {
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .16);
+      color: #fff; border: 1px solid rgba(255, 255, 255, .35); border-radius: 12px;
+      padding: 9px 18px; font-weight: 700; cursor: pointer; transition: .15s; text-decoration: none;
+    }
+    .dsh-logout:hover { background: rgba(255, 255, 255, .26); color: #fff; }
+
+    .dsh-welcome-hi { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+    .dsh-welcome-name { font-size: 24px; font-weight: 800; margin-top: 2px; }
+
+    .dsh-card { background: #fff; border: 1px solid var(--d-line); border-radius: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, .06); overflow: hidden; margin-bottom: 16px; }
+    .dsh-card-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--d-line); }
+    .dsh-card-head i { color: var(--d-accent); font-size: 18px; }
+    .dsh-card-head h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--d-ink); }
+    .dsh-card-body { padding: 18px; }
+    .dsh-card.dsh-danger { border-color: #fecaca; }
+    .dsh-card.dsh-danger .dsh-card-head { border-bottom-color: #fecaca; }
+    .dsh-card.dsh-danger .dsh-card-head i { color: #dc2626; }
+
+    .dsh label, .dsh .form-label { font-size: 13px; font-weight: 600; color: var(--d-muted); margin-bottom: .35rem; display: block; }
+    .dsh .form-control { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; font-size: 14px; background: #f8fafc; color: var(--d-ink); height: auto; box-shadow: none; transition: border-color .15s, box-shadow .15s, background .15s; }
+    .dsh .form-control:focus { border-color: var(--d-accent); background: #fff; box-shadow: 0 0 0 4px rgba(9, 80, 220, .12); outline: none; }
+    .dsh .form-group { margin-bottom: 14px; }
+    .dsh .form-text { color: var(--d-muted); }
+
+    .dsh .btn { border-radius: 12px; padding: 10px 18px; font-weight: 700; font-size: 14px; border: none; display: inline-flex; align-items: center; gap: 7px; transition: background .15s, transform .15s; }
+    .dsh .btn-primary { background: var(--d-accent); color: #fff; }
+    .dsh .btn-primary:hover, .dsh .btn-primary:focus { background: #0742b8; color: #fff; transform: translateY(-1px); }
+    .dsh .btn-danger { background: #dc2626; color: #fff; }
+    .dsh .btn-danger:hover, .dsh .btn-danger:focus { background: #b91c1c; color: #fff; transform: translateY(-1px); }
+    .dsh .btn-block, .dsh .w-100 { width: 100%; justify-content: center; }
+
+    .dsh-profilepic { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .dsh-profilepic img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #fff; box-shadow: 0 8px 24px rgba(15, 23, 42, .15); }
+    .dsh-profilepic .dsh-pp-empty { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #f1f5fb; color: #9bb2e0; font-size: 40px; border: 2px dashed #c3d4f3; }
+
+    .dsh-col { display: flex; flex-direction: column; }
+    .dsh-equal { display: flex; flex-direction: column; height: 100%; }
+  </style></head>
 
 <body>
   <nav class="navbar navbar-inverse visible-xs">
@@ -393,118 +444,111 @@ $conn->close();
       </div>
       <br>
       <div class="col-sm-10">
-        <div class="d-none topnav d-sm-inline-block">
-          <h4><?php echo $translations["welcome"]; ?> <?php echo $lastname; ?> <?php echo $firstname; ?></h4>
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-            <?php echo $translations["logout"]; ?>
-          </button>
-        </div>
-        <div class="row">
-
-        </div>
-        <?php echo $alerts_html; ?>
-        <div class="row">
-          <div class="col-sm-4">
-            <div class="card">
-              <div class="card-body">
-                <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
-                  <div class="row">
-                    <div class="col-md-9">
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="profilePicture"
-                            class="form-label"><?php echo $translations["select-upload-profile"]; ?></label>
-                          <input type="file" class="form-control" id="profilePicture" name="profilePicture"
-                            accept=".png,.jpg,.jpeg,.gif" required>
-                          <div id="fileHelp" class="form-text"><small><?php echo $translations["onlypng"]; ?></small>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <?php
-                    $profilePicPath = '../../assets/img/profiles/' . $userid . '.png';
-                    if (file_exists($profilePicPath)): ?>
-                      <div class="col-md-3 text-center">
-                        <img src="<?php echo $profilePicPath; ?>" alt="User" class="img-rounded img-fluid mb-3"
-                          height="150">
-                      </div>
-                    <?php endif; ?>
-
-                  </div>
-                  <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>
-                    <?php echo $translations["upload"]; ?></button>
-                </form>
-              </div>
+        <div class="dsh">
+          <!-- Üdvözlő fejléc -->
+          <div class="dsh-welcome">
+            <div>
+              <div class="dsh-welcome-hi"><?php echo $translations["welcome"]; ?></div>
+              <div class="dsh-welcome-name"><?php echo htmlspecialchars($lastname . ' ' . $firstname); ?></div>
             </div>
+            <button type="button" class="dsh-logout" data-toggle="modal" data-target="#logoutModal">
+              <i class="bi bi-box-arrow-right"></i> <?php echo $translations["logout"]; ?>
+            </button>
           </div>
-          <div class="col-sm-4">
-            <div class="card">
-              <div class="card-body">
-                <form id="passwordChangeForm" method="POST" action="">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="currentPassword"
-                            class="form-label"><?php echo $translations["curpassword"]; ?></label>
-                          <input type="password" class="form-control" id="currentPassword" name="currentPassword"
-                            required>
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="newPassword"
-                            class="form-label"><?php echo $translations["newpassword"]; ?></label>
-                          <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="confirmPassword"
-                            class="form-label"><?php echo $translations["password-confirm"]; ?>:</label>
-                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                            required>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i>
-                    <?php echo $translations["save"]; ?></button>
-                </form>
 
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-4">
-            <div class="card">
-              <div class="card-body">
-                <form action="" method="post">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="email" class="form-label"><?php echo $translations["newemailaddress"]; ?></label>
-                          <input type="email" class="form-control" id="newemail" name="newemail" required>
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <div class="form-group">
-                          <label for="password" class="form-label"><?php echo $translations["curpassword"]; ?></label>
-                          <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                      </div>
+          <?php echo $alerts_html; ?>
+
+          <div class="row">
+            <!-- Profilkép -->
+            <div class="col-sm-4 dsh-col">
+              <div class="dsh-card dsh-equal">
+                <div class="dsh-card-head">
+                  <i class="bi bi-image"></i>
+                  <h4><?php echo $translations["select-upload-profile"]; ?></h4>
+                </div>
+                <div class="dsh-card-body">
+                  <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
+                    <div class="dsh-profilepic">
+                      <?php if ($hasProfilePic): ?>
+                        <img id="ppPreview" src="<?php echo $profilePicPath; ?>" alt="User">
+                      <?php else: ?>
+                        <div class="dsh-pp-empty" id="ppEmpty"><i class="bi bi-person"></i></div>
+                        <img id="ppPreview" src="" alt="" style="display:none;">
+                      <?php endif; ?>
                     </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100"><i class="bi bi-save"></i>
-                    <?php echo $translations["save"]; ?></button>
-                </form>
+                    <div class="form-group">
+                      <input type="file" class="form-control" id="profilePicture" name="profilePicture"
+                        accept=".png,.jpg,.jpeg,.gif" required>
+                      <div id="fileHelp" class="form-text"><small><?php echo $translations["onlypng"]; ?></small></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-save"></i>
+                      <?php echo $translations["upload"]; ?></button>
+                  </form>
+                </div>
               </div>
             </div>
-            <div class="card">
-              <div class="card-body">
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#DeleteModal">
-                  <i class="bi bi-x-lg"></i> <?php echo $translations["deleteuser"]; ?></button>
+
+            <!-- Jelszó módosítás -->
+            <div class="col-sm-4 dsh-col">
+              <div class="dsh-card dsh-equal">
+                <div class="dsh-card-head">
+                  <i class="bi bi-shield-lock"></i>
+                  <h4><?php echo $translations["newpassword"]; ?></h4>
+                </div>
+                <div class="dsh-card-body">
+                  <form id="passwordChangeForm" method="POST" action="">
+                    <div class="form-group">
+                      <label for="currentPassword" class="form-label"><?php echo $translations["curpassword"]; ?></label>
+                      <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="newPassword" class="form-label"><?php echo $translations["newpassword"]; ?></label>
+                      <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="confirmPassword" class="form-label"><?php echo $translations["password-confirm"]; ?></label>
+                      <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-save"></i>
+                      <?php echo $translations["save"]; ?></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- E-mail módosítás + Fiók törlése -->
+            <div class="col-sm-4 dsh-col">
+              <div class="dsh-card">
+                <div class="dsh-card-head">
+                  <i class="bi bi-envelope-at"></i>
+                  <h4><?php echo $translations["newemailaddress"]; ?></h4>
+                </div>
+                <div class="dsh-card-body">
+                  <form action="" method="post">
+                    <div class="form-group">
+                      <label for="newemail" class="form-label"><?php echo $translations["newemailaddress"]; ?></label>
+                      <input type="email" class="form-control" id="newemail" name="newemail" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="password" class="form-label"><?php echo $translations["curpassword"]; ?></label>
+                      <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-save"></i>
+                      <?php echo $translations["save"]; ?></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="dsh-card dsh-danger">
+                <div class="dsh-card-head">
+                  <i class="bi bi-exclamation-octagon"></i>
+                  <h4><?php echo $translations["deleteuser"]; ?></h4>
+                </div>
+                <div class="dsh-card-body">
+                  <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#DeleteModal">
+                    <i class="bi bi-trash"></i> <?php echo $translations["deleteuser"]; ?>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -585,6 +629,22 @@ $conn->close();
 
     <!-- SCRIPTS! -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+      // Profilkép élő előnézet kiválasztáskor
+      (function () {
+        var input = document.getElementById('profilePicture');
+        if (!input) return;
+        input.addEventListener('change', function () {
+          var file = input.files && input.files[0];
+          if (!file || !/^image\//.test(file.type)) return;
+          var url = URL.createObjectURL(file);
+          var img = document.getElementById('ppPreview');
+          var empty = document.getElementById('ppEmpty');
+          if (img) { img.src = url; img.style.display = 'block'; }
+          if (empty) { empty.style.display = 'none'; }
+        });
+      })();
+    </script>
 </body>
 
 </html>

@@ -61,7 +61,7 @@ $sql = "SELECT firstname, lastname FROM users WHERE userid = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($lastname, $firstname);
+$stmt->bind_result($firstname, $lastname);
 $stmt->fetch();
 
 $stmt->close();
@@ -78,15 +78,71 @@ $conn->close();
 
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $business_name; ?> - <?php echo $translations["dashboard"]; ?></title>
+    <title><?php echo $business_name; ?> - <?php echo $translations["invoicepage"]; ?></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
     <link rel="shortcut icon" href="../../assets/img/brand/favicon.png" type="image/x-icon">
+    <style>
+        /* ====== Modern számlák (scoped: .dsh) ====== */
+        .dsh { --d-accent: #0950dc; --d-ink: #0f172a; --d-muted: #64748b; --d-line: rgba(15, 23, 42, .08); }
+        .dsh * { box-sizing: border-box; }
+
+        .dsh-welcome {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+            background: linear-gradient(135deg, #0950dc, #2f73f0); color: #fff; border-radius: 20px;
+            padding: 22px 26px; margin-bottom: 22px; box-shadow: 0 16px 40px rgba(9, 80, 220, .28);
+        }
+        .dsh-welcome-hi { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+        .dsh-welcome-name { font-size: 24px; font-weight: 800; margin-top: 2px; }
+        .dsh-logout {
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .16);
+            color: #fff; border: 1px solid rgba(255, 255, 255, .35); border-radius: 12px;
+            padding: 9px 18px; font-weight: 700; cursor: pointer; transition: .15s; text-decoration: none;
+        }
+        .dsh-logout:hover { background: rgba(255, 255, 255, .26); color: #fff; }
+
+        .dsh-card { background: #fff; border: 1px solid var(--d-line); border-radius: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, .06); overflow: hidden; }
+        .dsh-card-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--d-line); }
+        .dsh-card-head i { color: var(--d-accent); font-size: 18px; }
+        .dsh-card-head h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--d-ink); }
+        .dsh-card-head .dsh-count { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--d-accent); background: #eef4ff; padding: 4px 12px; border-radius: 999px; }
+
+        /* Táblázat */
+        .dsh-table-wrap { overflow-x: auto; }
+        .dsh-table { width: 100%; border-collapse: collapse; }
+        .dsh-table thead th {
+            text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+            color: var(--d-muted); padding: 12px 18px; background: #f8fafc; border-bottom: 1px solid var(--d-line); white-space: nowrap;
+        }
+        .dsh-table tbody td { padding: 14px 18px; border-bottom: 1px solid var(--d-line); font-size: 14px; color: var(--d-ink); vertical-align: middle; }
+        .dsh-table tbody tr:last-child td { border-bottom: none; }
+        .dsh-table tbody tr:hover { background: #f9fbff; }
+        .dsh-table .dsh-id { color: var(--d-muted); font-weight: 700; }
+        .dsh-table .dsh-name { font-weight: 700; }
+        .dsh-table .dsh-price { font-weight: 800; white-space: nowrap; }
+        .dsh-table .dsh-date { color: var(--d-muted); white-space: nowrap; }
+
+        .dsh-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+        .dsh-pill i { font-size: 11px; }
+        .dsh-pill-paid { background: #dcfce7; color: #15803d; }
+        .dsh-pill-unpaid { background: #fee2e2; color: #b91c1c; }
+
+        .dsh-actions { display: flex; align-items: center; gap: 8px; }
+        .dsh-iconbtn {
+            width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 16px; text-decoration: none; transition: .15s; border: 1px solid transparent;
+        }
+        .dsh-iconbtn-view { background: #e6efff; color: #0950dc; }
+        .dsh-iconbtn-view:hover { background: #0950dc; color: #fff; }
+        .dsh-iconbtn-dl { background: #f1f5f9; color: #475569; }
+        .dsh-iconbtn-dl:hover { background: #475569; color: #fff; }
+
+        .dsh-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 16px; color: var(--d-muted); }
+        .dsh-empty i { font-size: 38px; opacity: .5; }
+    </style>
 </head>
-<!-- ApexCharts -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <body>
     <nav class="navbar navbar-inverse visible-xs">
@@ -143,57 +199,75 @@ $conn->close();
             </div>
             <br>
             <div class="col-sm-10">
-                <div class="d-none topnav d-sm-inline-block">
-                    <h4><?php echo $translations["welcome"]; ?> <?php echo $lastname; ?> <?php echo $firstname; ?></h4>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#logoutModal">
-                        <?php echo $translations["logout"]; ?>
-                    </button>
-                </div>
-                <div class="row">
+                <div class="dsh">
+                    <!-- Üdvözlő fejléc -->
+                    <div class="dsh-welcome">
+                        <div>
+                            <div class="dsh-welcome-hi"><?php echo $translations["welcome"]; ?></div>
+                            <div class="dsh-welcome-name"><?php echo htmlspecialchars($lastname . ' ' . $firstname); ?></div>
+                        </div>
+                        <button type="button" class="dsh-logout" data-toggle="modal" data-target="#logoutModal">
+                            <i class="bi bi-box-arrow-right"></i> <?php echo $translations["logout"]; ?>
+                        </button>
+                    </div>
 
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <table class="table">
+                    <!-- Számlák -->
+                    <div class="dsh-card">
+                        <div class="dsh-card-head">
+                            <i class="bi bi-receipt"></i>
+                            <h4><?php echo $translations["invoicepage"]; ?></h4>
+                            <?php if ($result && $result->num_rows > 0): ?>
+                                <span class="dsh-count"><?php echo (int) $result->num_rows; ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if ($result && $result->num_rows > 0): ?>
+                            <div class="dsh-table-wrap">
+                                <table class="dsh-table">
                                     <thead>
                                         <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col"><?php echo $translations["fullname"]; ?></th>
-                                            <th scope="col"><?php echo $translations["invoiceprice"]; ?></th>
-                                            <th scope="col"><?php echo $translations["date-log"]; ?></th>
-                                            <th scope="col"><?php echo $translations["status"]; ?></th>
-                                            <th scope="col"><?php echo $translations["interact"]; ?></th>
+                                            <th>#</th>
+                                            <th><?php echo $translations["fullname"]; ?></th>
+                                            <th><?php echo $translations["invoiceprice"]; ?></th>
+                                            <th><?php echo $translations["date-log"]; ?></th>
+                                            <th><?php echo $translations["status"]; ?></th>
+                                            <th><?php echo $translations["interact"]; ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if ($result->num_rows > 0) {
-                                            while ($row = $result->fetch_assoc()) {
-                                                $statusClass = $row["status"] == 'paid' ? 'bg-label-success' : 'bg-label-danger';
-
-                                                echo "<tr>
-                <th scope='row'>" . $row["id"] . "</th>
-                <td scope='row'>" . $row["name"] . "</td>
-                <td scope='row'>" . $row["price"] . " " . $currency . "</td>
-                <td scope='row'>" . $row["created_at"] . "</td>
-                <td scope='row'><span class='badge $statusClass' text-capitalized=''>" . ucfirst($row["status"]) . "</span></td>
-                <td scope='row'>
-                    <div class='d-flex align-items-center'>
-                        <a target='_blank' href='../../assets/docs/invoices/" . $row["route"] . "' class='btn btn-primary'><i class='bi bi-eye'></i></a>
-                        <a href='../../assets/docs/invoices/" . $row["route"] . "' class='btn btn-primary' download><i class='bi bi-download'></i></a>
-                    </div>
-                </td>
-            </tr>";
-                                            }
-                                        } else {
-                                            echo "<tr><td colspan='6'>" . $translations["youdonthaveinvoices"] . "</td></tr>";
-                                        }
-                                        ; ?>
+                                        <?php while ($row = $result->fetch_assoc()):
+                                            $paid = ($row["status"] === 'paid');
+                                            $route = '../../assets/docs/invoices/' . $row["route"];
+                                        ?>
+                                            <tr>
+                                                <td class="dsh-id">#<?php echo (int) $row["id"]; ?></td>
+                                                <td class="dsh-name"><?php echo htmlspecialchars($row["name"]); ?></td>
+                                                <td class="dsh-price"><?php echo number_format((float) $row["price"], 0, ',', '.'); ?> <?php echo $currency; ?></td>
+                                                <td class="dsh-date"><?php echo htmlspecialchars($row["created_at"]); ?></td>
+                                                <td>
+                                                    <?php if ($paid): ?>
+                                                        <span class="dsh-pill dsh-pill-paid"><i class="bi bi-check-circle"></i> <?php echo ucfirst($row["status"]); ?></span>
+                                                    <?php else: ?>
+                                                        <span class="dsh-pill dsh-pill-unpaid"><i class="bi bi-exclamation-circle"></i> <?php echo ucfirst($row["status"]); ?></span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <div class="dsh-actions">
+                                                        <a target="_blank" href="<?php echo htmlspecialchars($route); ?>" class="dsh-iconbtn dsh-iconbtn-view" title="<?php echo $translations["interact"]; ?>"><i class="bi bi-eye"></i></a>
+                                                        <a href="<?php echo htmlspecialchars($route); ?>" class="dsh-iconbtn dsh-iconbtn-dl" download title="PDF"><i class="bi bi-download"></i></a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endwhile; ?>
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <div class="dsh-empty">
+                                <i class="bi bi-inbox"></i>
+                                <span><?php echo $translations["youdonthaveinvoices"]; ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

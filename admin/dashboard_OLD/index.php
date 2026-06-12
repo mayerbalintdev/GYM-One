@@ -8,39 +8,22 @@ if (!isset($_SESSION['adminuser'])) {
 
 $userid = $_SESSION['adminuser'];
 
-/**
- * .env beolvasása (\r\n és kommentek kezelése).
- */
 function read_env_file($file_path)
 {
-    if (!is_readable($file_path)) {
-        return [];
-    }
+    $env_file = file_get_contents($file_path);
+    $env_lines = explode("\n", $env_file);
     $env_data = [];
-    foreach (preg_split("/\r\n|\n|\r/", (string) file_get_contents($file_path)) as $line) {
-        if (trim($line) === '' || strpos(ltrim($line), '#') === 0) {
-            continue;
-        }
-        $parts = explode('=', $line, 2);
-        if (count($parts) === 2) {
-            $env_data[trim($parts[0])] = trim($parts[1]);
+
+    foreach ($env_lines as $line) {
+        $line_parts = explode('=', $line);
+        if (count($line_parts) == 2) {
+            $key = trim($line_parts[0]);
+            $value = trim($line_parts[1]);
+            $env_data[$key] = $value;
         }
     }
-    return $env_data;
-}
 
-/**
- * Külső HTTP GET timeout-tal és hibatűréssel.
- * Egy lassú/halott API ne fagyassza be a dashboardot.
- */
-function http_get($url, $timeout = 4)
-{
-    $ctx = stream_context_create([
-        'http' => ['timeout' => $timeout, 'ignore_errors' => true],
-        'ssl'  => ['verify_peer' => true, 'verify_peer_name' => true],
-    ]);
-    $data = @file_get_contents($url, false, $ctx);
-    return $data === false ? null : $data;
+    return $env_data;
 }
 
 $env_data = read_env_file('../../.env');
@@ -72,7 +55,6 @@ $conn = new mysqli($db_host, $db_username, $db_password, $db_name);
 if ($conn->connect_error) {
     die("Kapcsolódási hiba: " . $conn->connect_error);
 }
-$conn->set_charset('utf8mb4');
 
 
 $months = [
@@ -142,28 +124,32 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
-// Verzió-ellenőrzés (timeout-tal; ha nem elérhető, nincs frissítési jelzés)
-$latest_version = http_get('https://api.gymoneglobal.com/latest/version.txt', 4);
-$current_version = $version;
-$is_new_version_available = is_string($latest_version)
-    && version_compare(trim($latest_version), $current_version) > 0;
+$file_path = 'https://api.gymoneglobal.com/latest/version.txt';
 
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $file_path);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$latest_version = curl_exec($ch);
+curl_close($ch);
+
+$current_version = $version;
+
+$is_new_version_available = version_compare($latest_version, $current_version) > 0;
 // SUM DAILY USERS
-$total_people = 0;
+
 $sql = "SELECT COALESCE(SUM(number_of_people), 0) AS total_people FROM temp_dailyworkout";
+
 $result = $conn->query($sql);
-if ($result && $result->num_rows > 0) {
-    $r = $result->fetch_assoc();
-    $total_people = $r['total_people'];
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
 }
 // SUM DAILY USERS !!!!END!!!!
 
 // TEMP USERS TABLE!!!
+
 $sql = "SELECT name, userid, login_date FROM temp_loggeduser";
 $result = $conn->query($sql);
-
-$total_count = 0;
-$capacityPercent = 0;
 
 $sql_count = "SELECT COUNT(*) AS total_count FROM temp_loggeduser";
 $result_count = $conn->query($sql_count);
@@ -194,36 +180,36 @@ $stmt->bind_param('i', $userid);
 $stmt->execute();
 $stmt->bind_result($username);
 $stmt->fetch();
-$stmt->close();
 
 $conn->close();
 
-// Ország meghatározása (timeout-tal, hibatűréssel)
-$countryCode = '';
-$ipInfoRaw = http_get('https://ipinfo.io/json', 4);
-if ($ipInfoRaw) {
-    $ipInfo = json_decode($ipInfoRaw, true);
-    $countryCode = $ipInfo['country'] ?? '';
+$ipInfoUrl = 'https://ipinfo.io/json';
+
+$ipInfo = json_decode(file_get_contents($ipInfoUrl), true);
+$countryCode = $ipInfo['country'];
+
+$jsonFile = 'https://emergencynumberapi.com/api/data/all';
+
+$jsonData = @file_get_contents($jsonFile);
+if (!$jsonData) {
+    exit;
 }
 
-// Segélyhívó számok (ha nem elérhető, "unknown" marad — nem öli meg az oldalt)
+$data = json_decode($jsonData, true);
+if (!$data) {
+    exit;
+}
+
 $ambulanceNumbers = $translations["unknown"];
 $fireNumbers = $translations["unknown"];
 $policeNumbers = $translations["unknown"];
 
-if ($countryCode !== '') {
-    $jsonData = http_get('https://emergencynumberapi.com/api/data/all', 4);
-    $data = $jsonData ? json_decode($jsonData, true) : null;
-
-    if (is_array($data)) {
-        foreach ($data as $item) {
-            if (isset($item['Country']['ISOCode']) && $item['Country']['ISOCode'] == $countryCode) {
-                $ambulanceNumbers = isset($item['Ambulance']['All']) ? implode(', ', $item['Ambulance']['All']) : $translations["unknown"];
-                $fireNumbers = isset($item['Fire']['All']) ? implode(', ', $item['Fire']['All']) : $translations["unknown"];
-                $policeNumbers = isset($item['Police']['All']) ? implode(', ', $item['Police']['All']) : $translations["unknown"];
-                break;
-            }
-        }
+foreach ($data as $item) {
+    if (isset($item['Country']['ISOCode']) && $item['Country']['ISOCode'] == $countryCode) {
+        $ambulanceNumbers = isset($item['Ambulance']['All']) ? implode(', ', $item['Ambulance']['All']) : "Ismeretlen";
+        $fireNumbers = isset($item['Fire']['All']) ? implode(', ', $item['Fire']['All']) : "Ismeretlen";
+        $policeNumbers = isset($item['Police']['All']) ? implode(', ', $item['Police']['All']) : "Ismeretlen";
+        break;
     }
 }
 
@@ -243,7 +229,7 @@ if ($countryCode !== '') {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../../assets/css/dashboard.css">
-    <script src="https://unpkg.com/@zxing/browser@0.1.5"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <link rel="shortcut icon" href="https://gymoneglobal.com/assets/img/logo.png" type="image/x-icon">
 </head>
@@ -522,7 +508,7 @@ if ($countryCode !== '') {
                         }
                         ?>
                         <?php
-                        $ruleContent = @file_get_contents('../boss/rule/rule.html');
+                        $ruleContent = file_get_contents('../boss/rule/rule.html');
 
                         if (empty($ruleContent)) {
                             echo '<div class="alert alert-danger">';
@@ -547,7 +533,7 @@ if ($countryCode !== '') {
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title mb-0 fw-semibold"><?php echo $translations["dailyusers"]; ?></h5>
-                                <h1><strong><?php echo $total_people; ?></strong></h1>
+                                <h1><strong><?php echo $row["total_people"]; ?></strong></h1>
                             </div>
                         </div>
                     </div>
@@ -631,7 +617,7 @@ if ($countryCode !== '') {
                                     </thead>
                                     <tbody>
                                         <?php
-                                        if ($result && $result->num_rows > 0) {
+                                        if ($result->num_rows > 0) {
                                             $counter = 1;
                                             while ($row = $result->fetch_assoc()) {
                                                 $current_time = new DateTime();
@@ -642,10 +628,10 @@ if ($countryCode !== '') {
 
                                                 echo "<tr>";
                                                 echo "<td>" . $counter . "</td>";
-                                                echo "<td>" . htmlspecialchars($row["name"], ENT_QUOTES) . "</td>";
+                                                echo "<td>" . $row["name"] . "</td>";
                                                 echo "<td>" . $elapsed_time . "</td>";
-                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . urlencode($row["userid"]) . '">' . $translations["userlogout"] . '</a></td>';
-                                                echo '<td><a class= "btn btn-secondary" href="../users/edit/?user=' . urlencode($row["userid"]) . '">' . $translations["editbtn"] . '</a></td>';
+                                                echo '<td><a class="btn btn-danger" href="logout.php?user=' . $row["userid"] . '">' . $translations["userlogout"] . '</a></td>';
+                                                echo '<td><a class= "btn btn-secondary" href="../users/edit/?user=' . $row["userid"] . '">' . $translations["editbtn"] . '</a></td>';
                                                 echo "</tr>";
 
                                                 $counter++;
@@ -736,99 +722,87 @@ if ($countryCode !== '') {
             </div>
         </div>
     </div>
-    <!-- ===== BELÉPTETŐ (SCAN / KERESÉS) MODAL ===== -->
-    <div class="modal fade checkin-modal" id="Logginer_MODAL" tabindex="-1" role="dialog"
-        aria-labelledby="LogginerModalLabel" aria-hidden="true">
+    <!-- BELÉPTETŐ MODAL -->
+    <div class="modal fade" id="Logginer_MODAL" tabindex="-1" role="dialog" aria-labelledby="LogginerModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="cm-head">
-                        <span class="cm-head-icon"><i class="bi bi-qr-code-scan"></i></span>
-                        <h5 class="modal-title" id="LogginerModalLabel"><?php echo $translations["userlogginer"]; ?></h5>
-                    </div>
-                    <button type="button" class="cm-close" data-dismiss="modal" aria-label="Close">
-                        <i class="bi bi-x-lg"></i>
+                    <h5 class="modal-title" id="LogginerModalLabel"><?php echo $translations["userlogginer"]; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div id="video-container">
-                        <video id="video" autoplay playsinline muted></video>
-                        <div class="scan-frame"><span></span><span></span><span></span><span></span></div>
-                        <div id="checkmark">✔</div>
-                        <div id="error">✘</div>
+                    <div class="row text-center">
+                        <div class="col-12">
+                            <div id="video-container">
+                                <video id="video" width="500px" autoplay></video>
+                                <div id="checkmark">✔</div>
+                                <div id="error">✘</div>
+                            </div>
+                            <p id="result"><?php echo $translations["qrscann"]; ?></p>
+                        </div>
+                        <h1><?php echo $translations["or"]; ?></h1>
+                        <form class="form-inline my-2 my-lg-0">
+                            <input id="search" class="form-control mr-sm-2" type="search"
+                                placeholder="<?php echo $translations["name-search"]; ?> " aria-label="Search">
+                        </form>
+                        <div id="results" class="mt-4"></div>
+                        <input hidden id="qrcodeContent">
                     </div>
-                    <p id="result"><?php echo $translations["qrscann"]; ?></p>
-
-                    <div class="cm-divider"><span><?php echo $translations["or"]; ?></span></div>
-
-                    <form class="cm-search" onsubmit="return false;">
-                        <i class="bi bi-search"></i>
-                        <input id="search" type="search" autocomplete="off"
-                            placeholder="<?php echo $translations["name-search"]; ?>" aria-label="Search">
-                    </form>
-                    <div id="results"></div>
-                    <input hidden id="qrcodeContent">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="cm-btn cm-btn-ghost"
+                    <a type="button" id="continueButton" class="btn btn-primary"
+                        style="display: none;"><?php echo $translations["next"]; ?></a>
+                    <button type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["close"]; ?></button>
-                    <a type="button" id="continueButton" class="cm-btn cm-btn-primary" style="display:none;">
-                        <?php echo $translations["next"]; ?> <i class="bi bi-arrow-right"></i>
-                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== FELHASZNÁLÓ ADATAI MODAL ===== -->
-    <div class="modal fade checkin-modal" id="UserDetails_MODAL" tabindex="-1" role="dialog"
-        aria-labelledby="userDetailsLabel" aria-hidden="true">
+    <div class="modal fade" id="UserDetails_MODAL" tabindex="-1" role="dialog" aria-labelledby="userDetailsLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="cm-head">
-                        <span class="cm-head-icon"><i class="bi bi-person-vcard"></i></span>
-                        <h5 class="modal-title" id="userDetailsLabel"><?= $translations["userinfo"]; ?></h5>
-                    </div>
-                    <button type="button" class="cm-close" data-dismiss="modal"
+                    <h5 class="modal-title" id="userDetailsLabel"><?= $translations["userinfo"]; ?></h5>
+                    <button type="button" class="close" data-dismiss="modal"
                         aria-label="<?php echo $translations["close"]; ?>">
-                        <i class="bi bi-x-lg"></i>
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div id="userDetails"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="cm-btn cm-btn-ghost"
+                    <button id="nextButton" class="btn btn-primary"
+                        disabled><?php echo $translations["next"]; ?></button>
+                    <button type="button" class="btn btn-secondary"
                         data-dismiss="modal"><?php echo $translations["close"]; ?></button>
-                    <button id="nextButton" class="cm-btn cm-btn-primary" disabled>
-                        <?php echo $translations["next"]; ?> <i class="bi bi-arrow-right"></i>
-                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== JEGY / SZEKRÉNY MODAL ===== -->
-    <div class="modal fade checkin-modal" id="TicketDetails_MODAL" tabindex="-1" role="dialog"
+    <!-- Ticket Details Modal -->
+    <div class="modal fade" id="TicketDetails_MODAL" tabindex="-1" role="dialog"
         aria-labelledby="TicketDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="cm-head">
-                        <span class="cm-head-icon"><i class="bi bi-ticket-detailed"></i></span>
-                        <h5 class="modal-title" id="TicketDetailsModalLabel">
-                            <?php echo $translations["ticketinfomodal"]; ?></h5>
-                    </div>
-                    <button type="button" class="cm-close" data-dismiss="modal" aria-label="Close">
-                        <i class="bi bi-x-lg"></i>
+                    <h5 class="modal-title" id="TicketDetailsModalLabel"><?php echo $translations["ticketinfomodal"]; ?>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" id="ticketDetails"></div>
                 <div class="modal-footer">
-                    <button type="button" class="cm-btn cm-btn-primary" data-dismiss="modal"
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
                         onclick="window.location.reload();">
-                        <i class="bi bi-check-lg"></i> <?php echo $translations["close"]; ?>
+                        <?php echo $translations["close"]; ?>
                     </button>
                 </div>
             </div>
@@ -865,12 +839,247 @@ if ($countryCode !== '') {
     </div>
 
     <!-- SCRIPTS! -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", ".loginUser", function (e) {
+                e.preventDefault();
 
-    <!-- Beléptető (check-in) logika -->
-    <script>window.translations = <?php echo json_encode($translations); ?>;</script>
-    <script src="checkin.js"></script>
+                const userId = $(this).data("userid");
 
-    <!-- Regisztrációs grafikon -->
+                qrCodeContent.value = userId;
+                resultElement.textContent = `QR Code Result: ${userId}`;
+                continueButton.style.display = 'inline';
+                checkmark.style.display = 'none';
+                error.style.display = 'none';
+                video.classList.remove('scanned', 'error');
+
+                fetch('process.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `qrcode=${encodeURIComponent(userId)}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            scanCompleted = true;
+                            userData = {
+                                firstname: data.firstname,
+                                lastname: data.lastname,
+                                birthdate: data.birthdate,
+                                ticket_status: data.ticket_status,
+                                remaining_opportunities: data.remaining_opportunities,
+                                expiredate: data.expiredate,
+                                assigned_locker: data.assigned_locker
+                            };
+
+                            resultElement.innerHTML = `${translations.firstname}: ${data.firstname}<br>${translations.lastname}: ${data.lastname}`;
+
+                            userDetails.innerHTML =
+                                `${translations.firstname}: ${userData.firstname}<br>
+                 ${translations.lastname}: ${userData.lastname}<br>
+                 ${translations.birthday}: ${userData.birthdate}<br>
+                 ${translations.ticketinfo} ${userData.ticket_status}`;
+
+                            if (userData.ticket_status === translations.valid
+                            ) {
+                                nextButton.disabled = false;
+                            } else {
+                                nextButton.disabled = true;
+                            }
+
+                            video.classList.add('scanned');
+                            checkmark.style.display = 'block';
+                            error.style.display = 'none';
+                            continueButton.style.display = 'inline';
+                        } else {
+                            resultElement.textContent = translations['qr-error'];
+                            video.classList.add('error');
+                            error.style.display = 'block';
+                            checkmark.style.display = 'none';
+                            continueButton.style.display = 'none';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Manual login error:', err);
+                        resultElement.textContent = translations['qr-error'];
+                        video.classList.add('error');
+                        error.style.display = 'block';
+                        checkmark.style.display = 'none';
+                        continueButton.style.display = 'none';
+                    });
+            });
+
+
+            $("#search").on("input", function () {
+                var query = $(this).val();
+                if (query.length > 2) {
+                    $.ajax({
+                        url: 'search.php',
+                        method: 'POST',
+                        data: {
+                            search: query
+                        },
+                        success: function (data) {
+                            $("#results").html(data);
+                        }
+                    });
+                } else {
+                    $("#results").html('');
+                }
+            });
+
+            const codeReader = new ZXing.BrowserQRCodeReader();
+            const video = document.getElementById('video');
+            const resultElement = document.getElementById('result');
+            const checkmark = document.getElementById('checkmark');
+            const error = document.getElementById('error');
+            const qrCodeContent = document.getElementById('qrcodeContent');
+            const continueButton = document.getElementById('continueButton');
+            const userDetails = document.getElementById('userDetails');
+            const nextButton = document.getElementById('nextButton');
+
+            let scanCompleted = false;
+            let scanning = false;
+
+            let userData = {};
+
+            var translations = <?php echo json_encode($translations); ?>;
+
+            function startScanning() {
+                if (scanCompleted || scanning) return;
+
+                scanning = true;
+                codeReader.decodeFromVideoDevice(null, video, (result, error) => {
+                    if (result && !scanCompleted) {
+                        scanCompleted = true;
+                        const qrCodeText = result.text;
+                        resultElement.textContent = `QR Code Result: ${qrCodeText}`;
+                        qrCodeContent.value = qrCodeText;
+                        continueButton.style.display = 'inline';
+
+                        fetch('process.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `qrcode=${encodeURIComponent(qrCodeText)}`
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    userData = {
+                                        firstname: data.firstname,
+                                        lastname: data.lastname,
+                                        birthdate: data.birthdate,
+                                        ticket_status: data.ticket_status,
+                                        remaining_opportunities: data.remaining_opportunities,
+                                        expiredate: data.expiredate,
+                                        assigned_locker: data.assigned_locker
+                                    };
+                                    resultElement.innerHTML = `${translations.firstname}: ${data.firstname}<br>${translations.lastname}: ${data.lastname}`;
+
+                                    userDetails.innerHTML =
+                                        `${translations.firstname}: ${userData.firstname}<br>
+                            ${translations.lastname}: ${userData.lastname}<br>
+                            ${translations.birthday}: ${userData.birthdate}<br>
+                            ${translations.ticketinfo} ${userData.ticket_status}`;
+
+                                    if (userData.ticket_status === translations.valid) {
+                                        nextButton.disabled = false;
+                                    } else {
+                                        nextButton.disabled = true;
+                                    }
+
+                                    video.classList.add('scanned');
+                                    checkmark.style.display = 'block';
+                                } else {
+                                    resultElement.textContent = translations['qr-error'];
+                                    video.classList.add('error');
+                                    error.style.display = 'block';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                resultElement.textContent = translations['qr-error'];
+                                video.classList.add('error');
+                                error.style.display = 'block';
+                            });
+                    }
+                    if (error && !scanCompleted) {
+                        console.error(error);
+                    }
+                }).catch(error => console.error(error));
+            }
+
+            function stopScanning() {
+                if (scanning) {
+                    codeReader.reset();
+                    video.srcObject = null;
+                    scanning = false;
+                    scanCompleted = false;
+                    resultElement.textContent = '';
+                    checkmark.style.display = 'none';
+                    error.style.display = 'none';
+                    video.classList.remove('scanned', 'error');
+                    continueButton.style.display = 'none';
+                }
+            }
+
+            $('#continueButton').on('click', function () {
+                $('#Logginer_MODAL').modal('hide');
+                stopScanning();
+
+                userDetails.innerHTML =
+                    `${translations.firstname}: ${userData.firstname}<br>
+                            ${translations.lastname}: ${userData.lastname}<br>
+                            ${translations.birthday}: ${userData.birthdate}<br>
+                            ${translations.ticketinfo} ${userData.ticket_status}`;
+
+                $('#UserDetails_MODAL').modal('show');
+            });
+
+            $('#nextButton').on('click', function () {
+                if (userData.ticket_status === translations.valid) {
+                    $('#UserDetails_MODAL').modal('hide');
+                    $('#TicketDetails_MODAL').modal('show');
+
+                    $('#ticketDetails').html(
+                        `${translations.tickettableoccassion}: <span>${userData.remaining_opportunities}</span><br>
+                    ${translations.expiredate} ${userData.expiredate}<br>
+                    ${translations.randomlockerselected} <span class="flash">${userData.assigned_locker}</span>`
+                    );
+                } else {
+                    alert('A bérlet nem érvényes.');
+                }
+            });
+
+            $('#Logginer_MODAL').on('shown.bs.modal', startScanning);
+            $('#Logginer_MODAL').on('hidden.bs.modal', stopScanning);
+        });
+
+        $('<style>')
+            .prop('type', 'text/css')
+            .html(`
+        .flash {
+            color: red;
+            animation: flash-animation 1s infinite;
+        }
+        @keyframes flash-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    `)
+            .appendTo('head');
+    </script>
+
+
+
+
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let seriesData = Object.values(<?php echo json_encode($dataRegistrations); ?>);
@@ -910,7 +1119,7 @@ if ($countryCode !== '') {
         });
     </script>
 
-    <!-- Üdvözlő modal -->
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const now = new Date();

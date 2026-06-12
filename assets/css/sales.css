@@ -1,0 +1,326 @@
+/* ============================================================
+   GYM One – sale.css
+   Közös, modern (kék) design-réteg a sale flow oldalaira:
+   sell, ticket, payment, payment/balance, payment/item.
+   Csak megjelenés – a markupot/PHP-t/SQL-t nem érinti.
+   FONTOS: a dashboard.css UTÁN linkeld be (hogy felülírjon).
+   ============================================================ */
+
+:root {
+    --go-blue: #0950dc;
+    --go-blue2: #096ed2;
+    --go-ink: #0f172a;
+    --go-muted: #64748b;
+    --go-line: rgba(15, 23, 42, .08);
+    --go-card: #ffffff;
+}
+
+/* --- elrendezés finomítás --- */
+.content .col-sm-10 {
+    padding: 8px 22px 40px;
+}
+
+.content .col-sm-10 > .row {
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+/* --- kártyák --- */
+.content .card {
+    background: var(--go-card);
+    border: 1px solid var(--go-line);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+    overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.content .card .card-body {
+    padding: 20px;
+}
+
+.content .card .card-title,
+.content .card-heading .card-title {
+    font-weight: 700;
+    color: var(--go-ink);
+    margin-bottom: 10px;
+}
+
+.content .card .card-heading {
+    padding: 16px 20px 0;
+}
+
+.content .card .card-text,
+.content .card p {
+    color: var(--go-muted);
+}
+
+.content .card p b,
+.content .card p strong,
+.content .card p B {
+    color: var(--go-ink);
+}
+
+.content .card .lead {
+    color: var(--go-ink);
+    font-weight: 700;
+}
+
+/* értékek pill-kódban (pl. lejárat) */
+.content .card code {
+    background: #eff6ff;
+    color: var(--go-blue);
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    padding: 2px 8px;
+    font-weight: 600;
+}
+
+/* --- jegy/bérlet kártyák (választható csomagok) --- */
+.content .col-md-2 .card,
+.content .col-md-3 .card,
+.content .col-md-4 .card {
+    height: 100%;
+}
+
+.content .col-md-2 .card:hover,
+.content .product-item .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(9, 80, 220, .14);
+    border-color: #bfdbfe;
+}
+
+/* --- termékkártyák --- */
+.content .product-item .card.shadow {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+}
+
+.content .product-item img,
+.content .img-rounded {
+    border-radius: 14px !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, .1);
+}
+
+.content .product-item .card-title {
+    font-size: 16px;
+}
+
+/* --- gombok --- */
+.content .btn,
+.modal .btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border: none;
+    transition: filter .15s ease, transform .15s ease, box-shadow .15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.content .btn:hover,
+.modal .btn:hover {
+    transform: translateY(-1px);
+}
+
+.content .btn-primary,
+.modal .btn-primary {
+    background: linear-gradient(135deg, var(--go-blue), var(--go-blue2));
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(9, 80, 220, .28);
+}
+
+.content .btn-primary:hover,
+.modal .btn-primary:hover {
+    filter: brightness(1.06);
+    color: #fff;
+}
+
+.content .btn-success,
+.modal .btn-success {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(22, 163, 74, .28);
+}
+
+.content .btn-success:hover,
+.modal .btn-success:hover {
+    filter: brightness(1.06);
+    color: #fff;
+}
+
+.content .btn-danger,
+.modal .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, .25);
+}
+
+.content .btn-danger:hover,
+.modal .btn-danger:hover {
+    filter: brightness(1.05);
+    color: #fff;
+}
+
+.content .btn-default,
+.modal .btn-default {
+    background: #f1f5f9;
+    color: #475569;
+    box-shadow: none;
+}
+
+.content .btn-default:hover,
+.modal .btn-default:hover {
+    background: #e2e8f0;
+    color: var(--go-ink);
+}
+
+.content .btn-sm {
+    padding: 6px 13px;
+    font-size: 13px;
+    border-radius: 10px;
+}
+
+/* --- űrlapok --- */
+.content .form-control,
+.modal .form-control {
+    border-radius: 12px;
+    border: 1.5px solid var(--go-line);
+    background: #f8fafc;
+    box-shadow: none;
+    height: auto;
+    padding: 11px 14px;
+    color: var(--go-ink);
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.content .form-control:focus,
+.modal .form-control:focus {
+    border-color: var(--go-blue);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(9, 80, 220, .12);
+}
+
+.content select.form-control,
+.modal select.form-control {
+    cursor: pointer;
+}
+
+.content .form-group label,
+.modal .form-group label {
+    font-weight: 600;
+    color: var(--go-ink);
+    margin-bottom: 6px;
+}
+
+.content .input-group {
+    border-radius: 12px;
+}
+
+.content .input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.content .input-group-addon {
+    background: linear-gradient(135deg, var(--go-blue), var(--go-blue2));
+    color: #fff;
+    border: none;
+    border-radius: 0 12px 12px 0;
+    font-weight: 700;
+    padding: 0 16px;
+}
+
+/* --- riasztások --- */
+.content .alert,
+.modal .alert {
+    border: none;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-weight: 500;
+}
+
+.content .alert-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.content .alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.content .alert-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.content .alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* --- táblázatok (ha vannak) --- */
+.content .table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.content .table > thead > tr > th {
+    border-bottom: 2px solid var(--go-line);
+    color: var(--go-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: .04em;
+}
+
+.content .table > tbody > tr > td {
+    vertical-align: middle;
+    border-top: 1px solid var(--go-line);
+}
+
+.content .table-bordered,
+.content .table-bordered > tbody > tr > td,
+.content .table-bordered > thead > tr > th {
+    border-color: var(--go-line);
+}
+
+/* --- modálok --- */
+.modal .modal-content {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .28);
+    overflow: hidden;
+    animation: go-pop .22s cubic-bezier(.2, .9, .3, 1.2);
+}
+
+@keyframes go-pop {
+    from { transform: translateY(14px) scale(.97); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+}
+
+.modal .modal-body {
+    padding: 26px;
+}
+
+.modal .modal-body h1 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-top: 0;
+    color: var(--go-ink);
+}
+
+/* --- címsorok a tartalomban --- */
+.content > .col-sm-10 h1,
+.content .col-sm-10 > .row h1 {
+    font-weight: 800;
+    color: var(--go-ink);
+}
+
+/* --- badge a sidebarban (frissítés jelző) maradjon, de a tartalmiak modernek --- */
+.content .badge {
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 700;
+}

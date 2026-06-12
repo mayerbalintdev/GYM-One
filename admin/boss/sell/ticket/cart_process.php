@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['adminuser'])) {
+    header("Location: ../");
+    exit();
+}
+
 function read_env_file($file_path)
 {
     $env_file = file_get_contents($file_path);
@@ -57,20 +62,53 @@ if ($conn->connect_error) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['quantities'])) {
-        $userid = $_POST['userid'];
+        $userid = isset($_POST['userid']) ? $_POST['userid'] : $ticketbuyerid;
         $quantities = $_POST['quantities'];
 
-        $stmt = $conn->prepare("INSERT INTO temp_cart (product_id, quantity) VALUES (?, ?)");
+        // A temp_cart.user_id NOT NULL int(11); a vásárló userid bigint (túlcsordulna),
+        // és a kosarat user_id-szűrés nélkül olvassuk vissza, ezért 0-t tárolunk.
+        $cart_user_id = 0;
+
+        // Csak érvényes, raktáron lévő mennyiségeket teszünk be (szerveroldali ellenőrzés).
+        $stmt = $conn->prepare("INSERT INTO temp_cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
+        $stock_stmt = $conn->prepare("SELECT stock FROM products WHERE id = ?");
 
         foreach ($quantities as $product_id => $quantity) {
-            if ($quantity > 0) {
-                $stmt->bind_param("ii", $product_id, $quantity);
-                $stmt->execute();
+            $product_id = (int) $product_id;
+            $quantity = (int) $quantity;
+            if ($product_id <= 0 || $quantity <= 0) {
+                continue;
             }
+
+            $stock_stmt->bind_param("i", $product_id);
+            $stock_stmt->execute();
+            $stock_stmt->store_result();
+            $stock_stmt->bind_result($stock);
+            $has = $stock_stmt->fetch();
+            $stock_stmt->free_result();
+            if (!$has) {
+                continue;
+            }
+
+            // Ne lehessen több a raktárkészletnél.
+            if ($quantity > $stock) {
+                $quantity = (int) $stock;
+            }
+            if ($quantity <= 0) {
+                continue;
+            }
+
+            $stmt->bind_param("iii", $cart_user_id, $product_id, $quantity);
+            $stmt->execute();
         }
 
-        header("Location: ../payment/item/index.php?userid=$userid");
+        $stmt->close();
+        $stock_stmt->close();
+
+        header("Location: ../payment/item/index.php?userid=" . urlencode($userid));
         exit;
     }
 }
+
+$conn->close();
 ?>
