@@ -532,14 +532,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                       <div class="form-group">
                         <label for="firstname"><?php echo $translations["firstname"]; ?></label>
                         <input type="text" class="form-control" id="firstname" name="firstname"
-                          value="<?php echo $firstname; ?>" required>
+                          value="<?php echo htmlspecialchars($firstname, ENT_QUOTES, 'UTF-8'); ?>" required>
                       </div>
                     </div>
                     <div class="mb-3">
                       <div class="form-group">
                         <label for="lastname"><?php echo $translations["lastname"]; ?></label>
                         <input type="text" class="form-control" id="lastname" name="lastname"
-                          value="<?php echo $lastname; ?>" required>
+                          value="<?php echo htmlspecialchars($lastname, ENT_QUOTES, 'UTF-8'); ?>" required>
                       </div>
                     </div>
                   </div>
@@ -556,7 +556,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                 <div class="mb-3">
                   <div class="form-group">
                     <label for="email"><?php echo $translations["email"]; ?></label>
-                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>"
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
                       required>
                   </div>
 
@@ -616,7 +616,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['userid'])) {
                 </div>
                 <div class="form-group">
                   <label for="addressInput"><?php echo $translations["lastip"]; ?></label>
-                  <input type="text" class="form-control" id="addressInput" value="<?php echo $lastip; ?>" disabled>
+                  <input type="text" class="form-control" id="addressInput" value="<?php echo htmlspecialchars($lastip, ENT_QUOTES, 'UTF-8'); ?>" disabled>
                 </div>
               </div>
             </div>

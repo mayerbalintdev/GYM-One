@@ -61,8 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $szekreny_szam = $_POST['szekreny_szam'];
     $oltozo = $_POST['oltozo'];
 
-    $sql = "INSERT INTO lockers (lockernum, gender) VALUES ('$szekreny_szam', '$oltozo')";
-    if ($conn->query($sql) === TRUE) {
+    $sql = "INSERT INTO lockers (lockernum, gender) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $szekreny_szam, $oltozo);
+    if ($stmt->execute() === TRUE) {
         $alerts_html .= '<div class="alert alert-success" role="alert">
                             ' . $translations["success-add-locker"] . '
                         </div>';
@@ -83,7 +85,7 @@ $sql = "SELECT * FROM lockers";
 $result = $conn->query($sql);
 
 if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
+    $id = (int)$_GET['delete'];
 
     $sql = "SELECT lockernum FROM lockers WHERE id=$id";
     $result = $conn->query($sql);

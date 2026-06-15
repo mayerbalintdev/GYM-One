@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_user"])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_user"])) {
-    $deleteuserid = $_POST["userid"];
+    $deleteuserid = (int)$_POST["userid"];
 
     if ($deleteuserid != 1) {
         $get_worker_sql = "SELECT firstname, lastname, username, is_boss FROM workers WHERE userid = ?";

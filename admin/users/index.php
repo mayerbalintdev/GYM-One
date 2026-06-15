@@ -95,22 +95,35 @@ $search_name = isset($_GET['search_name']) ? $_GET['search_name'] : '';
 $search_email = isset($_GET['search_email']) ? $_GET['search_email'] : '';
 
 $sql = "SELECT * FROM users";
+$conditions = array();
+$params = array();
+$types = "";
 
-if (!empty($search_name) || !empty($search_email)) {
-    $sql .= " WHERE ";
-    $conditions = array();
-    if (!empty($search_name)) {
-        $conditions[] = "firstname LIKE '%$search_name%' OR lastname LIKE '%$search_name%'";
-    }
-    if (!empty($search_email)) {
-        $conditions[] = "email LIKE '%$search_email%'";
-    }
-    $sql .= implode(" AND ", $conditions);
+if (!empty($search_name)) {
+    $conditions[] = "(firstname LIKE ? OR lastname LIKE ?)";
+    $like = "%$search_name%";
+    $params[] = $like;
+    $params[] = $like;
+    $types .= "ss";
+}
+if (!empty($search_email)) {
+    $conditions[] = "email LIKE ?";
+    $params[] = "%$search_email%";
+    $types .= "s";
+}
+if (!empty($conditions)) {
+    $sql .= " WHERE " . implode(" AND ", $conditions);
 }
 
-$sql .= " LIMIT $start_from, $per_page";
+$sql .= " LIMIT ?, ?";
+$params[] = (int)$start_from;
+$params[] = (int)$per_page;
+$types .= "ii";
 
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param($types, ...$params);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 
@@ -406,17 +419,20 @@ $result = $conn->query($sql);
                                             while ($row = $result->fetch_assoc()) {
 
                                                 echo "<tr>";
-                                                echo "<td>" . $row["firstname"] . "</td>";
-                                                echo "<td>" . $row["lastname"] . "</td>";
-                                                echo "<td>" . $row["email"];
+                                                echo "<td>" . htmlspecialchars($row["firstname"], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                echo "<td>" . htmlspecialchars($row["lastname"], ENT_QUOTES, 'UTF-8') . "</td>";
+                                                echo "<td>" . htmlspecialchars($row["email"], ENT_QUOTES, 'UTF-8');
                                                 if ($row["confirmed"] == "No") {
                                                     echo " <span class='text-danger bi bi-exclamation-triangle-fill' data-bs-toggle='tooltip' title='" . $translations["waitingconfirm"] . "'></span>";
                                                 }
                                                 echo "</td>";
 
                                                 $userid = $row["userid"];
-                                                $ticket_sql = "SELECT expiredate FROM current_tickets WHERE userid = '$userid' ORDER BY expiredate DESC LIMIT 1";
-                                                $ticket_result = $conn->query($ticket_sql);
+                                                $ticket_sql = "SELECT expiredate FROM current_tickets WHERE userid = ? ORDER BY expiredate DESC LIMIT 1";
+                                                $ticket_stmt = $conn->prepare($ticket_sql);
+                                                $ticket_stmt->bind_param("i", $userid);
+                                                $ticket_stmt->execute();
+                                                $ticket_result = $ticket_stmt->get_result();
 
                                                 if ($ticket_result->num_rows > 0) {
                                                     $ticket = $ticket_result->fetch_assoc();
@@ -458,19 +474,31 @@ $result = $conn->query($sql);
 
                             <?php
                             $sql = "SELECT COUNT(*) AS total FROM users";
-                            if (!empty($search_name) || !empty($search_email)) {
-                                $sql .= " WHERE ";
-                                $conditions = array();
-                                if (!empty($search_name)) {
-                                    $conditions[] = "firstname LIKE '%$search_name%' OR lastname LIKE '%$search_name%'";
-                                }
-                                if (!empty($search_email)) {
-                                    $conditions[] = "email LIKE '%$search_email%'";
-                                }
-                                $sql .= implode(" AND ", $conditions);
+                            $conditions = array();
+                            $params = array();
+                            $types = "";
+                            if (!empty($search_name)) {
+                                $conditions[] = "(firstname LIKE ? OR lastname LIKE ?)";
+                                $like = "%$search_name%";
+                                $params[] = $like;
+                                $params[] = $like;
+                                $types .= "ss";
+                            }
+                            if (!empty($search_email)) {
+                                $conditions[] = "email LIKE ?";
+                                $params[] = "%$search_email%";
+                                $types .= "s";
+                            }
+                            if (!empty($conditions)) {
+                                $sql .= " WHERE " . implode(" AND ", $conditions);
                             }
 
-                            $result = $conn->query($sql);
+                            $stmt = $conn->prepare($sql);
+                            if (!empty($params)) {
+                                $stmt->bind_param($types, ...$params);
+                            }
+                            $stmt->execute();
+                            $result = $stmt->get_result();
                             $row = $result->fetch_assoc();
                             $total_pages = ceil($row["total"] / $per_page);
 

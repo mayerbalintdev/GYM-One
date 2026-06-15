@@ -85,7 +85,7 @@ $current_version = $version;
 $is_new_version_available = version_compare($latest_version, $current_version) > 0;
 
 if (isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = (int)$_GET['id'];
 
     $sql = "SELECT * FROM trainers WHERE id=$id";
     $result = $conn->query($sql);
@@ -109,16 +109,20 @@ if (isset($_GET['id'])) {
             $target_file = $target_dir . "trainer_" . $id . "." . $image_extension;
 
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                $sql = "UPDATE trainers SET name='$name', image='$target_file', description='$description', price_1hour='$price_1hour', price_10sessions='$price_10sessions' WHERE id=$id";
+                $sql = "UPDATE trainers SET name=?, image=?, description=?, price_1hour=?, price_10sessions=? WHERE id=?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssssi", $name, $target_file, $description, $price_1hour, $price_10sessions, $id);
             } else {
                 echo "Error uploading file.";
                 exit;
             }
         } else {
-            $sql = "UPDATE trainers SET name='$name', description='$description', price_1hour='$price_1hour', price_10sessions='$price_10sessions' WHERE id=$id";
+            $sql = "UPDATE trainers SET name=?, description=?, price_1hour=?, price_10sessions=? WHERE id=?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssi", $name, $description, $price_1hour, $price_10sessions, $id);
         }
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute() === TRUE) {
             header("Location: ../");
         } else {
             echo "Error updating record: " . $conn->error;
